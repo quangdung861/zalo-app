@@ -7,12 +7,9 @@ import EmailFormLogin from "./components/EmailFormLogin";
 import { signInWithPopup, getAdditionalUserInfo } from "firebase/auth";
 import { auth, googleProvider, githubProvider } from "firebaseConfig";
 import { addDocument, generateKeywords } from "services";
-import { useDispatch } from "react-redux";
-import { loginAction } from "redux/user/actions";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const [dropdownContries, setDropdownContries] = useState(false);
 
@@ -44,10 +41,12 @@ const LoginPage = () => {
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
+            friends: [],
+            invitationSent: [],
+            invitationRecive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }
-        dispatch(loginAction({ uid: data.user.uid }));
       }
     } catch (error) {
       if (error.code === "auth/cancelled-popup-request") {
@@ -75,10 +74,12 @@ const LoginPage = () => {
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
+            friends: [],
+            invitationSent: [],
+            invitationRecive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }
-        dispatch(loginAction({ uid: data.user.uid }));
       }
     } catch (error) {
       if (error.code === "auth/cancelled-popup-request") {

@@ -11,11 +11,8 @@ import {
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "services";
 
-import { loginAction } from "redux/user/actions";
-import { useDispatch } from "react-redux";
 
 const FormEmail = ({ setRegisterWay }) => {
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     fullName: {
       value: undefined,
@@ -194,10 +191,12 @@ const FormEmail = ({ setRegisterWay }) => {
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
+            friends: [],
+            invitationSent: [],
+            invitationRecive: [],
             keywords: generateKeywords(formData.fullName.value.toLowerCase()),
           });
         }
-        dispatch(loginAction({ uid: data.user.uid }));
       }
     } catch (error) {
       if (error.code === "auth/email-already-in-use")

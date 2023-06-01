@@ -5,16 +5,12 @@ import * as S from "./styles";
 import { useNavigate, Link } from "react-router-dom";
 import { ROUTES } from "routes";
 
-import { useDispatch, useSelector } from "react-redux";
-import { loginAction } from "redux/user/actions";
 import { auth } from "firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 const EmailFormLogin = ({ setLoginWay }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { userInfo } = useSelector((state) => state.userReducer);
 
   const [formData, setFormData] = useState({
     email: {
@@ -52,7 +48,6 @@ const EmailFormLogin = ({ setLoginWay }) => {
           formData.password.value
         );
         if (data) {
-          dispatch(loginAction({ uid: data.user.uid }));
         }
       } catch (error) {
         if (error.code === "auth/user-not-found") {
@@ -125,7 +120,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
               onChange={(e) => handleChange(e)}
             />
           </div>
-          <div className="error-fullname">{userInfo.error}</div>
+          <div className="error-fullname"></div>
           <div style={{ color: "#f33a58" }}>{formData.error}</div>
           <div
             style={{

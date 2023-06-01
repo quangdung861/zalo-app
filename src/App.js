@@ -5,31 +5,17 @@ import { ROUTES } from "routes";
 import ContainerPage from "pages/user/ContainerPage";
 import RegisterPage from "pages/user/RegisterPage";
 import LoginRegisterLayout from "layouts/LoginRegisterLayout";
-import { useDispatch } from "react-redux";
-import { getUserInfoAction } from "redux/user/actions";
 import { auth } from "firebaseConfig";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import LoginPage from "pages/user/LoginPage";
 
-export const AppContext = createContext();
+import AppProvider from "Context/AppProvider";
+import AuthProvider from "Context/AuthProvider";
+
+export const DropdownContext = createContext();
 
 function App() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    const unsubscribed = auth.onAuthStateChanged((user) => {
-      if (user) {
-        dispatch(getUserInfoAction({ uid: user.uid }));
-      } else {
-        navigate(ROUTES.LOGIN);
-      }
-    });
-    return () => {
-      unsubscribed();
-    };
-  }, []);
 
   useEffect(() => {
     window.scrollTo({
@@ -55,19 +41,23 @@ function App() {
   }, []);
 
   return (
-    <AppContext.Provider
-      value={{ setIsShowDropdown, isShowDropdown, dropdownRef }}
-    >
-      <Routes>
-        <Route element={<UserLayout />}>
-          <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
-        </Route>
-        <Route element={<LoginRegisterLayout />}>
-          <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-        </Route>
-      </Routes>
-    </AppContext.Provider>
+    <AuthProvider>
+      <AppProvider>
+        <DropdownContext.Provider
+          value={{ setIsShowDropdown, isShowDropdown, dropdownRef }}
+        >
+          <Routes>
+            <Route element={<UserLayout />}>
+              <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
+            </Route>
+            <Route element={<LoginRegisterLayout />}>
+              <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            </Route>
+          </Routes>
+        </DropdownContext.Provider>
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

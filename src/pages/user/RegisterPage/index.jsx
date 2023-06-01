@@ -12,12 +12,9 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "../../../services";
-import { loginAction } from "redux/user/actions";
-import { useDispatch } from "react-redux";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [registerWay, setRegisterWay] = useState("");
 
   const handleGoogleSignIn = async () => {
@@ -36,10 +33,12 @@ const LoginPage = () => {
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
+            friends: [],
+            invitationSent: [],
+            invitationRecive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }
-        dispatch(loginAction({ uid: data.user.uid }));
       }
     } catch (error) {
       if (error.code === "auth/cancelled-popup-request") {
@@ -67,10 +66,12 @@ const LoginPage = () => {
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
+            friends: [],
+            invitationSent: [],
+            invitationRecive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }
-        dispatch(loginAction({ uid: data.user.uid }));
       }
     } catch (error) {
       if (error.code === "auth/cancelled-popup-request") {

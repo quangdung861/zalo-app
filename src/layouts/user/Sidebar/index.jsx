@@ -4,21 +4,21 @@ import { ROUTES } from "routes";
 import { useNavigate, useLocation } from "react-router-dom";
 import { auth } from "firebaseConfig";
 import { signOut } from "firebase/auth";
-import { AppContext } from "App";
+import { DropdownContext } from "App";
 import * as S from "./styles";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutAction } from "redux/user/actions";
 import { UserLayoutContext } from "../UserLayout";
+import { AppContext } from "Context/AppProvider";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.userReducer);
+  // const { userInfo } = useSelector((state) => state.userReducer);
 
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
-    useContext(AppContext);
+    useContext(DropdownContext);
 
   const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
+  const { userInfo } = useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:24 ~ Sidebar ~ userInfo:", userInfo);
 
   const listItemTop = [
     {
@@ -54,11 +54,9 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     signOut(auth)
-      .then(() => {
-        dispatch(logoutAction());
-      })
+      .then(() => {})
       .catch((error) => {
-        // An error happened.
+        console.log(error);
       });
   };
 
@@ -66,7 +64,7 @@ const Sidebar = () => {
     <S.Wrapper>
       <div className="header">
         <div className="avatar">
-          <img src={userInfo.data.photoURL} alt="" />
+          <img src={userInfo?.photoURL} alt="" />
         </div>
       </div>
       <div className="action-list">

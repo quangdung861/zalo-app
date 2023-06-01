@@ -1,23 +1,15 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useContext } from "react";
 import * as S from "./styles";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getUserInfoSelectedAction,
-  getUserListAction,
-} from "redux/user/actions";
+
+import { AppContext } from "Context/AppProvider";
 
 const ChatWithStrangers = () => {
-  const dispatch = useDispatch();
-  const { userList, userInfo, userInfoSelected } = useSelector(
-    (state) => state.userReducer
-  );
-  const [totalCount, setTotalCount] = useState(0);
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
-  useEffect(() => {
-    dispatch(getUserListAction());
-  }, []);
+  const { userInfo, strangerList } = useContext(AppContext);
+
+  const handleInvitationSent = () => {};
 
   const dropdownRef = useRef(null);
   const accountInfoRef = useRef(null);
@@ -41,19 +33,15 @@ const ChatWithStrangers = () => {
     };
   }, []);
 
+  const [strangerSelected, setStrangerSelected] = useState();
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
     setIsShowDropdown(false);
-    dispatch(getUserInfoSelectedAction({ id }));
+    const strangerSelected = strangerList.find((item) => item.id === id);
+    setStrangerSelected(strangerSelected);
   };
 
   const renderStrangerList = useMemo(() => {
-    const strangerList = userList.data?.filter(
-      (item) => item.id !== userInfo.data.id
-    );
-
-    setTotalCount(strangerList.length);
-
     return strangerList.map((item, index) => {
       return (
         <div className="item-stranger" key={index}>
@@ -82,14 +70,19 @@ const ChatWithStrangers = () => {
                 <div className="divding-line" />
                 <div className="dropdown-menu__item">Chặn người này</div>
                 <div className="divding-line" />
-                <div className="dropdown-menu__item add-friend">Thêm bạn</div>
+                <div
+                  className="dropdown-menu__item add-friend"
+                  onClick={() => handleInvitationSent()}
+                >
+                  Thêm bạn
+                </div>
               </div>
             )}
           </div>
         </div>
       );
     });
-  }, [userList.data, isShowDropdown]);
+  }, [strangerList, isShowDropdown]);
 
   return (
     <S.Wrapper>
@@ -100,7 +93,7 @@ const ChatWithStrangers = () => {
             Trò chuyện với người lạ
           </div>
           <div className="strangerlist-content">
-            <div className="total-strangers">Bạn bè {totalCount}</div>
+            <div className="total-strangers">Bạn bè {strangerList.length}</div>
             <div className="filter-strangers">Filter</div>
             <div className="list-strangers">{renderStrangerList}</div>
           </div>
@@ -119,18 +112,18 @@ const ChatWithStrangers = () => {
                 <div className="box-account-info">
                   <div className="header">
                     <img
-                      src={userInfoSelected.data.photoCover}
+                      src={strangerSelected.photoCover}
                       alt=""
                       className="photo-cover"
                     />
                     <div className="box-image">
                       <img
-                        src={userInfoSelected.data.photoURL}
+                        src={strangerSelected.photoURL}
                         alt=""
                         className="photo-avatar"
                       />
                       <div className="display-name">
-                        {userInfoSelected.data.displayName}
+                        {strangerSelected.displayName}
                       </div>
                       <div className="btn-texting">Nhắn tin</div>
                     </div>
