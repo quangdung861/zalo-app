@@ -193,7 +193,7 @@ const FormEmail = ({ setRegisterWay }) => {
             providerId: data.providerId,
             friends: [],
             invitationSent: [],
-            invitationRecive: [],
+            invitationReceive: [],
             keywords: generateKeywords(formData.fullName.value.toLowerCase()),
           });
         }

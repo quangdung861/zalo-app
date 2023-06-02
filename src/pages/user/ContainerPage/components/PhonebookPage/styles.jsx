@@ -81,4 +81,12 @@ export const Container = styled.div`
       flex: 1;
     }
   }
+
+  @media only screen and (max-width: 768px) {
+    .phonebook {
+      .section-left {
+        display: none;
+      }
+    }
+  }
 `;

@@ -22,9 +22,22 @@ export const Container = styled.div`
       }
     }
     .strangerlist-content {
-      padding: 0 12px;
-      min-height: 100vh;
+      max-height: calc(100vh - 65px);
+      min-height: calc(100vh - 65px);
+      padding: 0 16px;
       background-color: #f1f1f1;
+      overflow: hidden;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+      }
+      &::-webkit-scrollbar:vertical {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+      }
       .total-strangers {
         height: 64px;
         line-height: 64px;

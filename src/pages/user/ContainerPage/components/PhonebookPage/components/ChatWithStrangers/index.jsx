@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useRef, useContext } from "react";
 import * as S from "./styles";
 
 import { AppContext } from "Context/AppProvider";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "firebaseConfig";
 
 const ChatWithStrangers = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
@@ -9,7 +11,25 @@ const ChatWithStrangers = () => {
 
   const { userInfo, strangerList } = useContext(AppContext);
 
-  const handleInvitationSent = () => {};
+  const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: [uid, ...userInfo.invitationSent],
+      },
+      { merge: true }
+    );
+    // STRANGER
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: [userInfo.uid, ...invitationReceive],
+      },
+      { merge: true }
+    );
+  };
 
   const dropdownRef = useRef(null);
   const accountInfoRef = useRef(null);
@@ -69,13 +89,26 @@ const ChatWithStrangers = () => {
                 <div className="dropdown-menu__item">Đặt tên gợi nhớ</div>
                 <div className="divding-line" />
                 <div className="dropdown-menu__item">Chặn người này</div>
-                <div className="divding-line" />
-                <div
-                  className="dropdown-menu__item add-friend"
-                  onClick={() => handleInvitationSent()}
-                >
-                  Thêm bạn
-                </div>
+                {userInfo.invitationSent.includes(item.uid) ||
+                userInfo.invitationReceive.includes(item.uid) ? (
+                  <></>
+                ) : (
+                  <>
+                    <div className="divding-line" />
+                    <div
+                      className="dropdown-menu__item add-friend"
+                      onClick={() =>
+                        handleInvitationSent({
+                          uid: item.uid,
+                          id: item.id,
+                          invitationReceive: item.invitationReceive,
+                        })
+                      }
+                    >
+                      Thêm bạn
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -148,23 +181,23 @@ const ChatWithStrangers = () => {
                   <div className="footer">
                     <div className="action-list">
                       <div className="action-item">
-                        <i class="fa-solid fa-users"></i>
+                        <i className="fa-solid fa-users"></i>
                         <span>Nhóm chung (0)</span>
                       </div>
                       <div className="action-item">
-                        <i class="fa-regular fa-address-card"></i>
+                        <i className="fa-regular fa-address-card"></i>
                         <span>Chia sẻ danh thiếp</span>
                       </div>
                       <div className="action-item">
-                        <i class="fa-solid fa-ban"></i>
+                        <i className="fa-solid fa-ban"></i>
                         <span>Chặn tin nhắn</span>
                       </div>
                       <div className="action-item">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <i className="fa-solid fa-triangle-exclamation"></i>
                         <span>Báo xấu</span>
                       </div>
                       <div className="action-item">
-                        <i class="fa-regular fa-trash-can"></i>
+                        <i className="fa-regular fa-trash-can"></i>
                         <span>Xóa khỏi danh sách bạn bè</span>
                       </div>
                     </div>

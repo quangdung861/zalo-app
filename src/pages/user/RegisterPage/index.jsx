@@ -35,7 +35,7 @@ const LoginPage = () => {
             providerId: data.providerId,
             friends: [],
             invitationSent: [],
-            invitationRecive: [],
+            invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }
@@ -68,7 +68,7 @@ const LoginPage = () => {
             providerId: data.providerId,
             friends: [],
             invitationSent: [],
-            invitationRecive: [],
+            invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
           });
         }

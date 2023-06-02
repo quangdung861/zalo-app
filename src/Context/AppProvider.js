@@ -18,7 +18,6 @@ const AppProvider = ({ children }) => {
   } = useContext(AuthContext);
 
   const [userInfo, setUserInfo] = useState();
-  console.log("🚀 ~ file: AppProvider.js:21 ~ AppProvider ~ userInfo:", userInfo)
   useEffect(() => {
     if (uid) {
       const userInfoRef = query(
@@ -37,7 +36,7 @@ const AppProvider = ({ children }) => {
         setUserInfo(documents[0]);
       });
     }
-  }, [uid]);
+  }, [userInfo]);
 
   const [strangerList, setStrangerList] = useState();
   useEffect(() => {
@@ -67,10 +66,30 @@ const AppProvider = ({ children }) => {
         setStrangerList(documents);
       });
     }
-  }, [uid]);
+  }, [userInfo]);
+
+  const [userList, setUserList] = useState();
+  useEffect(() => {
+    if (uid) {
+      const userListRef = collection(db, "users");
+      onSnapshot(userListRef, (docsSnap) => {
+        const documents = docsSnap.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+        setUserList(documents);
+      });
+    }
+  }, [userInfo]);
 
   return (
-    <AppContext.Provider value={{ userInfo, strangerList }}>{children}</AppContext.Provider>
+    <AppContext.Provider value={{ userInfo, strangerList, userList }}>
+      {children}
+    </AppContext.Provider>
   );
 };
 

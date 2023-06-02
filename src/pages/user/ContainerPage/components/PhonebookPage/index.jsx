@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import * as S from "./styles";
 import FriendList from "./components/FriendList";
 import ChatWithStrangers from "./components/ChatWithStrangers";
+import Invitations from "./components/Invitations/Index";
 
 const PhonebookPage = () => {
   const [sectionSelected, setSectionSelected] = useState("friend-list");
@@ -12,6 +13,8 @@ const PhonebookPage = () => {
         return <FriendList />;
       case "chat-with-strangers":
         return <ChatWithStrangers />;
+      case "invitations":
+        return <Invitations />;
       default:
         break;
     }
@@ -64,7 +67,7 @@ const PhonebookPage = () => {
                       ? "content-item content-item--active"
                       : "content-item"
                   }
-                  onClick={() => setSectionSelected("friend-request")}
+                  onClick={() => setSectionSelected("invitations")}
                 >
                   <i className="fa-regular fa-envelope-open"></i>
                   Lời mời kết bạn
