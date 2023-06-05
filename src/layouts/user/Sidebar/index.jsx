@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { ROUTES } from "routes";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,17 +8,19 @@ import { DropdownContext } from "App";
 import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
+import ModalAccount from "components/ModalAccount";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   // const { userInfo } = useSelector((state) => state.userReducer);
+
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
     useContext(DropdownContext);
 
   const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
   const { userInfo } = useContext(AppContext);
-  console.log("🚀 ~ file: index.jsx:24 ~ Sidebar ~ userInfo:", userInfo);
 
   const listItemTop = [
     {
@@ -62,101 +64,114 @@ const Sidebar = () => {
 
   return (
     <S.Wrapper>
-      <div className="header">
-        <div className="avatar">
-          <img src={userInfo?.photoURL} alt="" />
-        </div>
-      </div>
-      <div className="action-list">
-        <div className="action-top">{renderActionList(listItemTop)}</div>
-        {/*  */}
-        <div className="action-bottom">
-          <div
-            className="action-item action-cloud"
-            title="Cloud"
-            ref={dropdownRef}
-          >
-            <i className="fa-solid fa-cloud"></i>
-          </div>
-          <div
-            className="action-item action-setting"
-            title="Cài đặt"
-            ref={dropdownRef}
-            style={isShowDropdown ? { backgroundColor: "#006edc" } : {}}
-          >
-            <i
-              className="fa-solid fa-gear"
-              onClick={() => setIsShowDropdown(!isShowDropdown)}
-            ></i>
-            {isShowDropdown && (
-              <div className="dropdown-setting">
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-regular fa-user"></i>
-                    Thông tin tài khoản
-                  </div>
-                </div>
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-solid fa-gear"></i>
-                    Cài đặt
-                  </div>
-                </div>
-                <div className="dividing-line" />
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-regular fa-floppy-disk"></i>
-                    Lưu trữ
-                  </div>
-                  <div className="content-right">
-                    <i className="fa-solid fa-angle-right"></i>
-                  </div>
-                  <div className="dropdown-second">
-                    <div className="dropdown-second__item">Quản lý File</div>
-                  </div>
-                </div>
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-solid fa-screwdriver-wrench"></i>
-                    Công cụ
-                  </div>
-                  <div className="content-right">
-                    <i className="fa-solid fa-angle-right"></i>
-                  </div>
-                </div>
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-solid fa-globe"></i>
-                    Ngôn ngữ
-                  </div>
-                  <div className="content-right">
-                    <i className="fa-solid fa-angle-right"></i>
-                  </div>
-                </div>
-                <div className="dropdown-setting__item ">
-                  <div className="content-left">
-                    <i className="fa-solid fa-circle-info"></i>
-                    Giới thiệu
-                  </div>
-                  <div className="content-right">
-                    <i className="fa-solid fa-angle-right"></i>
-                  </div>
-                </div>
-                <div className="dividing-line" />
-                <div
-                  className="dropdown-setting__item logout"
-                  onClick={() => {
-                    handleLogout();
-                    setIsShowDropdown(!isShowDropdown);
-                  }}
-                >
-                  Đăng xuất
-                </div>
-              </div>
-            )}
+      <div className="sidebar">
+        <div className="header">
+          <div className="avatar">
+            <img
+              src={userInfo?.photoURL}
+              alt=""
+              onClick={() => setIsShowOverlayModal(true)}
+            />
           </div>
         </div>
+        <div className="action-list">
+          <div className="action-top">{renderActionList(listItemTop)}</div>
+          {/*  */}
+          <div className="action-bottom">
+            <div
+              className="action-item action-cloud"
+              title="Cloud"
+              ref={dropdownRef}
+            >
+              <i className="fa-solid fa-cloud"></i>
+            </div>
+            <div
+              className="action-item action-setting"
+              title="Cài đặt"
+              ref={dropdownRef}
+              style={isShowDropdown ? { backgroundColor: "#006edc" } : {}}
+            >
+              <i
+                className="fa-solid fa-gear"
+                onClick={() => setIsShowDropdown(!isShowDropdown)}
+              ></i>
+              {isShowDropdown && (
+                <div className="dropdown-setting">
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-regular fa-user"></i>
+                      Thông tin tài khoản
+                    </div>
+                  </div>
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-solid fa-gear"></i>
+                      Cài đặt
+                    </div>
+                  </div>
+                  <div className="dividing-line" />
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-regular fa-floppy-disk"></i>
+                      Lưu trữ
+                    </div>
+                    <div className="content-right">
+                      <i className="fa-solid fa-angle-right"></i>
+                    </div>
+                    <div className="dropdown-second">
+                      <div className="dropdown-second__item">Quản lý File</div>
+                    </div>
+                  </div>
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-solid fa-screwdriver-wrench"></i>
+                      Công cụ
+                    </div>
+                    <div className="content-right">
+                      <i className="fa-solid fa-angle-right"></i>
+                    </div>
+                  </div>
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-solid fa-globe"></i>
+                      Ngôn ngữ
+                    </div>
+                    <div className="content-right">
+                      <i className="fa-solid fa-angle-right"></i>
+                    </div>
+                  </div>
+                  <div className="dropdown-setting__item ">
+                    <div className="content-left">
+                      <i className="fa-solid fa-circle-info"></i>
+                      Giới thiệu
+                    </div>
+                    <div className="content-right">
+                      <i className="fa-solid fa-angle-right"></i>
+                    </div>
+                  </div>
+                  <div className="dividing-line" />
+                  <div
+                    className="dropdown-setting__item logout"
+                    onClick={() => {
+                      handleLogout();
+                      setIsShowDropdown(!isShowDropdown);
+                    }}
+                  >
+                    Đăng xuất
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {isShowOverlayModal && (
+        <ModalAccount
+          setIsShowOverlayModal={setIsShowOverlayModal}
+          accountSelected={userInfo}
+        />
+      )}
     </S.Wrapper>
   );
 };

@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import * as S from "./styles";
 import FriendList from "./components/FriendList";
 import ChatWithStrangers from "./components/ChatWithStrangers";
 import Invitations from "./components/Invitations/Index";
+import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const PhonebookPage = () => {
   const [sectionSelected, setSectionSelected] = useState("friend-list");
+
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
 
   const renderSectionSelected = () => {
     switch (sectionSelected) {
@@ -45,7 +48,10 @@ const PhonebookPage = () => {
                       ? "content-item content-item--active"
                       : "content-item"
                   }
-                  onClick={() => setSectionSelected("friend-list")}
+                  onClick={() => {
+                    setIsShowBoxChat(false);
+                    setSectionSelected("friend-list");
+                  }}
                 >
                   <i className="fa-solid fa-user-group"></i>
                   Danh sách bạn bè
@@ -67,7 +73,10 @@ const PhonebookPage = () => {
                       ? "content-item content-item--active"
                       : "content-item"
                   }
-                  onClick={() => setSectionSelected("invitations")}
+                  onClick={() => {
+                    setIsShowBoxChat(false);
+                    setSectionSelected("invitations");
+                  }}
                 >
                   <i className="fa-regular fa-envelope-open"></i>
                   Lời mời kết bạn
@@ -78,7 +87,10 @@ const PhonebookPage = () => {
                       ? "content-item content-item--active"
                       : "content-item"
                   }
-                  onClick={() => setSectionSelected("chat-with-strangers")}
+                  onClick={() => {
+                    setIsShowBoxChat(false);
+                    setSectionSelected("chat-with-strangers");
+                  }}
                 >
                   <i className="fa-solid fa-comments"></i>
                   Trò chuyện với người lạ
@@ -86,7 +98,9 @@ const PhonebookPage = () => {
               </div>
             </div>
           </div>
-          <div className="section-right">{renderSectionSelected()}</div>
+          {!isShowBoxChat && (
+            <div className="section-right">{renderSectionSelected()}</div>
+          )}
         </div>
       </S.Container>
     </S.Wrapper>

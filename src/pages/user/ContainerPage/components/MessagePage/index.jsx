@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import * as S from "./styles";
+import { UserLayoutContext } from "layouts/user/UserLayout";
+import { AppContext } from "Context/AppProvider";
 
 const MessagePage = () => {
+  const { isShowBoxChat } = useContext(UserLayoutContext);
+  const { rooms, userInfo } = useContext(AppContext);
+
   var settings = {
     dots: true,
     infinite: true,
@@ -102,6 +107,23 @@ const MessagePage = () => {
     },
   ];
 
+  const renderRooms = () => {
+    return rooms?.map((room) => {
+      return (
+        <div key={room.id} className="room-item">
+          <div className="room-item__left">
+            <img src={room.avatar} alt="" />
+            <div className="info">
+              <div className="room-name">{room.name}</div>
+              <div className="new-message">{room.description}</div>
+            </div>
+          </div>
+          <div className="room-item__right">5 giờ</div>
+        </div>
+      );
+    });
+  };
+
   const renderSlideList = () => {
     return slideList.map((item, index) => {
       return (
@@ -146,22 +168,25 @@ const MessagePage = () => {
                   <div className="menu-right__item">more</div>
                 </div>
               </div>
+              <div className="room-list">{renderRooms()}</div>
             </div>
           </div>
-          <div className="section-right">
-            <div className="content-welcome">
-              <div className="content-welcome__header">
-                <h2>Chào mừng đến với Zalo PC!</h2>
-                <div>
-                  khám phá tiện ích hổ trợ làm việc và trò chuyện cùng người
-                  thân, bạn bè được tối ưu hóa cho máy tính của bạn.
+          {!isShowBoxChat && (
+            <div className="section-right">
+              <div className="content-welcome">
+                <div className="content-welcome__header">
+                  <h2>Chào mừng đến với Zalo PC!</h2>
+                  <div>
+                    khám phá tiện ích hổ trợ làm việc và trò chuyện cùng người
+                    thân, bạn bè được tối ưu hóa cho máy tính của bạn.
+                  </div>
                 </div>
+                <Slider {...settings} className="slide-list">
+                  {renderSlideList()}
+                </Slider>
               </div>
-              <Slider {...settings} className="slide-list">
-                {renderSlideList()}
-              </Slider>
             </div>
-          </div>
+          )}
         </div>
       </S.Container>
     </S.Wrapper>

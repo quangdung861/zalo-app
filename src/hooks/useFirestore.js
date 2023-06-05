@@ -10,6 +10,7 @@ import {
 
 const useFirestore = (collectionName, condition, params) => {
   const [documents, setDocuments] = useState([]);
+  console.log("🚀 ~ file: useFirestore.js:13 ~ useFirestore ~ documents:", documents)
 
   useEffect(() => {
     let dbRef = query(
@@ -31,14 +32,19 @@ const useFirestore = (collectionName, condition, params) => {
     }
 
     onSnapshot(dbRef, (docsSnap) => {
-      const documents = docsSnap.docs.map((doc) => {
-        const id = doc.id;
-        const data = doc.data();
-        return {
-          ...data,
-          id: id,
-        };
-      });
+      let documents;
+      if (docsSnap.empty) {
+        documents = [];
+      } else {
+        documents = docsSnap.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+      }
       setDocuments(documents);
     });
   }, [collectionName, condition]);

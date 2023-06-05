@@ -7,7 +7,7 @@ export const Container = styled.div`
     display: flex;
     .section-left {
       user-select: none;
-      min-width: 350px;
+      min-width: var(--section-left-width);
       height: 100vh;
       border-right: 1px solid var(--boder-dividing-color);
       &__header {

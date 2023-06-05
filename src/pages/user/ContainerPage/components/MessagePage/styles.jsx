@@ -10,7 +10,7 @@ export const Container = styled.div`
     display: flex;
     width: 100%;
     .section-left {
-      min-width: 350px;
+      min-width: var(--section-left-width);
       height: 100vh;
       border-right: 1px solid var(--boder-dividing-color);
       &__header {
@@ -77,6 +77,48 @@ export const Container = styled.div`
             gap: 10px;
             .menu-right__item {
               cursor: pointer;
+            }
+          }
+        }
+        .room-list {
+          height: calc(100vh - 64px - 32px);
+          .room-item {
+            height: 72px;
+            padding: 0 16px;
+            /* background-color: #ccc; */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            &__left {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              > img {
+                width: 48px;
+                height: 48px;
+                object-fit: cover;
+                border-radius: 50%;
+              }
+              .info {
+                .room-name {
+                  font-size: 16px;
+                  font-weight: 500;
+                  margin-bottom: 2px;
+                }
+                .new-message {
+                  color: #7589a3;
+                }
+              }
+            }
+            &__right {
+              height: 100%;
+              padding-top: 16px;
+              font-size: 13px;
+              color: #7589a3;
+            }
+            :hover {
+              background-color: #f1f1f1;
             }
           }
         }
