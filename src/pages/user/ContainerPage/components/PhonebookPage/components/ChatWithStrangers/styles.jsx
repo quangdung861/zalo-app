@@ -55,6 +55,7 @@ export const Container = styled.div`
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
         background-color: #fff;
+        margin-bottom: 24px;
         .item-stranger {
           height: 72px;
           padding: 0 16px;

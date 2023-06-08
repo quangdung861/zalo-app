@@ -159,7 +159,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
           Bạn chưa có tài khoản?{" "}
           <Link
             style={{ color: "#f05123", fontWeight: 500 }}
-            to={ROUTES.USER.REGISTER}
+            to={ROUTES.REGISTER}
           >
             Đăng ký
           </Link>
