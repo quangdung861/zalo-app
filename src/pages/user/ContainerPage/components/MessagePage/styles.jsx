@@ -97,6 +97,7 @@ export const Container = styled.div`
               flex: 1;
               > img {
                 width: 48px;
+                flex-shrink: 0;
                 height: 48px;
                 object-fit: cover;
                 border-radius: 50%;
