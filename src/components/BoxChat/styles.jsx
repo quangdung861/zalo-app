@@ -3,6 +3,9 @@ import messageBg from "assets/messageBg.jpg";
 
 export const Wrapper = styled.div`
   min-width: calc(100% - var(--section-left-width) - var(--sidebar-width));
+  @media only screen and (max-width: 992px) {
+    min-width: calc(100% - var(--sidebar-width));
+  }
 `;
 
 export const Container = styled.div`

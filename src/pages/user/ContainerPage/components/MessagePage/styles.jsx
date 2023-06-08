@@ -234,4 +234,12 @@ export const Container = styled.div`
       }
     }
   }
+
+  @media only screen and (max-width: 992px) {
+    .message {
+      .section-left {
+        display: none;
+      }
+    }
+  }
 `;
