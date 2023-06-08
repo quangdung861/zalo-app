@@ -1,5 +1,5 @@
 .modal-overlay {
-  z-index: 1;
+  z-index: 2;
   background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   inset: 0 0 0 0;
@@ -62,6 +62,7 @@
             justify-content: center;
             align-items: center;
             margin-top: -40px;
+            margin-bottom: 16px;
             .photo-avatar {
               width: 72px;
               height: 72px;
@@ -89,7 +90,7 @@
               border-radius: 4px;
               width: 50%;
               margin-top: 16px;
-              margin-bottom: 16px;
+              margin-bottom: 0px;
               cursor: pointer;
               :hover {
                 filter: brightness(95%);

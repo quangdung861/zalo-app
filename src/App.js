@@ -11,6 +11,8 @@ import LoginPage from "pages/user/LoginPage";
 
 import AppProvider from "Context/AppProvider";
 import AuthProvider from "Context/AuthProvider";
+import "moment/locale/vi";
+import moment from "moment";
 
 export const DropdownContext = createContext();
 
@@ -23,6 +25,9 @@ function App() {
       left: 0,
     });
   }, [pathname]);
+
+  const exampleMoment = moment().format("HH:mm");
+  console.log("🚀 ~ file: App.js:30 ~ App ~ exampleMoment:", exampleMoment)
 
   const dropdownRef = useRef(null);
 

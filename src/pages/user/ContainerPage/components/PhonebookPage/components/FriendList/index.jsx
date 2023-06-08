@@ -16,11 +16,33 @@ import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const FriendList = () => {
-  const { userInfo } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat, setSelectedUserMessaging, room } =
-    useContext(UserLayoutContext);
+  const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
 
-  const { friends } = useContext(AppContext);
+  const [friends, setFriends] = useState([]);
+  useEffect(() => {
+    const getFriends = async () => {
+      if (userInfo.friends[0]) {
+        const friendsRef = query(
+          collection(db, "users"),
+          where("uid", "in", userInfo.friends)
+        );
+        const response = await getDocs(friendsRef);
+        const documents = response.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+        setFriends(documents);
+      } else {
+        setFriends([]);
+      }
+    };
+    getFriends();
+  }, [userInfo.friends]);
 
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
@@ -47,25 +69,6 @@ const FriendList = () => {
     const friendSelected = friends.find((item) => item.id === id);
     setFriendSelected(friendSelected);
   };
-
-  // const getFriendList = async () => {
-  //   const friendListRef = query(
-  //     collection(db, "users"),
-  //     where("uid", "in", userInfo.friends)
-  //   );
-
-  //   const response = await getDocs(friendListRef);
-
-  //   const documents = response.docs.map((doc) => {
-  //     const id = doc.id;
-  //     const data = doc.data();
-  //     return {
-  //       id,
-  //       ...data,
-  //     };
-  //   });
-  //   return setFriendList(documents);
-  // };
 
   const handleUnfriend = async ({ id, uid, friends }) => {
     // USER_INFO
@@ -94,21 +97,34 @@ const FriendList = () => {
     );
   };
 
-  const toogleBoxChat = (friendSelected) => {
+  const toogleBoxChat = ({
+    uidSelected,
+    photoURLSelected,
+    displayNameSelected,
+  }) => {
     setIsShowBoxChat(!isShowBoxChat);
-    setSelectedUserMessaging(friendSelected);
+    setSelectedUserMessaging({
+      uidSelected,
+      photoURLSelected,
+      displayNameSelected,
+    });
   };
 
   const renderFriendlist = () => {
-    if (userInfo?.friends[0]) {
-      return friends?.map((item) => {
+    if (friends[0]) {
+      return friends.map((item) => {
         return (
-          <div
-            className="item-friend"
-            key={item.id}
-            onClick={() => toogleBoxChat(item)}
-          >
-            <div className="item-friend__left">
+          <div className="item-friend" key={item.id}>
+            <div
+              className="item-friend__left"
+              onClick={() =>
+                toogleBoxChat({
+                  uidSelected: item.uid,
+                  photoURLSelected: item.photoURL,
+                  displayNameSelected: item.displayName,
+                })
+              }
+            >
               <img src={item.photoURL} alt="" />
               <span>{item.displayName} </span>
             </div>

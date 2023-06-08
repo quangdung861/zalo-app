@@ -1,14 +1,33 @@
-import React, { useContext } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import * as S from "./styles";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { AppContext } from "Context/AppProvider";
+import {
+  collection,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "firebaseConfig";
+import moment from "moment";
 
 const MessagePage = () => {
-  const { isShowBoxChat } = useContext(UserLayoutContext);
-  const { rooms, userInfo } = useContext(AppContext);
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { rooms, userInfo, selectedUserMessaging, setSelectedUserMessaging } =
+  useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:29 ~ MessagePage ~ selectedUserMessaging:", selectedUserMessaging)
 
   var settings = {
     dots: true,
@@ -107,22 +126,73 @@ const MessagePage = () => {
     },
   ];
 
-  const renderRooms = () => {
-    return rooms?.map((room) => {
-      return (
-        <div key={room.id} className="room-item">
-          <div className="room-item__left">
-            <img src={room.avatar} alt="" />
-            <div className="info">
-              <div className="room-name">{room.name}</div>
-              <div className="new-message">{room.description}</div>
-            </div>
-          </div>
-          <div className="room-item__right">5 giờ</div>
-        </div>
-      );
+  const toogleBoxChat = ({
+    uidSelected,
+    photoURLSelected,
+    displayNameSelected,
+  }) => {
+    setIsShowBoxChat(true);
+    setSelectedUserMessaging({
+      uidSelected,
+      photoURLSelected,
+      displayNameSelected,
     });
   };
+
+  const renderRooms = useMemo(() => {
+    if (rooms[0]) {
+      return rooms?.map((room, index) => {
+        const formatDate = moment(
+          room.messageLastest?.createdAt?.seconds * 1000
+        )?.fromNow();
+        const uidSelected = room.members.filter(
+          (member) => member !== userInfo.uid
+        )[0];
+
+        const infoPartner = room.info.filter(
+          (item) => item.uid !== userInfo.uid
+        )[0];
+
+        return (
+          <div
+            key={room.id}
+            className={
+              uidSelected === selectedUserMessaging.uidSelected
+                ? "room-item room-item--active"
+                : "room-item"
+            }
+          >
+            <div
+              className="room-item__left"
+              onClick={() =>
+                toogleBoxChat({
+                  uidSelected: uidSelected,
+                  photoURLSelected: infoPartner.avatar,
+                  displayNameSelected: infoPartner.name,
+                })
+              }
+            >
+              <img src={infoPartner.avatar} alt="" />
+              <div className="info">
+                <div className="room-name">{infoPartner.name}</div>
+                <div className="new-message">
+                  <span className="new-message__author">
+                    {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                  </span>
+                  <span className="new-message__text">
+                    {room.messageLastest?.text}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="room-item__right">
+              {formatDate !== "Invalid date" ? formatDate : "..."}
+            </div>
+          </div>
+        );
+      });
+    }
+  }, [rooms, selectedUserMessaging.uidSelected]);
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
@@ -168,7 +238,10 @@ const MessagePage = () => {
                   <div className="menu-right__item">more</div>
                 </div>
               </div>
-              <div className="room-list">{renderRooms()}</div>
+              <div className="room-list">
+                {/* <RenderRooms /> */}
+                {renderRooms}
+              </div>
             </div>
           </div>
           {!isShowBoxChat && (

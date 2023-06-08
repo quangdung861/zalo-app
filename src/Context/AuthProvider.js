@@ -18,7 +18,7 @@ const AuthProvider = ({ children }) => {
         return navigate("/");
       }
       setIsLoading(false);
-      navigate("/login");
+      // navigate("/login");
     });
 
     return () => {
@@ -27,7 +27,7 @@ const AuthProvider = ({ children }) => {
   }, [navigate]);
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, setUser }}>
       {isLoading ? <>Loading...</> : children}
     </AuthContext.Provider>
   );

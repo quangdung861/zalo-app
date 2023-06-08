@@ -94,6 +94,7 @@ export const Container = styled.div`
               display: flex;
               align-items: center;
               gap: 12px;
+              flex: 1;
               > img {
                 width: 48px;
                 height: 48px;
@@ -104,21 +105,33 @@ export const Container = styled.div`
                 .room-name {
                   font-size: 16px;
                   font-weight: 500;
-                  margin-bottom: 2px;
+                  margin-bottom: 6px;
                 }
                 .new-message {
                   color: #7589a3;
+                  &__author {
+                    color: #7589a3;
+                  }
+                  &__text {
+                    color: #7589a3;
+                  }
                 }
               }
             }
             &__right {
               height: 100%;
               padding-top: 16px;
-              font-size: 13px;
+              font-size: 12px;
               color: #7589a3;
             }
             :hover {
               background-color: #f1f1f1;
+            }
+          }
+          .room-item--active {
+            background-color: #e5efff;
+            :hover {
+              background-color: #e5efff;
             }
           }
         }

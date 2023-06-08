@@ -1,9 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 
 import "./styles.scss";
+import { AppContext } from "Context/AppProvider";
 
 const ModalAccount = ({ setIsShowOverlayModal, accountSelected }) => {
+  console.log(
+    "🚀 ~ file: index.jsx:6 ~ ModalAccount ~ accountSelected:",
+    accountSelected
+  );
   const accountInfoRef = useRef(null);
+
+  const { userInfo } = useContext(AppContext);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,7 +54,10 @@ const ModalAccount = ({ setIsShowOverlayModal, accountSelected }) => {
                 <div className="display-name">
                   {accountSelected.displayName}
                 </div>
-                <div className="btn-texting">Nhắn tin</div>
+
+                {accountSelected.uid !== userInfo?.uid && (
+                  <div className="btn-texting"> Nhắn tin </div>
+                )}
               </div>
             </div>
             <div className="content">

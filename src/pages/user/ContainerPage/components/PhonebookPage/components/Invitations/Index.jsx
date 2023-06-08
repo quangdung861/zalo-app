@@ -18,79 +18,58 @@ import { addDocument } from "services";
 
 const Invitations = () => {
   const { userInfo } = useContext(AppContext);
+  const [invitationSent, setInvitationSent] = useState([]);
+  const [invitationReceive, setInvitationReceive] = useState([]);
 
-  // const [invitationSent, setInvitationSent] = useState([]);
-  // const [invitationReceive, setInvitationReceive] = useState([]);
+  useEffect(() => {
+    const getInvitationSent = async () => {
+      if (userInfo.invitationSent[0]) {
+        const invitationSentRef = query(
+          collection(db, "users"),
+          where("uid", "in", userInfo.invitationSent)
+        );
+        const response = await getDocs(invitationSentRef);
+        const documents = response.docs?.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            id,
+            ...data,
+          };
+        });
 
-  // useEffect(() => {
-  //   getInvitationSent();
-  // }, [userInfo.invitationSent]);
+        setInvitationSent(documents);
+      } else {
+        setInvitationSent([]);
+      }
+    };
+    getInvitationSent();
+  }, [userInfo.invitationSent]);
 
-  // useEffect(() => {
-  //   getInvitationReceive();
-  // }, [userInfo.invitationReceive]);
+  useEffect(() => {
+    const getInvitationReceive = async () => {
+      if (userInfo.invitationReceive[0]) {
+        const invitationReceiveRef = query(
+          collection(db, "users"),
+          where("uid", "in", userInfo.invitationReceive)
+        );
+        const response = await getDocs(invitationReceiveRef);
+        const documents = response.docs?.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            id,
+            ...data,
+          };
+        });
 
-  // const getInvitationSent = async () => {
-  //   if (userInfo.invitationSent[0]) {
-  //     const invitationSentRef = query(
-  //       collection(db, "users"),
-  //       where("uid", "in", userInfo.invitationSent)
-  //     );
-
-  //     const response = await getDocs(invitationSentRef);
-
-  //     const documents = response.docs?.map((doc) => {
-  //       const id = doc.id;
-  //       const data = doc.data();
-  //       return {
-  //         id,
-  //         ...data,
-  //       };
-  //     });
-
-  //     setInvitationSent(documents);
-
-  //     // onSnapshot(invitationSentRef, (docsSnap) => {
-  //     //   const invitationSentList = docsSnap.docs.map((doc) => {
-  //     //     const id = doc.id;
-  //     //     const data = doc.data();
-  //     //     return {
-  //     //       ...data,
-  //     //       id: id,
-  //     //     };
-  //     //   });
-  //     //   setInvitationSent(invitationSentList);
-  //     // });
-  //   } else {
-  //     setInvitationSent([]);
-  //   }
-  // };
-
-  // const getInvitationReceive = async () => {
-  //   if (userInfo.invitationReceive[0]) {
-  //     const invitationReceiveRef = query(
-  //       collection(db, "users"),
-  //       where("uid", "in", userInfo.invitationReceive)
-  //     );
-
-  //     const response = await getDocs(invitationReceiveRef);
-
-  //     const documents = response.docs?.map((doc) => {
-  //       const id = doc.id;
-  //       const data = doc.data();
-  //       return {
-  //         id,
-  //         ...data,
-  //       };
-  //     });
-
-  //     setInvitationReceive(documents);
-  //   } else {
-  //     setInvitationReceive([]);
-  //   }
-  // };
-
-  const { invitationReceive, invitationSent } = useContext(AppContext);
+        setInvitationReceive(documents);
+      } else {
+        setInvitationReceive([]);
+      }
+    };
+    getInvitationReceive();
+  }, [userInfo.invitationReceive]);
 
   const handleInvitationRecall = async ({ uid, invitationReceive, id }) => {
     // USER
@@ -176,8 +155,6 @@ const Invitations = () => {
     invitationSent,
     id,
     friends,
-    displayName,
-    photoURL,
   }) => {
     const newInvitationSent = invitationSent.filter(
       (item) => item !== userInfo.uid
@@ -208,15 +185,6 @@ const Invitations = () => {
         merge: true,
       }
     );
-
-    // await addDoc(collection(db, "rooms"), {
-    //   description: "",
-    //   name: displayName,
-    //   members: [userInfo.uid, uid],
-    //   avatar: photoURL,
-    // });
-
-    // await addDocument("rooms", {});
   };
 
   const handleInvitationReject = async ({ uid, invitationSent, id }) => {
@@ -326,13 +294,13 @@ const Invitations = () => {
           <div className="content">
             <div className="invitation__receive">
               <div className="total-count total-count-receive">
-                Lời mời đã nhận ({})
+                Lời mời đã nhận ({invitationReceive.length})
               </div>
               <div className="receive-list">{renderInvitationReceive()}</div>
             </div>
             <div className="invitation__sent">
               <div className="total-count total-count-sent">
-                Lời mời đã gửi ({})
+                Lời mời đã gửi ({invitationSent.length})
               </div>
               <div className="sent-list">{renderInvitationSent()}</div>
             </div>

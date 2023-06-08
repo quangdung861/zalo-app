@@ -6,7 +6,17 @@ import React, {
   useState,
 } from "react";
 import { AuthContext } from "./AuthProvider";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "firebaseConfig";
 
 export const AppContext = createContext();
@@ -17,17 +27,14 @@ const AppProvider = ({ children }) => {
   } = useContext(AuthContext);
 
   const [userInfo, setUserInfo] = useState();
-  console.log(
-    "🚀 ~ file: AppProvider.js:20 ~ AppProvider ~ userInfo:",
-    userInfo
-  );
+
   useEffect(() => {
     if (uid) {
       const userInfoRef = query(
         collection(db, "users"),
         where("uid", "==", uid)
       );
-      const userinfoSnap = onSnapshot(userInfoRef, (docsSnap) => {
+      onSnapshot(userInfoRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -41,16 +48,16 @@ const AppProvider = ({ children }) => {
     }
   }, [uid]);
 
-  const [strangerList, setStrangerList] = useState();
+  const [strangerList, setStrangerList] = useState([]);
   useEffect(() => {
-    if (userInfo) {
-      const strangerListRef = query(
-        collection(db, "users"),
-        where("uid", "not-in", [uid, ...userInfo.friends])
-      );
-
-      onSnapshot(strangerListRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
+    if (userInfo?.friends) {
+      const getStrangerList = async () => {
+        const strangerListRef = query(
+          collection(db, "users"),
+          where("uid", "not-in", [uid, ...userInfo.friends])
+        );
+        const response = await getDocs(strangerListRef);
+        const documents = response.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
           return {
@@ -59,36 +66,26 @@ const AppProvider = ({ children }) => {
           };
         });
         setStrangerList(documents);
-      });
+      };
+      getStrangerList();
+    } else {
+      setStrangerList([]);
     }
-  }, [userInfo, uid]);
+  }, [userInfo]);
 
-  const [userList, setUserList] = useState();
-  useEffect(() => {
-    if (userInfo) {
-      const userListRef = collection(db, "users");
-      onSnapshot(userListRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setUserList(documents);
-      });
-    }
-  }, [userInfo, uid]);
+  const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
 
-  const [rooms, setRooms] = useState([]);
+  const [room, setRoom] = useState({});
+  const [rooms, setRooms] = useState({});
+
   useEffect(() => {
-    if (userInfo) {
-      const userInfoRef = query(
+    if (uid) {
+      const roomsRef = query(
         collection(db, "rooms"),
-        where("members", "array-contains", userInfo.uid)
+        where("members", "array-contains", uid),
+        orderBy("createdAt", "desc"),
       );
-      onSnapshot(userInfoRef, (docsSnap) => {
+      onSnapshot(roomsRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -100,22 +97,18 @@ const AppProvider = ({ children }) => {
         setRooms(documents);
       });
     }
-  }, [userInfo]);
+  }, [uid]);
 
-  const [friends, setFriends] = useState([]);
   useEffect(() => {
-    if (userInfo) {
-      if (userInfo.friends.length === 0) {
-        console.log("Empty age list. No query sent.");
-        return;
-      }
-      const userInfoRef = query(
-        collection(db, "users"),
-        where("uid", "in", userInfo.friends)
-      );
+    if (selectedUserMessaging.uidSelected) {
+      const getRoom = async () => {
+        const roomsRef = query(
+          collection(db, "rooms"),
+          where("members", "array-contains", userInfo.uid)
+        );
+        const responseRooms = await getDocs(roomsRef);
 
-      onSnapshot(userInfoRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
+        const rooms = responseRooms.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
           return {
@@ -123,75 +116,32 @@ const AppProvider = ({ children }) => {
             id: id,
           };
         });
-        setFriends(documents);
-      });
+
+        const room = rooms.filter(
+          (item) =>
+            item.members.includes(selectedUserMessaging.uidSelected) &&
+            item.category === "single"
+        );
+        if (room[0]) {
+          setRoom(room[0]);
+        } else {
+          setRoom({});
+        }
+      };
+      getRoom();
     }
-  }, [userInfo]);
-
-  const [invitationSent, setInvitationSent] = useState([]);
-  useEffect(() => {
-    if (userInfo) {
-      if (userInfo.invitationSent.length === 0) {
-        console.log("Empty age list. No query sent.");
-        setInvitationSent([]);
-        return;
-      }
-      const invitationSentRef = query(
-        collection(db, "users"),
-        where("uid", "in", userInfo.invitationSent)
-      );
-
-      onSnapshot(invitationSentRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setInvitationSent(documents);
-      });
-    }
-  }, [userInfo]);
-
-  const [invitationReceive, setInvitationReceive] = useState([]);
-  useEffect(() => {
-    if (userInfo) {
-      if (userInfo.invitationReceive.length === 0) {
-        console.log("Empty age list. No query sent.");
-        setInvitationReceive([]);
-        return;
-      }
-      const invitationReceiveRef = query(
-        collection(db, "users"),
-        where("uid", "in", userInfo.invitationReceive)
-      );
-
-      onSnapshot(invitationReceiveRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setInvitationReceive(documents);
-      });
-    }
-  }, [userInfo]);
+  }, [selectedUserMessaging, rooms]);
 
   return (
     <AppContext.Provider
       value={{
-        invitationReceive,
-        invitationSent,
         userInfo,
         strangerList,
-        userList,
+        setSelectedUserMessaging,
+        selectedUserMessaging,
+        room,
+        setRoom,
         rooms,
-        friends,
       }}
     >
       {children}

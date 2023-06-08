@@ -3,23 +3,23 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 import * as S from "./styles";
 import Sidebar from "../Sidebar";
-import { auth, db } from "firebaseConfig";
+import { auth } from "firebaseConfig";
 import { ROUTES } from "routes";
 import BoxChat from "components/BoxChat";
-import {
-  collection,
-  getDoc,
-  query,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
-import { AppContext } from "Context/AppProvider";
+import { AuthContext } from "Context/AuthProvider";
 
 export const UserLayoutContext = createContext();
 
 const UserLayout = () => {
   const navigate = useNavigate();
-  const { userInfo, rooms } = useContext(AppContext);
+  const {
+    user: { uid },
+  } = useContext(AuthContext);
+  console.log("🚀 ~ file: index.jsx:17 ~ UserLayout ~ uid:", uid);
+
+  if (!uid) {
+    navigate(ROUTES.LOGIN);
+  }
 
   const [sidebarSelected, setSidebarSelected] = useState("message");
   useEffect(() => {
@@ -34,24 +34,6 @@ const UserLayout = () => {
   }, []);
 
   const [isShowBoxChat, setIsShowBoxChat] = useState(false);
-  const [selectedUserMessaging, setSelectedUserMessaging] = useState(null);
-  const [curentRoom, setCurrentRoom] = useState(null);
-
-  const [room, setRoom] = useState([]);
-  useEffect(() => {
-    if (selectedUserMessaging?.uid) {
-      const room = rooms.filter(
-        (item) =>
-          item.members.includes(selectedUserMessaging.uid) &&
-          item.category === "single"
-      );
-      if (room[0]) {
-        setRoom(room);
-      } else {
-        setRoom([]);
-      }
-    }
-  }, [selectedUserMessaging, rooms]);
 
   return (
     <UserLayoutContext.Provider
@@ -60,9 +42,6 @@ const UserLayout = () => {
         setSidebarSelected,
         isShowBoxChat,
         setIsShowBoxChat,
-        selectedUserMessaging,
-        setSelectedUserMessaging,
-        room,
       }}
     >
       <S.Wrapper>

@@ -11,6 +11,7 @@ const ChatWithStrangers = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const { userInfo, strangerList } = useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:14 ~ ChatWithStrangers ~ strangerList:", strangerList)
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
     const userInfoRef = doc(db, "users", userInfo.id);
@@ -47,11 +48,12 @@ const ChatWithStrangers = () => {
   }, []);
 
   const [strangerSelected, setStrangerSelected] = useState();
+
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
     setIsShowDropdown(false);
-    const strangerSelected = strangerList.find((item) => item.id === id);
-    setStrangerSelected(strangerSelected);
+    const newStrangerSelected = strangerList.find((item) => item.id === id);
+    setStrangerSelected(newStrangerSelected);
   };
 
   const renderStrangerList = useMemo(() => {
@@ -119,7 +121,7 @@ const ChatWithStrangers = () => {
             Trò chuyện với người lạ
           </div>
           <div className="strangerlist-content">
-            <div className="total-strangers">Người lạ {strangerList?.length}</div>
+            <div className="total-strangers">Người lạ ({strangerList?.length})</div>
             <div className="filter-strangers">Filter</div>
             <div className="list-strangers">{renderStrangerList}</div>
           </div>

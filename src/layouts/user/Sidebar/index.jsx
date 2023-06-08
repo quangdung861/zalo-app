@@ -9,6 +9,7 @@ import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
+import { AuthContext } from "Context/AuthProvider";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const Sidebar = () => {
     useContext(DropdownContext);
 
   const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, setUserInfo } = useContext(AppContext);
+  const { setUser } = useContext(AuthContext);
 
   const listItemTop = [
     {
@@ -54,12 +56,9 @@ const Sidebar = () => {
     });
   };
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {})
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleLogout = async () => {
+    await auth.signOut();
+    window.location.reload();
   };
 
   return (

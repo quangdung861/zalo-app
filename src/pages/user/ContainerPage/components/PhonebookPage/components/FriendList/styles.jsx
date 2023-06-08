@@ -44,12 +44,10 @@ export const Container = styled.div`
         .item-friend {
           height: 72px;
           padding: 0 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
           position: relative;
           cursor: pointer;
           &__left {
+            height: 72px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -67,9 +65,13 @@ export const Container = styled.div`
           &__right {
             width: 32px;
             height: 32px;
-            display: flex;
+            position: absolute;
+            right: 0;
+            top: 20px;
+            right: 16px;
+            /* display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center; */
             border-radius: 4px;
             > i {
               width: 32px;
