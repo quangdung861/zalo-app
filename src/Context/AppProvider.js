@@ -119,8 +119,7 @@ const AppProvider = ({ children }) => {
 
         const room = rooms.filter(
           (item) =>
-            item.members.includes(selectedUserMessaging.uidSelected) &&
-            item.category === "single"
+            item.members.includes(selectedUserMessaging.uidSelected)
         );
         if (room[0]) {
           setRoom(room[0]);

@@ -142,12 +142,14 @@ const MessagePage = () => {
   const renderRooms = useMemo(() => {
     if (rooms[0]) {
       return rooms?.map((room, index) => {
+        console.log("🚀 ~ file: index.jsx:145 ~ returnrooms?.map ~ rooms:", rooms)
         const formatDate = moment(
           room.messageLastest?.createdAt?.seconds * 1000
         )?.fromNow();
         const uidSelected = room.members.filter(
           (member) => member !== userInfo.uid
         )[0];
+        console.log("🚀 ~ file: index.jsx:151 ~ returnrooms?.map ~ uidSelected:", uidSelected)
 
         const infoPartner = room.info.filter(
           (item) => item.uid !== userInfo.uid

@@ -28,6 +28,8 @@ import { formatRelative } from "date-fns";
 import moment from "moment";
 import messageSend from "assets/audio/messageSend.wav";
 import messageTouch from "assets/audio/messageTouch.wav";
+import data from "@emoji-mart/data/sets/14/facebook.json";
+import Picker from "@emoji-mart/react";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
@@ -39,17 +41,16 @@ const BoxChat = () => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const handleInputChange = (value) => {
-    setInputValue(value);
-    // const audio = new Audio(messageTouch);
-    // audio.play();
-  };
+  const audio = new Audio(messageSend);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       if (inputValue) {
         if (room.id) {
-          const audio = new Audio(messageSend);
+          console.log(
+            "🚀 ~ file: index.jsx:50 ~ handleKeyDown ~ room.id:",
+            room.id
+          );
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
@@ -280,6 +281,38 @@ const BoxChat = () => {
     }
   };
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const pickerEmojiRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        pickerEmojiRef.current &&
+        !pickerEmojiRef.current.contains(event.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleInputChange = (value) => {
+    setInputValue(value);
+  };
+
+  // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
+  const handleToggleEmojiPicker = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  // Hàm xử lý sự kiện khi chọn emoji từ bảng chọn
+  const handleSelectEmoji = (emoji) => {
+    setInputValue(inputValue + emoji.native);
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -328,6 +361,10 @@ const BoxChat = () => {
                   {selectedUserMessaging.displayNameSelected} là bạn bè của bạn
                   trên Zalo
                 </div>
+              ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
+                <div className="user-info__description">
+                 Nơi lưu trữ thông tin của bạn trên Cloud
+                </div>
               ) : (
                 <div className="user-info__description">
                   {selectedUserMessaging.displayNameSelected} không phải bạn bè
@@ -339,7 +376,31 @@ const BoxChat = () => {
             {renderMessages()}
           </div>
           <div className="box-chat__footer">
-            <div className="toolbar-chat-input"></div>
+            <div className="toolbar-chat-input">
+              <div className="emoji-mart" ref={pickerEmojiRef}>
+                {showEmojiPicker && (
+                  <Picker
+                    data={data}
+                    onEmojiSelect={handleSelectEmoji}
+                    previewPosition="none"
+                    emojiSize={22}
+                    searchPosition="none"
+                    locale="vi"
+                    emojiButtonRadius="6px"
+                    perLine={8}
+                    set="facebook"
+                  />
+                )}
+              </div>
+              <div
+                onClick={handleToggleEmojiPicker}
+                className={
+                  showEmojiPicker ? "box-icon box-icon--active" : "box-icon"
+                }
+              >
+                <i className="fa-regular fa-face-laugh-beam"></i>
+              </div>
+            </div>
             <div className="box-chat-input">
               <div className="box-chat-input__left">
                 {/* Nhận content từ người dùng */}

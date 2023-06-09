@@ -26,9 +26,6 @@ function App() {
     });
   }, [pathname]);
 
-  const exampleMoment = moment().format("HH:mm");
-  console.log("🚀 ~ file: App.js:30 ~ App ~ exampleMoment:", exampleMoment)
-
   const dropdownRef = useRef(null);
 
   const [isShowDropdown, setIsShowDropdown] = useState(false);

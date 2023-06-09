@@ -242,6 +242,39 @@ export const Container = styled.div`
       .toolbar-chat-input {
         height: 47px;
         border-bottom: 1px solid var(--boder-dividing-color);
+        position: relative;
+        display: flex;
+        align-items: center;
+        .emoji-mart {
+          position: absolute;
+          bottom: 50px;
+          left: 8px;
+          box-shadow: var(--box-shadow-default);
+          
+        }
+        .box-icon {
+          width: 38px;
+          height: 38px;
+          margin-left: 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          :hover {
+            background-color: #f1f1f1;
+          }
+          > i {
+            font-size: 22px;
+            color: rgb(117, 137, 163);
+          }
+        }
+        .box-icon--active {
+          background-color: #e5efff;
+          > i {
+            color: #035ce0;
+          }
+        }
       }
       .box-chat-input {
         height: 58px;
