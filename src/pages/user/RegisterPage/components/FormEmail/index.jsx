@@ -196,6 +196,26 @@ const FormEmail = ({ setRegisterWay }) => {
             invitationReceive: [],
             keywords: generateKeywords(formData.fullName.value.toLowerCase()),
           });
+           addDocument("rooms", {
+            category: "my cloud",
+            members: [data.user.uid, "my-cloud"],
+            info: [
+              {
+                avatar:
+                  "https://res-zalo.zadn.vn/upload/media/2021/6/4/2_1622800570007_369788.jpg",
+                name: "Cloud của tôi",
+                uid: "my-cloud",
+              },
+              {
+                avatar: data.user.photoURL
+                  ? data.user.photoURL
+                  : "https://dvdn247.net/wp-content/uploads/2020/07/avatar-mac-dinh-1.png",
+                name: data.user.displayName,
+                uid: data.user.uid,
+              },
+            ],
+            messageLastest: {},
+          });
         }
       }
     } catch (error) {
