@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" id="favicon" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" id="favicon-app" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Mulish&display=swap"
       rel="stylesheet"
     />
-    <title>React App</title>
+    <title id="title-app">React App</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -50,10 +50,12 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
     <script>
-      const element = document.querySelector("#favicon");
-      const newHref = "%PUBLIC_URL%/zalo.ico";
-      if (window.location.hostname !== "localhost") {
-        element.setAttribute("href", newHref);
+      if (window.location.hostname === "localhost") {
+        const elementFavicon = document.querySelector("#favicon-app");
+        const newHref = "%PUBLIC_URL%/zalo.ico";
+        elementFavicon.setAttribute("href", newHref);
+        const elementTitle = document.querySelector("#title-app");
+        elementTitle.textContent = "Zalo Web";
       }
     </script>
   </body>
