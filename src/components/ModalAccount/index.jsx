@@ -6,6 +6,7 @@ import { db } from "firebaseConfig";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
+import coverCloud from "assets/coverCloud.png";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
@@ -390,6 +391,56 @@ const ModalAccount = ({
                   <i className="fa-regular fa-trash-can"></i>
                   <span>Xóa khỏi danh sách bạn bè</span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : accountSelected.myCloud ? (
+    <div className="modal-overlay">
+      <div className="container-account-info" ref={accountInfoRef}>
+        <div className="account-info">
+          <div className="title">
+            Thông tin tài khoản
+            <i
+              className="fa-solid fa-xmark"
+              onClick={() => setIsShowOverlayModal(false)}
+            ></i>
+          </div>
+          <div className="box-account-info">
+            <div className="header">
+              <img src={coverCloud} alt="" className="photo-cover" />
+              <div className="box-image">
+                <img
+                  src={accountSelected.myCloud.photoURLSelected}
+                  alt=""
+                  className="photo-avatar"
+                />
+                <div className="display-name">
+                  {accountSelected.myCloud.displayNameSelected}
+                </div>
+
+                <div
+                  className="btn-texting"
+                  onClick={() =>
+                    toogleBoxChat({
+                      uidSelected: accountSelected.myCloud.uidSelected,
+                      photoURLSelected:
+                        accountSelected.myCloud.photoURLSelected,
+                      displayNameSelected:
+                        accountSelected.myCloud.displayNameSelected,
+                    })
+                  }
+                >
+                  Nhắn tin
+                </div>
+              </div>
+            </div>
+            <div className="content-cloud">
+              <span className="name">Mô tả</span>
+              <div className="value">
+                Dể dàng lưu trử và đồng bộ dữ liệu giữa các thiết bị của bạn.
               </div>
             </div>
           </div>

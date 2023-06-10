@@ -5,6 +5,7 @@
   inset: 0 0 0 0;
   animation-name: fadeIn;
   animation-duration: 0.2s;
+  user-select: none;
   .container-account-info {
     padding: 0px 12px;
     .account-info {
@@ -235,6 +236,23 @@
                 }
               }
             }
+          }
+        }
+        .content-cloud {
+          margin-top: 32px;
+          padding-left: 20px;
+          display: flex;
+          .name {
+            color: #7589a3;
+            width: 110px;
+            min-width: 110px;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.5;
+            display: inline-block;
+          }
+          .value {
+            padding-right: 32px;
           }
         }
         .footer {

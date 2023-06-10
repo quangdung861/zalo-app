@@ -4,6 +4,18 @@ import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
+const loading = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "500px",
+};
+
+const spinner = {
+  fontSize: "30px",
+  color: "#007bff",
+};
+
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
@@ -28,7 +40,13 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      {isLoading ? <>Loading...</> : children}
+      {isLoading ? (
+        <div style={loading}>
+          <i class="fas fa-spinner fa-spin" style={spinner}></i>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

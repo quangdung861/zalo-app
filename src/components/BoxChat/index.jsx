@@ -144,6 +144,10 @@ const BoxChat = () => {
   }, [selectedUserMessaging]);
 
   const [fullInfoUser, setFullInfoUser] = useState({});
+  console.log(
+    "🚀 ~ file: index.jsx:147 ~ BoxChat ~ fullInfoUser:",
+    fullInfoUser
+  );
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const fullInfoUserMessaging = async () => {
@@ -331,10 +335,7 @@ const BoxChat = () => {
               <img
                 src={selectedUserMessaging?.photoURLSelected}
                 alt=""
-                onClick={() =>
-                  selectedUserMessaging.uidSelected !== "my-cloud" &&
-                  setIsShowOverlayModal(true)
-                }
+                onClick={() => setIsShowOverlayModal(true)}
               />
               <div className="user-info">
                 <div className="display-name">
@@ -442,7 +443,9 @@ const BoxChat = () => {
         {isShowOverlayModal && (
           <ModalAccount
             setIsShowOverlayModal={setIsShowOverlayModal}
-            accountSelected={fullInfoUser}
+            accountSelected={
+              fullInfoUser ? fullInfoUser : { myCloud: selectedUserMessaging }
+            }
             isShowOverlayModal={isShowOverlayModal}
           />
         )}

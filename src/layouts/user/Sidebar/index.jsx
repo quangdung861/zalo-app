@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { auth } from "firebaseConfig";
 import { DropdownContext } from "App";
@@ -8,14 +8,13 @@ import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
 
 const Sidebar = () => {
-
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
     useContext(DropdownContext);
 
   const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, rooms, setSelectedUserMessaging } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -54,6 +53,32 @@ const Sidebar = () => {
     window.location.reload();
   };
 
+  const { setIsShowBoxChat } = useContext(UserLayoutContext);
+
+  const [roomCloud, setRoomCloud] = useState();
+  const getRoomCloud = () => {
+    const roomCloudResult = rooms?.find((item) => item.category === "my cloud");
+    const cloudInfo = roomCloudResult.info.find(
+      (item) => item.uid === "my-cloud"
+    );
+    setRoomCloud(cloudInfo);
+  };
+
+  useEffect(() => {
+    if (rooms[0]) {
+      getRoomCloud();
+    }
+  }, [rooms]);
+
+  const toogleBoxChat = () => {
+    setIsShowBoxChat(true);
+    setSelectedUserMessaging({
+      uidSelected: roomCloud.uid,
+      photoURLSelected: roomCloud.avatar,
+      displayNameSelected: roomCloud.name,
+    });
+  };
+
   return (
     <S.Wrapper>
       <div className="sidebar">
@@ -74,6 +99,7 @@ const Sidebar = () => {
               className="action-item action-cloud"
               title="Cloud"
               ref={dropdownRef}
+              onClick={() => toogleBoxChat()}
             >
               <i className="fa-solid fa-cloud"></i>
             </div>

@@ -51,7 +51,6 @@ const ChatWithStrangers = () => {
   }, []);
 
   const [strangerSelected, setStrangerSelected] = useState();
-  console.log("🚀 ~ file: index.jsx:54 ~ ChatWithStrangers ~ strangerSelected:", strangerSelected)
 
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);

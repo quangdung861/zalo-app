@@ -5,14 +5,12 @@ import { ROUTES } from "routes";
 import ContainerPage from "pages/user/ContainerPage";
 import RegisterPage from "pages/user/RegisterPage";
 import LoginRegisterLayout from "layouts/LoginRegisterLayout";
-import { auth } from "firebaseConfig";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import LoginPage from "pages/user/LoginPage";
 
 import AppProvider from "Context/AppProvider";
 import AuthProvider from "Context/AuthProvider";
 import "moment/locale/vi";
-import moment from "moment";
 
 export const DropdownContext = createContext();
 
