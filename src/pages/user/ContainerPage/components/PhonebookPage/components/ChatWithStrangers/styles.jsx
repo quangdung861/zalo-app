@@ -67,6 +67,7 @@ export const Container = styled.div`
           &__left {
             display: flex;
             align-items: center;
+            flex: 1;
             gap: 12px;
             > img {
               border-radius: 50%;
@@ -82,11 +83,11 @@ export const Container = styled.div`
           &__right {
             width: 32px;
             height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: absolute;
+            right: 0;
+            top: 20px;
+            right: 16px;
             border-radius: 4px;
-            position: relative;
             > i {
               width: 32px;
               height: 32px;

@@ -5,13 +5,16 @@ import { AppContext } from "Context/AppProvider";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import ModalAccount from "components/ModalAccount";
+import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const ChatWithStrangers = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
-  const { userInfo, strangerList } = useContext(AppContext);
-  console.log("🚀 ~ file: index.jsx:14 ~ ChatWithStrangers ~ strangerList:", strangerList)
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+
+  const { userInfo, strangerList, setSelectedUserMessaging } =
+    useContext(AppContext);
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
     const userInfoRef = doc(db, "users", userInfo.id);
@@ -48,6 +51,7 @@ const ChatWithStrangers = () => {
   }, []);
 
   const [strangerSelected, setStrangerSelected] = useState();
+  console.log("🚀 ~ file: index.jsx:54 ~ ChatWithStrangers ~ strangerSelected:", strangerSelected)
 
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
@@ -56,11 +60,33 @@ const ChatWithStrangers = () => {
     setStrangerSelected(newStrangerSelected);
   };
 
+  const toogleBoxChat = ({
+    uidSelected,
+    photoURLSelected,
+    displayNameSelected,
+  }) => {
+    setIsShowBoxChat(!isShowBoxChat);
+    setSelectedUserMessaging({
+      uidSelected,
+      photoURLSelected,
+      displayNameSelected,
+    });
+  };
+
   const renderStrangerList = useMemo(() => {
     return strangerList?.map((item, index) => {
       return (
         <div className="item-stranger" key={index}>
-          <div className="item-stranger__left">
+          <div
+            className="item-stranger__left"
+            onClick={() =>
+              toogleBoxChat({
+                uidSelected: item.uid,
+                photoURLSelected: item.photoURL,
+                displayNameSelected: item.displayName,
+              })
+            }
+          >
             <img src={item.photoURL} alt="" />
             <span>{item.displayName}</span>
           </div>
@@ -121,7 +147,9 @@ const ChatWithStrangers = () => {
             Trò chuyện với người lạ
           </div>
           <div className="strangerlist-content">
-            <div className="total-strangers">Người lạ ({strangerList?.length})</div>
+            <div className="total-strangers">
+              Người lạ ({strangerList?.length})
+            </div>
             <div className="filter-strangers">Filter</div>
             <div className="list-strangers">{renderStrangerList}</div>
           </div>

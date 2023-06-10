@@ -1,13 +1,5 @@
-import React, {
-  useContext,
-  useState,
-  useRef,
-  useMemo,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import * as S from "./styles";
-import { UserLayoutContext } from "layouts/user/UserLayout";
 import {
   collection,
   query,
@@ -16,25 +8,23 @@ import {
   addDoc,
   onSnapshot,
   doc,
-  Timestamp,
   orderBy,
   getDoc,
   setDoc,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
 import { AppContext } from "Context/AppProvider";
-import { formatRelative } from "date-fns";
 import moment from "moment";
 import messageSend from "assets/audio/messageSend.wav";
-import messageTouch from "assets/audio/messageTouch.wav";
 import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
+import ModalAccount from "components/ModalAccount";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
     useContext(AppContext);
-  console.log("🚀 ~ file: index.jsx:30 ~ BoxChat ~ room:", room);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -47,10 +37,6 @@ const BoxChat = () => {
     if (e.key === "Enter") {
       if (inputValue) {
         if (room.id) {
-          console.log(
-            "🚀 ~ file: index.jsx:50 ~ handleKeyDown ~ room.id:",
-            room.id
-          );
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
@@ -147,6 +133,25 @@ const BoxChat = () => {
         });
       }, 200);
     }
+  };
+
+  useEffect(() => {
+    fullInfoUserMessaging();
+  }, [selectedUserMessaging]);
+
+  const [fullInfoUser, setFullInfoUser] = useState({});
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+
+  const fullInfoUserMessaging = async () => {
+    const fullInfoUserMessagingRef = query(
+      collection(db, "users"),
+      where("uid", "==", selectedUserMessaging.uidSelected)
+    );
+    const response = await getDocs(fullInfoUserMessagingRef);
+    const documents = response.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+    return setFullInfoUser(documents[0]);
   };
 
   useEffect(() => {
@@ -319,7 +324,11 @@ const BoxChat = () => {
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
-              <img src={selectedUserMessaging?.photoURLSelected} alt="" />
+              <img
+                src={selectedUserMessaging?.photoURLSelected}
+                alt=""
+                onClick={() => setIsShowOverlayModal(true)}
+              />
               <div className="user-info">
                 <div className="display-name">
                   {selectedUserMessaging?.displayNameSelected}
@@ -363,7 +372,7 @@ const BoxChat = () => {
                 </div>
               ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
                 <div className="user-info__description">
-                 Nơi lưu trữ thông tin của bạn trên Cloud
+                  Nơi lưu trữ thông tin của bạn trên Cloud
                 </div>
               ) : (
                 <div className="user-info__description">
@@ -418,6 +427,13 @@ const BoxChat = () => {
             </div>
           </div>
         </div>
+        {isShowOverlayModal && (
+          <ModalAccount
+            setIsShowOverlayModal={setIsShowOverlayModal}
+            accountSelected={fullInfoUser}
+            isShowOverlayModal={isShowOverlayModal}
+          />
+        )}
       </S.Container>
     </S.Wrapper>
   );

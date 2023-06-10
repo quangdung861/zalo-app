@@ -28,6 +28,10 @@ export const Container = styled.div`
           height: 48px;
           margin-right: 12px;
           object-fit: cover;
+          cursor: pointer;
+          &:hover {
+            opacity: .9;
+          }
         }
         .user-info {
           white-space: nowrap;

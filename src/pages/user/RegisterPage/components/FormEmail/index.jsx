@@ -195,6 +195,9 @@ const FormEmail = ({ setRegisterWay }) => {
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(formData.fullName.value.toLowerCase()),
+            phoneNumber: "",
+            sex: "",
+            dateOfBirth: "",
           });
            addDocument("rooms", {
             category: "my cloud",

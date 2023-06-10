@@ -67,11 +67,14 @@ export const Container = styled.div`
                       object-fit: cover;
                       border-radius: 50%;
                       margin-right: 10px;
+                      cursor: pointer;
                     }
                     .detail {
                       .display-name {
+                        display: inline-block;
                         font-weight: 500;
                         margin-bottom: 4px;
+                        cursor: pointer;
                       }
                       .origin {
                         font-size: 13px;
@@ -188,11 +191,14 @@ export const Container = styled.div`
                       object-fit: cover;
                       border-radius: 50%;
                       margin-right: 10px;
+                      cursor: pointer;
                     }
                     .detail {
                       .display-name {
+                        display: inline-block;
                         font-weight: 500;
                         margin-bottom: 4px;
+                        cursor: pointer;
                       }
                       .origin {
                         font-size: 13px;

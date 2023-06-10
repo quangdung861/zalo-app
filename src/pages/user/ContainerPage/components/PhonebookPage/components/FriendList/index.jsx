@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import * as S from "./styles";
-import { AppContext } from "Context/AppProvider";
 import {
   collection,
   doc,
@@ -13,6 +12,7 @@ import {
 import { db } from "firebaseConfig";
 import empty from "assets/empty.png";
 import ModalAccount from "components/ModalAccount";
+import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const FriendList = () => {

@@ -3,9 +3,13 @@
   background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   inset: 0 0 0 0;
+  animation-name: fadeIn;
+  animation-duration: 2s;
   .container-account-info {
     padding: 0px 12px;
     .account-info {
+      animation-name: zoom;
+      animation-duration: 2s;
       position: absolute;
       height: 95vh;
       width: 352px;
@@ -54,6 +58,53 @@
         }
         .header {
           position: relative;
+          .header-right {
+            position: absolute;
+            top: 95px;
+            right: 10px;
+            z-index: 2;
+            .custom-file-input {
+              display: none;
+            }
+            .custom-file-label {
+              user-select: none;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background-color: #fff;
+              padding: 6px;
+              border-radius: 50%;
+              box-shadow: 0 3px 3px rgba(24, 19, 19, 0.16);
+              cursor: pointer;
+              i {
+                font-size: 14px;
+              }
+              &:hover {
+                filter: brightness(80%);
+              }
+            }
+            .btn-default--custome {
+              background-color: #fff;
+              color: #333;
+              border-radius: 4px;
+              border: none;
+              outline: none;
+              padding: 4px 8px;
+              font-size: 12px;
+              font-weight: 600;
+              margin-top: 6px;
+              cursor: pointer;
+              &:last-child {
+                margin-left: 8px;
+              }
+              &:hover {
+                background-color: #f1f1f1;
+              }
+            }
+            .dropdown-cover-image {
+              background-color: #fff;
+            }
+          }
           .box-image {
             position: relative;
             height: 100%;
@@ -63,15 +114,37 @@
             align-items: center;
             margin-top: -40px;
             margin-bottom: 16px;
+            .custom-file-input {
+              display: none;
+            }
+            .box-avatar__icon {
+              position: absolute;
+              display: flex;
+              flex-shrink: 0;
+              margin-left: 80px;
+              margin-top: 30px;
+              cursor: pointer;
+              > i {
+                font-size: 14px;
+                padding: 6px;
+                border-radius: 50%;
+                background-color: #fff;
+                box-shadow: 0 3px 3px rgba(0, 0, 0, 0.16);
+              }
+              :hover {
+                filter: brightness(80%);
+              }
+            }
             .photo-avatar {
-              width: 72px;
-              height: 72px;
+              width: 90px;
+              height: 90px;
               border: 2px solid #fff;
               border-radius: 50%;
               bottom: -36px;
               left: 0;
               right: 0;
               margin: 0 auto;
+              object-fit: cover;
             }
             .display-name {
               font-weight: 500;
@@ -120,6 +193,47 @@
                 min-width: 110px;
                 color: #7589a3;
               }
+              .value {
+                flex: 1;
+                display: flex;
+                > input {
+                  width: 70%;
+                  padding: 0px 8px;
+                  border: none;
+                  border-bottom: 1px solid #ccc;
+                }
+                .icon-save {
+                  margin-left: 8px;
+                  margin-right: 8px;
+                  cursor: pointer;
+                  padding: 4px;
+                  border-radius: 50%;
+                  color: #1b9c85;
+                  &:hover {
+                    background-color: #f1f1f1;
+                  }
+                }
+                .icon-cancel {
+                  margin-right: 8px;
+                  cursor: pointer;
+                  padding: 4px;
+                  border-radius: 50%;
+                  color: #7589a3;
+                  &:hover {
+                    background-color: #f1f1f1;
+                  }
+                }
+              }
+              .icon-edit {
+                margin-right: 8px;
+                cursor: pointer;
+                padding: 8px;
+                border-radius: 50%;
+                color: #7589a3;
+                &:hover {
+                  background-color: #f1f1f1;
+                }
+              }
             }
           }
         }
@@ -153,6 +267,23 @@
           }
         }
       }
+    }
+  }
+
+  @keyframes zoom {
+    0% {
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    100% {
+    }
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
     }
   }
 }

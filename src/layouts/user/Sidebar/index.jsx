@@ -1,19 +1,13 @@
 import React, { useContext, useState } from "react";
 
-import { ROUTES } from "routes";
-import { useNavigate, useLocation } from "react-router-dom";
 import { auth } from "firebaseConfig";
-import { signOut } from "firebase/auth";
 import { DropdownContext } from "App";
 import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
-import { AuthContext } from "Context/AuthProvider";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-  // const { userInfo } = useSelector((state) => state.userReducer);
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
@@ -21,8 +15,7 @@ const Sidebar = () => {
     useContext(DropdownContext);
 
   const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
-  const { userInfo, setUserInfo } = useContext(AppContext);
-  const { setUser } = useContext(AuthContext);
+  const { userInfo } = useContext(AppContext);
 
   const listItemTop = [
     {

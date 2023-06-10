@@ -37,6 +37,9 @@ const LoginPage = () => {
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
+            phoneNumber: "",
+            sex: "",
+            dateOfBirth: "",
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -90,6 +93,9 @@ const LoginPage = () => {
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
+            phoneNumber: "",
+            sex: "",
+            dateOfBirth: "",
           });
           addDocument("rooms", {
             category: "my cloud",

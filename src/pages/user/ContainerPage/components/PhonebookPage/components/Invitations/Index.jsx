@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import * as S from "./styles";
-import { AppContext } from "Context/AppProvider";
 import {
   collection,
   where,
@@ -15,11 +14,18 @@ import { db } from "firebaseConfig";
 import useFirestore from "hooks/useFirestore";
 import empty from "assets/empty.png";
 import { addDocument } from "services";
+import { AppContext } from "Context/AppProvider";
+import { UserLayoutContext } from "layouts/user/UserLayout";
+import ModalAccount from "components/ModalAccount";
 
 const Invitations = () => {
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+
   const [invitationSent, setInvitationSent] = useState([]);
   const [invitationReceive, setInvitationReceive] = useState([]);
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [userInfoSelected, setUserInfoSelected] = useState();
 
   useEffect(() => {
     const getInvitationSent = async () => {
@@ -111,13 +117,37 @@ const Invitations = () => {
               <div className="content__top">
                 <div className="info">
                   <div className="info__left">
-                    <img src={item.photoURL} alt="" />
+                    <img
+                      src={item.photoURL}
+                      alt=""
+                      onClick={() => {
+                        setUserInfoSelected(item);
+                        setIsShowOverlayModal(true);
+                      }}
+                    />
                     <div className="detail">
-                      <div className="display-name">{item.displayName}</div>
+                      <span
+                        className="display-name"
+                        onClick={() => {
+                          setUserInfoSelected(item);
+                          setIsShowOverlayModal(true);
+                        }}
+                      >
+                        {item.displayName}
+                      </span>
                       <div className="origin">2 ngày - Từ nhóm trò chuyện</div>
                     </div>
                   </div>
-                  <i className="fa-regular fa-comment info__right"></i>
+                  <i
+                    className="fa-regular fa-comment info__right"
+                    onClick={() =>
+                      toogleBoxChat({
+                        uidSelected: item.uid,
+                        photoURLSelected: item.photoURL,
+                        displayNameSelected: item.displayName,
+                      })
+                    }
+                  ></i>
                 </div>
               </div>
 
@@ -226,13 +256,37 @@ const Invitations = () => {
               <div className="content__top">
                 <div className="info">
                   <div className="info__left">
-                    <img src={item.photoURL} alt="" />
+                    <img
+                      src={item.photoURL}
+                      alt=""
+                      onClick={() => {
+                        setUserInfoSelected(item);
+                        setIsShowOverlayModal(true);
+                      }}
+                    />
                     <div className="detail">
-                      <div className="display-name">{item.displayName}</div>
+                      <span
+                        className="display-name"
+                        onClick={() => {
+                          setUserInfoSelected(item);
+                          setIsShowOverlayModal(true);
+                        }}
+                      >
+                        {item.displayName}
+                      </span>
                       <div className="origin">2 ngày - Từ nhóm trò chuyện</div>
                     </div>
                   </div>
-                  <i className="fa-regular fa-comment info__right"></i>
+                  <i
+                    className="fa-regular fa-comment info__right"
+                    onClick={() =>
+                      toogleBoxChat({
+                        uidSelected: item.uid,
+                        photoURLSelected: item.photoURL,
+                        displayNameSelected: item.displayName,
+                      })
+                    }
+                  ></i>
                 </div>
               </div>
 
@@ -283,6 +337,19 @@ const Invitations = () => {
     }
   };
 
+  const toogleBoxChat = ({
+    uidSelected,
+    photoURLSelected,
+    displayNameSelected,
+  }) => {
+    setIsShowBoxChat(!isShowBoxChat);
+    setSelectedUserMessaging({
+      uidSelected,
+      photoURLSelected,
+      displayNameSelected,
+    });
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -306,6 +373,12 @@ const Invitations = () => {
             </div>
           </div>
         </div>
+        {isShowOverlayModal && (
+          <ModalAccount
+            setIsShowOverlayModal={setIsShowOverlayModal}
+            accountSelected={userInfoSelected}
+          />
+        )}
       </S.Container>
     </S.Wrapper>
   );
