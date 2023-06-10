@@ -13,6 +13,7 @@ const ModalAccount = ({
   isShowOverlayModal,
   accountSelected,
 }) => {
+  console.log("🚀 ~ file: index.jsx:16 ~ accountSelected:", accountSelected)
   const phoneNumberRef = useRef(null);
 
   const accountInfoRef = useRef(null);
@@ -172,7 +173,7 @@ const ModalAccount = ({
         return setDoc(
           userInfoRef,
           {
-            photoCover: res,
+            photoURL: res,
           },
           {
             merge: true,

@@ -52,7 +52,7 @@ const AuthProvider = ({ children }) => {
       {isLoading ? (
         <div style={loading}>
           <img src={zlogo} alt="zalo" style={image} />
-          <i class="fas fa-spinner fa-spin" style={spinner}></i>
+          <i className="fas fa-spinner fa-spin" style={spinner}></i>
           <span>Đang đăng nhập...</span>
         </div>
       ) : (

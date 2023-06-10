@@ -15,7 +15,6 @@ const UserLayout = () => {
   const {
     user: { uid },
   } = useContext(AuthContext);
-  console.log("🚀 ~ file: index.jsx:17 ~ UserLayout ~ uid:", uid);
 
   if (!uid) {
     navigate(ROUTES.LOGIN);

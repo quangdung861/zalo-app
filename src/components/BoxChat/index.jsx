@@ -25,10 +25,7 @@ import ModalAccount from "components/ModalAccount";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
     useContext(AppContext);
-  console.log(
-    "🚀 ~ file: index.jsx:27 ~ BoxChat ~ selectedUserMessaging:",
-    selectedUserMessaging
-  );
+ 
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -144,10 +141,7 @@ const BoxChat = () => {
   }, [selectedUserMessaging]);
 
   const [fullInfoUser, setFullInfoUser] = useState({});
-  console.log(
-    "🚀 ~ file: index.jsx:147 ~ BoxChat ~ fullInfoUser:",
-    fullInfoUser
-  );
+ 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const fullInfoUserMessaging = async () => {
