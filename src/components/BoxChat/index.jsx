@@ -25,6 +25,10 @@ import ModalAccount from "components/ModalAccount";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
     useContext(AppContext);
+  console.log(
+    "🚀 ~ file: index.jsx:27 ~ BoxChat ~ selectedUserMessaging:",
+    selectedUserMessaging
+  );
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -327,7 +331,10 @@ const BoxChat = () => {
               <img
                 src={selectedUserMessaging?.photoURLSelected}
                 alt=""
-                onClick={() => setIsShowOverlayModal(true)}
+                onClick={() =>
+                  selectedUserMessaging.uidSelected !== "my-cloud" &&
+                  setIsShowOverlayModal(true)
+                }
               />
               <div className="user-info">
                 <div className="display-name">
@@ -335,7 +342,12 @@ const BoxChat = () => {
                 </div>
 
                 <div className="last-time">
-                  Truy cập 10 giờ trước<span className="new-seperator"></span>
+                  {selectedUserMessaging.uidSelected === "my-cloud" ? (
+                    <>Lưu và đồng bộ dữ liệu giữa các thiết bị</>
+                  ) : (
+                    <>Truy cập 10 giờ trước</>
+                  )}
+                  <span className="new-seperator"></span>
                   <i className="fa-regular fa-bookmark"></i>
                 </div>
               </div>

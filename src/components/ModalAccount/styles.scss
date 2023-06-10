@@ -4,12 +4,12 @@
   position: fixed;
   inset: 0 0 0 0;
   animation-name: fadeIn;
-  animation-duration: 2s;
+  animation-duration: 0.2s;
   .container-account-info {
     padding: 0px 12px;
     .account-info {
       animation-name: zoom;
-      animation-duration: 2s;
+      animation-duration: 0.5s;
       position: absolute;
       height: 95vh;
       width: 352px;
