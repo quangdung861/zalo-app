@@ -50,7 +50,7 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
     <script>
-      if (window.location.hostname === "localhost") {
+      if (window.location.hostname !== "localhost") {
         const elementFavicon = document.querySelector("#favicon-app");
         const newHref = "%PUBLIC_URL%/zalo.ico";
         elementFavicon.setAttribute("href", newHref);
