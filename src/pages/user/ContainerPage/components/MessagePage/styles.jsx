@@ -110,6 +110,10 @@ export const Container = styled.div`
                 }
                 .new-message {
                   color: #7589a3;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  width: 160px;
+                  text-overflow: ellipsis;
                   &__author {
                     color: #7589a3;
                   }

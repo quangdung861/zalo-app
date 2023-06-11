@@ -25,12 +25,12 @@ import ModalAccount from "components/ModalAccount";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
     useContext(AppContext);
- 
 
   const inputRef = useRef();
   const boxChatRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
+  console.log("🚀 ~ file: index.jsx:33 ~ BoxChat ~ inputValue:", inputValue);
 
   const audio = new Audio(messageSend);
 
@@ -141,7 +141,7 @@ const BoxChat = () => {
   }, [selectedUserMessaging]);
 
   const [fullInfoUser, setFullInfoUser] = useState({});
- 
+
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const fullInfoUserMessaging = async () => {
@@ -423,6 +423,7 @@ const BoxChat = () => {
                 <input
                   className="input-message-text"
                   type="text"
+                  // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhắn tin tới ${selectedUserMessaging.displayNameSelected}`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
