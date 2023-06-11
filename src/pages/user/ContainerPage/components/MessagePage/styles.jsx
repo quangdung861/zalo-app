@@ -107,6 +107,10 @@ export const Container = styled.div`
                   font-size: 16px;
                   font-weight: 500;
                   margin-bottom: 6px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  width: 160px;
+                  text-overflow: ellipsis;
                 }
                 .new-message {
                   color: #7589a3;
