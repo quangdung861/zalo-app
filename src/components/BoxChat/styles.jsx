@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import messageBg from "assets/messageBg.jpg";
+import cloudBg from "assets/cloudBg.jpg"
 
 export const Wrapper = styled.div`
   min-width: calc(100% - var(--section-left-width) - var(--sidebar-width));
@@ -83,9 +84,9 @@ export const Container = styled.div`
     }
     &__content {
       padding-top: 20px;
-      background-image: url(${messageBg});
+      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg }) ;
       background-blend-mode: multiply;
-      background-color: rgba(0, 0, 0, 0.15);
+      background-color: rgba(${(props) => props.isCloud ? "0, 0, 0, 0.05" :  "0, 0, 0, 0.15" });
       background-size: cover;
       background-repeat: no-repeat;
       height: calc(100vh - var(--header-height) - var(--footer-height));

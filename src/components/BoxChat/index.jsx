@@ -322,7 +322,11 @@ const BoxChat = () => {
 
   return (
     <S.Wrapper>
-      <S.Container>
+      <S.Container
+        isCloud={
+          selectedUserMessaging.uidSelected === "my-cloud" ? true : false
+        }
+      >
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
