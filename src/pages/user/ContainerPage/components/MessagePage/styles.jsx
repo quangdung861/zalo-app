@@ -141,14 +141,14 @@ export const Container = styled.div`
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 18px;
-                height: 18px;
+                width: 16px;
+                height: 16px;
                 font-size: 12px;
                 line-height: 12px;
                 margin-top: 8px;
                 border-radius: 50%;
                 color: #fff;
-                background-color: #dd0808;
+                background-color: #C31818;
               }
             }
             :hover {

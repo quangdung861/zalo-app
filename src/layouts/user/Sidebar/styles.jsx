@@ -37,7 +37,7 @@ export const Wrapper = styled.div`
           align-items: center;
           justify-content: center;
           transition: all 0.2s ease;
-
+          position: relative;
           > i {
             font-size: 24px;
             color: white;
@@ -45,6 +45,21 @@ export const Wrapper = styled.div`
           cursor: pointer;
           :hover {
             background-color: rgba(0, 0, 0, 0.1);
+          }
+         .unseen-messages {
+            position: absolute;
+            top: 6px;
+            right: 7px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 16px;
+            height: 16px;
+            font-size: 12px;
+            line-height: 12px;
+            border-radius: 50%;
+            color: #fff;
+            background-color: #c31818;
           }
         }
         .action-item--active {

@@ -28,7 +28,8 @@ import moment from "moment";
 import notificationDowloadZaloPc from "assets/notificationDowloadZaloPc.jpg";
 
 const MessagePage = () => {
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setTotalUnseenMessage } =
+    useContext(UserLayoutContext);
   const { rooms, userInfo, selectedUserMessaging, setSelectedUserMessaging } =
     useContext(AppContext);
 
@@ -142,7 +143,14 @@ const MessagePage = () => {
     });
   };
 
+  const [totalUnSeenMessageRef, setTotalUnseenMessageRef] = useState(0);
+
+  useEffect(() => {
+    setTotalUnseenMessage(totalUnSeenMessageRef);
+  }, [totalUnSeenMessageRef]);
+
   const renderRooms = useMemo(() => {
+    setTotalUnseenMessageRef(0)
     if (rooms[0]) {
       return rooms?.map((room, index) => {
         const formatDate = moment(
@@ -161,6 +169,8 @@ const MessagePage = () => {
         );
 
         const unseenMessages = room.totalMessages - infoMyself.count;
+
+        setTotalUnseenMessageRef((current) => current + unseenMessages);
 
         return (
           <div
@@ -265,8 +275,16 @@ const MessagePage = () => {
                   <div className="menu-left__item">Chưa đọc</div>
                 </div>
                 <div className="menu__right">
-                  <div className="menu-right__item">Phân loại  &nbsp; <i class="fa-solid fa-chevron-down"></i></div>
-                  <div className="menu-right__item" style={{marginRight: "8px", marginLeft: "4px"}}><i class="fa-solid fa-ellipsis"></i></div>
+                  <div className="menu-right__item">
+                    Phân loại &nbsp;{" "}
+                    <i className="fa-solid fa-chevron-down"></i>
+                  </div>
+                  <div
+                    className="menu-right__item"
+                    style={{ marginRight: "8px", marginLeft: "4px" }}
+                  >
+                    <i className="fa-solid fa-ellipsis"></i>
+                  </div>
                 </div>
               </div>
               <div className="room-list">
@@ -275,10 +293,7 @@ const MessagePage = () => {
                 {userInfo?.notificationDowloadZaloPc.status && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">
-                      <img
-                        src={notificationDowloadZaloPc}
-                        alt=""
-                      />
+                      <img src={notificationDowloadZaloPc} alt="" />
                     </div>
                     <div className="notification-compatible__content">
                       <div className="title">
@@ -297,7 +312,7 @@ const MessagePage = () => {
                         </div>
                         <div className="dowload-now">
                           <span>Tải ngay</span>
-                          <i class="fa-solid fa-download"></i>
+                          <i className="fa-solid fa-download"></i>
                         </div>
                       </div>
                     </div>

@@ -13,7 +13,8 @@ const Sidebar = () => {
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
     useContext(DropdownContext);
 
-  const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
+  const { sidebarSelected, setSidebarSelected, totalUnSeenMessage } =
+    useContext(UserLayoutContext);
   const { userInfo, rooms, setSelectedUserMessaging } = useContext(AppContext);
 
   const listItemTop = [
@@ -43,6 +44,11 @@ const Sidebar = () => {
           onClick={() => setSidebarSelected(item.id)}
         >
           {item.icon}
+          {totalUnSeenMessage > 0 && item.id === "message" && (
+            <div className="unseen-messages">
+              {totalUnSeenMessage}
+            </div>
+          )}
         </div>
       );
     });
@@ -101,7 +107,7 @@ const Sidebar = () => {
               ref={dropdownRef}
               onClick={() => toogleBoxChat()}
             >
-              <i className="fa-solid fa-cloud"></i>
+              <i className="fa-solid fa-cloud icon-cloud"></i>
             </div>
             <div
               className="action-item action-setting"

@@ -34,6 +34,10 @@ const UserLayout = () => {
 
   const [isShowBoxChat, setIsShowBoxChat] = useState(false);
 
+
+  const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
+  console.log("🚀 ~ file: index.jsx:39 ~ UserLayout ~ totalUnSeenMessage:", totalUnSeenMessage)
+
   return (
     <UserLayoutContext.Provider
       value={{
@@ -41,6 +45,8 @@ const UserLayout = () => {
         setSidebarSelected,
         isShowBoxChat,
         setIsShowBoxChat,
+        totalUnSeenMessage,
+        setTotalUnseenMessage,
       }}
     >
       <S.Wrapper>
