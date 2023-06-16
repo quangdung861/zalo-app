@@ -30,12 +30,13 @@ const AppProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState();
 
   useEffect(() => {
+    let unSubcribe;
     if (uid) {
       const userInfoRef = query(
         collection(db, "users"),
         where("uid", "==", uid)
       );
-      onSnapshot(userInfoRef, (docsSnap) => {
+      unSubcribe = onSnapshot(userInfoRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -47,6 +48,7 @@ const AppProvider = ({ children }) => {
         setUserInfo(documents[0]);
       });
     }
+    return () => unSubcribe && unSubcribe();
   }, [uid]);
 
   const [strangerList, setStrangerList] = useState([]);
@@ -94,13 +96,14 @@ const AppProvider = ({ children }) => {
   const [rooms, setRooms] = useState({});
 
   useEffect(() => {
+    let unSubcribe;
     if (uid) {
       const roomsRef = query(
         collection(db, "rooms"),
         where("members", "array-contains", uid)
       );
 
-      onSnapshot(roomsRef, (docsSnap) => {
+      unSubcribe = onSnapshot(roomsRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -117,6 +120,7 @@ const AppProvider = ({ children }) => {
         setRooms(newDocuments);
       });
     }
+    return () => unSubcribe && unSubcribe();
   }, [uid]);
 
   useEffect(() => {
