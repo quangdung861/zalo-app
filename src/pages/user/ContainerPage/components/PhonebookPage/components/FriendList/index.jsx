@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, useMemo } from "react";
 import * as S from "./styles";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
   setDoc,
@@ -18,15 +17,27 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 const FriendList = () => {
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const [keywords, setKeywords] = useState("");
 
   const [friends, setFriends] = useState([]);
   useEffect(() => {
     const getFriends = async () => {
-      if (userInfo.friends[0]) {
-        const friendsRef = query(
-          collection(db, "users"),
-          where("uid", "in", userInfo.friends)
-        );
+      let friendsRef;
+      if (userInfo?.friends[0]) {
+        const uidFriends = userInfo.friends.map((friend) => friend.uid);
+        if (keywords) {
+          friendsRef = query(
+            collection(db, "users"),
+            where("uid", "in", uidFriends),
+            where("keywords", "array-contains", keywords.toLowerCase())
+          );
+        } else {
+          friendsRef = query(
+            collection(db, "users"),
+            where("uid", "in", uidFriends)
+          );
+        }
+
         const response = await getDocs(friendsRef);
         const documents = response.docs.map((doc) => {
           const id = doc.id;
@@ -42,17 +53,34 @@ const FriendList = () => {
       }
     };
     getFriends();
-  }, [userInfo.friends]);
+  }, [userInfo?.friends, keywords]);
 
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [isShowDropdownCategories, setIsShowDropdownCategories] =
+    useState(false);
+  const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
+  const [dropdownCategorySecond, setDropdownCategorySecond] = useState(false);
+  const [categorySelected, setCategorySelected] = useState("Tất cả");
 
   const dropdownRef = useRef(null);
+  const orderByRef = useRef(null);
+  const categoriesRef = useRef();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsShowDropdown(false);
+      }
+      if (
+        categoriesRef.current &&
+        !categoriesRef.current.contains(event.target)
+      ) {
+        setIsShowDropdownCategories(false);
+        setDropdownCategorySecond(false);
+      }
+      if (orderByRef.current && !orderByRef.current.contains(event.target)) {
+        setDropdownOrderBy(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -110,9 +138,46 @@ const FriendList = () => {
     });
   };
 
-  const renderFriendlist = () => {
+  const [orderBy, setOderBy] = useState("asc");
+
+  const [totalFriends, setTotalFriends] = useState(0);
+
+  const renderFriendlist = useMemo(() => {
+    if (orderBy === "desc") {
+      friends.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
+    } else {
+      friends.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
+    }
+
+    setTotalFriends(0);
+
     if (friends[0]) {
       return friends.map((item) => {
+        let categoryName;
+        let color;
+
+        const infoFriend = userInfo.friends.find(
+          (friend) => friend.uid === item.uid
+        );
+
+        const categoryResult = userInfo.categoriesTemplate.find(
+          (item) => item.name === infoFriend.category
+        );
+
+        if (categoryResult) {
+          categoryName = categoryResult.name;
+          color = categoryResult.color;
+        }
+
+        if (
+          categorySelected !== "Tất cả" &&
+          categorySelected !== categoryName
+        ) {
+          return;
+        }
+
+        setTotalFriends((preven) => preven + 1);
+
         return (
           <div className="item-friend" key={item.id}>
             <div
@@ -126,7 +191,24 @@ const FriendList = () => {
               }
             >
               <img src={item.photoURL} alt="" />
-              <span>{item.displayName} </span>
+              <div className="box-info">
+                <span>{item.displayName}</span>
+                {categoryResult && (
+                  <div>
+                    <i
+                      className="fa-solid fa-bookmark category-icon"
+                      style={{
+                        color: color,
+                        fontSize: "12px",
+                        marginRight: "6px",
+                      }}
+                    ></i>
+                    <span style={{ fontSize: "12px", color: "#7589a3" }}>
+                      {categoryName}
+                    </span>
+                  </div>
+                )}{" "}
+              </div>
             </div>
             <div className="item-friend__right">
               <i
@@ -184,6 +266,20 @@ const FriendList = () => {
         </div>
       );
     }
+  }, [orderBy, friends, categorySelected, isShowDropdown]);
+
+  const handleSearch = async (value) => {
+    // const usersResult = await fetchUserList(value);
+    setKeywords(value);
+  };
+
+  const handleHoverEnter = () => {
+    setDropdownCategorySecond(true);
+  };
+
+  const handlefilterCategory = (value) => {
+    console.log(value);
+    setCategorySelected(value);
   };
 
   return (
@@ -196,10 +292,144 @@ const FriendList = () => {
           </div>
           <div className="friendlist-content">
             <div className="total-friends">
-              Bạn bè ({userInfo?.friends?.length})
+              Bạn bè ({totalFriends})
             </div>
-            <div className="filter-friends">Filter</div>
-            <div className="list-friends">{renderFriendlist()}</div>
+            <div className="filter-friends">
+              <div className="filter-item search">
+                <i className="fa-solid fa-magnifying-glass"></i>
+                <input
+                  value={keywords}
+                  type="text"
+                  className="input-search"
+                  placeholder="Tìm bạn"
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+                {keywords?.length > 0 && (
+                  <i
+                    className="fa-solid fa-circle-xmark"
+                    onClick={() => handleSearch("")}
+                    style={{ cursor: "pointer" }}
+                  ></i>
+                )}
+              </div>
+              <div className="filter-item asc-desc-order">
+                <div
+                  className={
+                    dropdownOrderBy
+                      ? "asc-desc-order__current asc-desc-order__current--active"
+                      : "asc-desc-order__current"
+                  }
+                  onClick={() => setDropdownOrderBy(!dropdownOrderBy)}
+                >
+                  <i className="fa-solid fa-arrows-up-down"></i>
+                  <span>Tên {orderBy === "asc" ? "(A-Z)" : "(Z-A)"}</span>
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+                {dropdownOrderBy && (
+                  <div className="asc-desc-order__dropdown" ref={orderByRef}>
+                    <div
+                      className="asc-filter"
+                      onClick={() => {
+                        setOderBy("asc");
+                        setDropdownOrderBy(false);
+                      }}
+                    >
+                      <span className="pick">
+                        {orderBy === "asc" && (
+                          <i className="fa-solid fa-check"></i>
+                        )}
+                      </span>
+
+                      <span>Tên (A-Z)</span>
+                    </div>
+                    <div
+                      className="desc-filter"
+                      onClick={() => {
+                        setOderBy("desc");
+                        setDropdownOrderBy(false);
+                      }}
+                    >
+                      <span className="pick">
+                        {orderBy === "desc" && (
+                          <i className="fa-solid fa-check"></i>
+                        )}
+                      </span>
+                      <span>Tên (Z-A)</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="filter-item category-order">
+                <div
+                  className={
+                    isShowDropdownCategories
+                      ? "category-order__current category-order__current--active"
+                      : "category-order__current"
+                  }
+                  onClick={() => setIsShowDropdownCategories(true)}
+                >
+                  <i className="fa-solid fa-filter"></i>
+                  <span>{categorySelected}</span>
+                </div>
+                {isShowDropdownCategories && (
+                  <div className="category-order__dropdown" ref={categoriesRef}>
+                    <div
+                      className="filter-all"
+                      onMouseEnter={() => setDropdownCategorySecond(false)}
+                      onClick={() => handlefilterCategory("Tất cả")}
+                    >
+                      {categorySelected === "Tất cả" && (
+                        <i
+                          className="fa-solid fa-check"
+                          style={{ color: "#005ae0" }}
+                        ></i>
+                      )}
+
+                      <span
+                        style={
+                          categorySelected !== "Tất cả"
+                            ? {
+                                paddingLeft: "26px",
+                              }
+                            : {}
+                        }
+                      >
+                        Tất cả
+                      </span>
+                    </div>
+                    <div
+                      className="filter-category"
+                      onMouseEnter={() => handleHoverEnter()}
+                    >
+                      <span style={{ paddingLeft: "26px" }}>Phân loại</span>
+                      <i className="fa-solid fa-chevron-right"></i>
+                      <div
+                        className={
+                          dropdownCategorySecond
+                            ? "filter-category__dropdown filter-category__dropdown--active"
+                            : "filter-category__dropdown"
+                        }
+                      >
+                        {userInfo.categoriesTemplate.map((item, index) => (
+                          <div
+                            className="category-dropdown-item"
+                            key={index}
+                            onClick={() => handlefilterCategory(item.name)}
+                          >
+                            <i
+                              className="fa-solid fa-bookmark category-icon"
+                              style={{ color: item.color }}
+                            ></i>
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="list-friends">{renderFriendlist}</div>
           </div>
         </div>
         {isShowOverlayModal && (

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import messageBg from "assets/messageBg.jpg";
-import cloudBg from "assets/cloudBg.jpg"
+import cloudBg from "assets/cloudBg.jpg";
 
 export const Wrapper = styled.div`
   min-width: calc(100% - var(--section-left-width) - var(--sidebar-width));
@@ -31,7 +31,7 @@ export const Container = styled.div`
           object-fit: cover;
           cursor: pointer;
           &:hover {
-            opacity: .9;
+            opacity: 0.9;
           }
         }
         .user-info {
@@ -50,10 +50,43 @@ export const Container = styled.div`
             display: inline-block;
           }
           .last-time {
+            display: flex;
+            align-items: center;
             font-weight: 500;
             color: #7589a3;
-            > i {
-              color: #7589a3;
+            .category {
+              position: relative;
+              .category-icon {
+                color: #7589a3;
+                font-size: 16px;
+                &:hover {
+                  cursor: pointer;
+                  color: #005ae0;
+                }
+              }
+              .category-dropdown {
+                position: absolute;
+                top: 24px;
+                background-color: #fff;
+                border-radius: 4px;
+                padding: 8px 0;
+                box-shadow: var(--box-shadow-default);
+                &__item {
+                  width: 190px;
+                  height: 40px;
+                  padding: 0 16px;
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  > i {
+                    font-size: 16px;
+                  }
+                  &:hover {
+                    cursor: pointer;
+                    background-color: #f1f1f1;
+                  }
+                }
+              }
             }
           }
         }
@@ -84,9 +117,11 @@ export const Container = styled.div`
     }
     &__content {
       padding-top: 20px;
-      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg }) ;
+      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
-      background-color: rgba(${(props) => props.isCloud ? "0, 0, 0, 0.05" :  "0, 0, 0, 0.15" });
+      background-color: rgba(
+        ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
+      );
       background-size: cover;
       background-repeat: no-repeat;
       height: calc(100vh - var(--header-height) - var(--footer-height));
@@ -255,7 +290,6 @@ export const Container = styled.div`
           bottom: 50px;
           left: 8px;
           box-shadow: var(--box-shadow-default);
-          
         }
         .box-icon {
           width: 38px;

@@ -2,10 +2,37 @@ import React, { useState, useEffect, useMemo, useRef, useContext } from "react";
 import * as S from "./styles";
 
 import { AppContext } from "Context/AppProvider";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "firebaseConfig";
 import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+
+async function fetchUserList(search) {
+  let array = [];
+
+  const dbRef = query(
+    collection(db, "users"),
+    where("keywords", "array-contains", search.toLowerCase())
+  );
+
+  const queryDocs = await getDocs(dbRef);
+
+  queryDocs.forEach((doc) => {
+    array.push({
+      id: doc.id,
+      ...doc.data(),
+    });
+  });
+
+  return array;
+}
 
 const ChatWithStrangers = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
@@ -13,8 +40,13 @@ const ChatWithStrangers = () => {
 
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
 
-  const { userInfo, strangerList, setSelectedUserMessaging } =
-    useContext(AppContext);
+  const {
+    userInfo,
+    strangerList,
+    setSelectedUserMessaging,
+    keywords,
+    setKeywords,
+  } = useContext(AppContext);
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
     const userInfoRef = doc(db, "users", userInfo.id);
@@ -37,13 +69,18 @@ const ChatWithStrangers = () => {
   };
 
   const dropdownRef = useRef(null);
+  const orderByRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsShowDropdown(false);
       }
+      if (orderByRef.current && !orderByRef.current.contains(event.target)) {
+        setDropdownOrderBy(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -72,7 +109,15 @@ const ChatWithStrangers = () => {
     });
   };
 
+  const [orderBy, setOderBy] = useState("asc");
+  const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
+
   const renderStrangerList = useMemo(() => {
+    if (orderBy === "desc") {
+      strangerList.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
+    } else {
+      strangerList.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
+    }
     return strangerList?.map((item, index) => {
       return (
         <div className="item-stranger" key={index}>
@@ -135,7 +180,12 @@ const ChatWithStrangers = () => {
         </div>
       );
     });
-  }, [strangerList, isShowDropdown]);
+  }, [strangerList, isShowDropdown, orderBy]);
+
+  const handleSearch = async (value) => {
+    // const usersResult = await fetchUserList(value);
+    setKeywords(value);
+  };
 
   return (
     <S.Wrapper>
@@ -149,7 +199,72 @@ const ChatWithStrangers = () => {
             <div className="total-strangers">
               Người lạ ({strangerList?.length})
             </div>
-            <div className="filter-strangers">Filter</div>
+            <div className="filter-strangers">
+              <div className="filter-item search">
+                <i className="fa-solid fa-magnifying-glass"></i>
+                <input
+                  value={keywords}
+                  type="text"
+                  className="input-search"
+                  placeholder="Tìm bạn"
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+                {keywords?.length > 0 && (
+                  <i
+                    className="fa-solid fa-circle-xmark"
+                    onClick={() => handleSearch("")}
+                    style={{ cursor: "pointer" }}
+                  ></i>
+                )}
+              </div>
+              <div className="filter-item asc-desc-order">
+                <div
+                  className={
+                    dropdownOrderBy
+                      ? "asc-desc-order__current asc-desc-order__current--active"
+                      : "asc-desc-order__current"
+                  }
+                  onClick={() => setDropdownOrderBy(!dropdownOrderBy)}
+                >
+                  <i className="fa-solid fa-arrows-up-down"></i>
+                  <span>Tên {orderBy === "asc" ? "(A-Z)" : "(Z-A)"}</span>
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+                {dropdownOrderBy && (
+                  <div className="asc-desc-order__dropdown" ref={orderByRef}>
+                    <div
+                      className="asc-filter"
+                      onClick={() => {
+                        setOderBy("asc");
+                        setDropdownOrderBy(false);
+                      }}
+                    >
+                      <span className="pick">
+                        {orderBy === "asc" && (
+                          <i className="fa-solid fa-check"></i>
+                        )}
+                      </span>
+
+                      <span>Tên (A-Z)</span>
+                    </div>
+                    <div
+                      className="desc-filter"
+                      onClick={() => {
+                        setOderBy("desc");
+                        setDropdownOrderBy(false);
+                      }}
+                    >
+                      <span className="pick">
+                        {orderBy === "desc" && (
+                          <i className="fa-solid fa-check"></i>
+                        )}
+                      </span>
+                      <span>Tên (Z-A)</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="list-strangers">{renderStrangerList}</div>
           </div>
         </div>

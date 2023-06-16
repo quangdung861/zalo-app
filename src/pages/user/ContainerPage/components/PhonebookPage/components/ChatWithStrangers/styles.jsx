@@ -44,12 +44,96 @@ export const Container = styled.div`
         font-weight: 500;
       }
       .filter-strangers {
+        width: 100%;
         height: 64px;
-        line-height: 64px;
         padding: 0 16px;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
         background-color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        .filter-item {
+          height: 32px;
+          flex: 1;
+          position: relative;
+        }
+        .search {
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          > input {
+            width: 100%;
+            border: none;
+            height: 32px;
+            padding: 0 6px;
+            background-color: transparent;
+            outline: none;
+            color: #7589a3;
+          }
+          > i {
+            padding: 0 6px;
+            color: #7589a3;
+          }
+        }
+        .asc-desc-order {
+          &__current {
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            height: 32px;
+            background-color: #eaedf0;
+            cursor: pointer;
+            > i {
+              padding: 0 12px;
+            }
+            > span {
+              flex: 1;
+            }
+            &:hover {
+              filter: brightness(95%);
+            }
+          }
+          &__current--active {
+            background-color: #e5efff;
+            * {
+              color: #005ae0;
+            }
+          }
+          &__dropdown {
+            width: 100%;
+            position: absolute;
+            top: 38px;
+            background-color: #fff;
+            box-shadow: var(--box-shadow-default);
+            border-radius: 4px;
+            padding: 8px 0;
+            z-index: 2;
+            > * {
+              height: 36px;
+              padding: 0 12px;
+              line-height: 36px;
+              .pick {
+                width: 24px;
+                display: inline-block;
+                > i {
+                  padding-right: 12px;
+                }
+              }
+
+              &:hover {
+                cursor: pointer;
+                background-color: #f1f1f1;
+              }
+            }
+            .asc-filter {
+            }
+            .desc-filter {
+            }
+          }
+        }
       }
       .list-strangers {
         border-bottom-left-radius: 6px;

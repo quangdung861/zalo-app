@@ -193,7 +193,7 @@ const Invitations = () => {
     await setDoc(
       strangerRef,
       {
-        friends: [userInfo.uid, ...friends],
+        friends: [{ uid: userInfo.uid, category: "" }, ...friends],
         invitationSent: newInvitationSent,
       },
       {
@@ -208,7 +208,7 @@ const Invitations = () => {
     await setDoc(
       userInfoRef,
       {
-        friends: [uid, ...userInfo.friends],
+        friends: [{ uid, category: "" }, ...userInfo.friends],
         invitationReceive: newInvitationReceive,
       },
       {

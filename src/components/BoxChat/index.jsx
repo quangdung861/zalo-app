@@ -26,13 +26,32 @@ const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
     useContext(AppContext);
 
+  console.log(
+    "🚀 ~ file: index.jsx:27 ~ BoxChat ~ selectedUserMessaging:",
+    selectedUserMessaging
+  );
   const inputRef = useRef();
   const boxChatRef = useRef();
+  const categoryRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
-  console.log("🚀 ~ file: index.jsx:33 ~ BoxChat ~ inputValue:", inputValue);
 
   const audio = new Audio(messageSend);
+
+  const [categoryDropdown, setCategoryDropdown] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+        setCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -320,6 +339,65 @@ const BoxChat = () => {
     setInputValue(inputValue + emoji.native);
   };
 
+  const [categoryUser, setCategoryUser] = useState({});
+
+  useEffect(() => {
+    const infoFriend = userInfo.friends.find(
+      (item) => item.uid === selectedUserMessaging.uidSelected
+    );
+
+    const categoryResult = userInfo.categoriesTemplate.find(
+      (item) => item.name === infoFriend?.category
+    );
+
+    setCategoryUser(categoryResult);
+  }, [selectedUserMessaging, userInfo]);
+
+  const handleCategoryUser = async (value) => {
+    const friendIndex = userInfo.friends.findIndex(
+      (item) => item.uid === selectedUserMessaging.uidSelected
+    );
+
+    const newFriends = userInfo.friends;
+
+    if (userInfo.friends[friendIndex].category === value) {
+      newFriends.splice(friendIndex, 1, {
+        uid: selectedUserMessaging.uidSelected,
+        category: "",
+      });
+
+      const userInfoRef = doc(db, "users", userInfo.id);
+
+      await setDoc(
+        userInfoRef,
+        {
+          friends: newFriends,
+        },
+        {
+          merge: true,
+        }
+      );
+      return;
+    }
+
+    newFriends.splice(friendIndex, 1, {
+      uid: selectedUserMessaging.uidSelected,
+      category: value,
+    });
+
+    const userInfoRef = doc(db, "users", userInfo.id);
+
+    await setDoc(
+      userInfoRef,
+      {
+        friends: newFriends,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
   return (
     <S.Wrapper>
       <S.Container
@@ -344,10 +422,60 @@ const BoxChat = () => {
                   {selectedUserMessaging.uidSelected === "my-cloud" ? (
                     <>Lưu và đồng bộ dữ liệu giữa các thiết bị</>
                   ) : (
-                    <>Truy cập 10 giờ trước</>
+                    <>
+                      <>Truy cập 10 giờ trước</>
+
+                      <span className="new-seperator"></span>
+                      <div className="category">
+                        {categoryUser ? (
+                          <div
+                            style={{ cursor: "pointer" }}
+                            onClick={() => setCategoryDropdown(true)}
+                          >
+                            <i
+                              className="fa-solid fa-bookmark category-icon"
+                              style={{
+                                color: categoryUser.color,
+                                marginRight: "8px",
+                              }}
+                            ></i>
+                            <span
+                              style={{
+                                color: categoryUser.color,
+                              }}
+                            >
+                              {categoryUser.name}
+                            </span>
+                          </div>
+                        ) : (
+                          <i
+                            className="fa-regular fa-bookmark category-icon"
+                            onClick={() => setCategoryDropdown(true)}
+                          ></i>
+                        )}
+
+                        {categoryDropdown && (
+                          <div className="category-dropdown" ref={categoryRef}>
+                            {userInfo?.categoriesTemplate?.map(
+                              (item, index) => (
+                                <div
+                                  key={index}
+                                  className="category-dropdown__item"
+                                  onClick={() => handleCategoryUser(item.name)}
+                                >
+                                  <i
+                                    className="fa-solid fa-bookmark"
+                                    style={{ color: item.color }}
+                                  ></i>
+                                  {item.name}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </>
                   )}
-                  <span className="new-seperator"></span>
-                  <i className="fa-regular fa-bookmark"></i>
                 </div>
               </div>
             </div>

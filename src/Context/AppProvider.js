@@ -49,13 +49,27 @@ const AppProvider = ({ children }) => {
   }, [uid]);
 
   const [strangerList, setStrangerList] = useState([]);
+  const [keywords, setKeywords] = useState("");
+
   useEffect(() => {
     if (userInfo?.friends) {
       const getStrangerList = async () => {
-        const strangerListRef = query(
-          collection(db, "users"),
-          where("uid", "not-in", [uid, ...userInfo.friends])
-        );
+        let strangerListRef;
+        const uidFriends = userInfo.friends.map((friend) => friend.uid);
+
+        if (keywords) {
+          strangerListRef = query(
+            collection(db, "users"),
+            where("uid", "not-in", [uid, ...uidFriends]),
+            where("keywords", "array-contains", keywords.toLowerCase())
+          );
+        } else {
+          strangerListRef = query(
+            collection(db, "users"),
+            where("uid", "not-in", [uid, ...uidFriends])
+          );
+        }
+
         const response = await getDocs(strangerListRef);
         const documents = response.docs.map((doc) => {
           const id = doc.id;
@@ -71,7 +85,7 @@ const AppProvider = ({ children }) => {
     } else {
       setStrangerList([]);
     }
-  }, [userInfo]);
+  }, [userInfo, keywords]);
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
 
@@ -83,7 +97,7 @@ const AppProvider = ({ children }) => {
       const roomsRef = query(
         collection(db, "rooms"),
         where("members", "array-contains", uid),
-        orderBy("createdAt", "desc"),
+        orderBy("createdAt", "desc")
       );
       onSnapshot(roomsRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
@@ -117,9 +131,8 @@ const AppProvider = ({ children }) => {
           };
         });
 
-        const room = rooms.filter(
-          (item) =>
-            item.members.includes(selectedUserMessaging.uidSelected)
+        const room = rooms.filter((item) =>
+          item.members.includes(selectedUserMessaging.uidSelected)
         );
         if (room[0]) {
           setRoom(room[0]);
@@ -141,6 +154,8 @@ const AppProvider = ({ children }) => {
         room,
         setRoom,
         rooms,
+        keywords,
+        setKeywords,
       }}
     >
       {children}
