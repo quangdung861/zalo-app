@@ -225,6 +225,10 @@ const FormEmail = ({ setRegisterWay }) => {
                 color: "#0068FF",
               },
             ],
+            notificationDowloadZaloPc: {
+              status: true,
+              updatedAt: serverTimestamp(),
+            },
           });
            addDocument("rooms", {
             category: "my cloud",

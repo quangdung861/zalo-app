@@ -13,15 +13,19 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import { AppContext } from "Context/AppProvider";
 import {
   collection,
+  doc,
   getDoc,
   getDocs,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import moment from "moment";
+import notificationDowloadZaloPc from "assets/notificationDowloadZaloPc.jpg";
 
 const MessagePage = () => {
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
@@ -194,7 +198,7 @@ const MessagePage = () => {
               </div>
               {!!unseenMessages && (
                 <div className="unseen">
-                  {unseenMessages < 5 ? unseenMessages : "N" }
+                  {unseenMessages < 5 ? unseenMessages : "N"}
                 </div>
               )}
             </div>
@@ -218,6 +222,23 @@ const MessagePage = () => {
         </div>
       );
     });
+  };
+
+  const handleRemindLater = async () => {
+    const docRef = doc(db, "users", userInfo.id);
+
+    await setDoc(
+      docRef,
+      {
+        notificationDowloadZaloPc: {
+          status: false,
+          updatedAt: serverTimestamp(),
+        },
+      },
+      {
+        merge: true,
+      }
+    );
   };
 
   return (
@@ -244,13 +265,44 @@ const MessagePage = () => {
                   <div className="menu-left__item">Chưa đọc</div>
                 </div>
                 <div className="menu__right">
-                  <div className="menu-right__item">Phân loại icon</div>
-                  <div className="menu-right__item">more</div>
+                  <div className="menu-right__item">Phân loại  &nbsp; <i class="fa-solid fa-chevron-down"></i></div>
+                  <div className="menu-right__item" style={{marginRight: "8px", marginLeft: "4px"}}><i class="fa-solid fa-ellipsis"></i></div>
                 </div>
               </div>
               <div className="room-list">
                 {/* <RenderRooms /> */}
                 {renderRooms}
+                {userInfo?.notificationDowloadZaloPc.status && (
+                  <div className="notification-compatible">
+                    <div className="notification-compatible__header">
+                      <img
+                        src={notificationDowloadZaloPc}
+                        alt=""
+                      />
+                    </div>
+                    <div className="notification-compatible__content">
+                      <div className="title">
+                        Tải và cài đặt ngay ứng dụng Zalo PC
+                      </div>
+                      <div className="description">
+                        Tăng khả năng bảo mật thông tin và trải nghiệm nhiều
+                        tính năng độc quyền chỉ có trên Zalo PC
+                      </div>
+                      <div className="footer">
+                        <div
+                          className="remind-me-later-btn"
+                          onClick={() => handleRemindLater()}
+                        >
+                          Nhắc tôi sau
+                        </div>
+                        <div className="dowload-now">
+                          <span>Tải ngay</span>
+                          <i class="fa-solid fa-download"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

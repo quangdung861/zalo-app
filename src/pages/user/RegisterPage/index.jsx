@@ -67,6 +67,10 @@ const LoginPage = () => {
                 color: "#0068FF",
               },
             ],
+            notificationDowloadZaloPc: {
+              status: true,
+              updatedAt: serverTimestamp(),
+            },
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -90,9 +94,7 @@ const LoginPage = () => {
               createdAt: serverTimestamp(),
             },
             totalMessages: 0,
-            messagesViewed: [
-              { uid: data.user.uid, count: 0 },
-            ],
+            messagesViewed: [{ uid: data.user.uid, count: 0 }],
           });
         }
       }
@@ -155,6 +157,10 @@ const LoginPage = () => {
                 color: "#0068FF",
               },
             ],
+            notificationDowloadZaloPc: {
+              status: true,
+              updatedAt: serverTimestamp(),
+            },
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -178,9 +184,7 @@ const LoginPage = () => {
               createdAt: serverTimestamp(),
             },
             totalMessages: 0,
-            messagesViewed: [
-              { uid: data.user.uid, count: 0 },
-            ],
+            messagesViewed: [{ uid: data.user.uid, count: 0 }],
           });
         }
       }

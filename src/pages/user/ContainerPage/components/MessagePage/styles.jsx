@@ -6,6 +6,7 @@ export const Wrapper = styled.div`
 
 export const Container = styled.div`
   width: 100%;
+  user-select: none;
   .message {
     display: flex;
     width: 100%;
@@ -82,6 +83,7 @@ export const Container = styled.div`
         }
         .room-list {
           height: calc(100vh - 64px - 32px);
+          position: relative;
           .room-item {
             height: 72px;
             padding: 0 16px;
@@ -157,6 +159,67 @@ export const Container = styled.div`
             background-color: #e5efff;
             :hover {
               background-color: #e5efff;
+            }
+          }
+          .notification-compatible {
+            user-select: none;
+            width: 93%;
+            position: absolute;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
+            bottom: 14px;
+            background-color: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow-default);
+            &__header {
+              > img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+              }
+            }
+            &__content {
+              padding: 6px 12px 12px 12px;
+              .title {
+                font-weight: 500;
+                margin-bottom: 8px;
+              }
+              .description {
+                margin-bottom: 16px;
+              }
+              .footer {
+                display: flex;
+                justify-content: end;
+                .remind-me-later-btn {
+                  background-color: #eaedf0;
+                  display: inline-block;
+                  padding: 2px 20px;
+                  border-radius: 4px;
+                  font-weight: 500;
+                  margin-right: 12px;
+                  &:hover {
+                    opacity: .9;
+                    cursor: pointer;
+                  }
+                }
+                .dowload-now {
+                  font-weight: 500;
+                  > i {
+                    margin-left: 5px;
+                    color: #005ae0;
+                  }
+                  > span {
+                    color: #005ae0;
+                  }
+                  &:hover {
+                    opacity: .9;
+                    cursor: pointer;
+                  }
+                }
+
+              }
             }
           }
         }
