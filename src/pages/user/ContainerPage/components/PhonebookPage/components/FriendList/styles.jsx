@@ -31,7 +31,8 @@ export const Container = styled.div`
       }
       .filter-friends {
         width: 100%;
-        height: 64px;
+        min-height: 64px;
+        height: 100%;
         padding: 0 16px;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
@@ -41,10 +42,11 @@ export const Container = styled.div`
         gap: 12px;
         .filter-item {
           height: 32px;
-          flex: 1;
+          /* flex: 1; */
           position: relative;
         }
         .search {
+          width: 33.33%;
           border: 1px solid #ccc;
           border-radius: 4px;
           height: 32px;
@@ -65,6 +67,8 @@ export const Container = styled.div`
           }
         }
         .asc-desc-order {
+          width: 33.33%;
+
           &__current {
             display: flex;
             align-items: center;
@@ -121,6 +125,8 @@ export const Container = styled.div`
           }
         }
         .category-order {
+          width: 33.33%;
+
           &__current {
             display: flex;
             align-items: center;
@@ -302,6 +308,34 @@ export const Container = styled.div`
           > div {
             font-weight: 500;
             color: #97a4b5;
+          }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 992px) {
+    .friendlist {
+      .friendlist-content {
+        .filter-friends {
+          flex-wrap: wrap;
+          padding-bottom: 16px;
+          padding-top: 16px;
+          gap: 0;
+          .filter-item {
+          }
+          .search {
+            width: 100%;
+            margin-bottom: 12px;
+          }
+          .asc-desc-order {
+            width: calc(50% - 5px);
+            margin-right: 5px;
+
+          }
+          .category-order {
+            width: calc(50% - 5px);
+            margin-left: 5px;
           }
         }
       }

@@ -10,6 +10,7 @@ import {
   getAdditionalUserInfo,
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "services";
+import { serverTimestamp } from "firebase/firestore";
 
 
 const FormEmail = ({ setRegisterWay }) => {
@@ -243,7 +244,13 @@ const FormEmail = ({ setRegisterWay }) => {
                 uid: data.user.uid,
               },
             ],
-            messageLastest: {},
+            messageLastest: {
+              createdAt: serverTimestamp(),
+            },
+            totalMessages: 0,
+            messagesViewed: [
+              { uid: data.user.uid, count: 0 },
+            ],
           });
         }
       }

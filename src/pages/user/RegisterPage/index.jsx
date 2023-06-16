@@ -12,6 +12,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "../../../services";
+import { serverTimestamp } from "firebase/firestore";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -85,7 +86,13 @@ const LoginPage = () => {
                 uid: data.user.uid,
               },
             ],
-            messageLastest: {},
+            messageLastest: {
+              createdAt: serverTimestamp(),
+            },
+            totalMessages: 0,
+            messagesViewed: [
+              { uid: data.user.uid, count: 0 },
+            ],
           });
         }
       }
@@ -167,7 +174,13 @@ const LoginPage = () => {
                 uid: data.user.uid,
               },
             ],
-            messageLastest: {},
+            messageLastest: {
+              createdAt: serverTimestamp(),
+            },
+            totalMessages: 0,
+            messagesViewed: [
+              { uid: data.user.uid, count: 0 },
+            ],
           });
         }
       }

@@ -24,12 +24,8 @@ import ModalAccount from "components/ModalAccount";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
-    useContext(AppContext);
+  useContext(AppContext);
 
-  console.log(
-    "🚀 ~ file: index.jsx:27 ~ BoxChat ~ selectedUserMessaging:",
-    selectedUserMessaging
-  );
   const inputRef = useRef();
   const boxChatRef = useRef();
   const categoryRef = useRef();
@@ -39,6 +35,48 @@ const BoxChat = () => {
   const audio = new Audio(messageSend);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
+
+  useEffect(() => {
+    if (inputRef) {
+      inputRef.current.focus();
+    }
+  }, [room.id]);
+
+  useEffect(() => {
+    if (room.id) {
+      const messagesViewedIndex = room.messagesViewed.findIndex(
+        (item) => item.uid === userInfo.uid
+      );
+      const messagesViewed = room.messagesViewed.find(
+        (item) => item.uid === userInfo.uid
+      );
+
+      const newMessageViewed = [...room.messagesViewed];
+
+      newMessageViewed.splice(messagesViewedIndex, 1, {
+        ...messagesViewed,
+        count: room.totalMessages,
+      });
+
+      const docRef = doc(db, "rooms", room.id);
+
+      updateMessageViewed(docRef, newMessageViewed);
+    }
+  }, [room]);
+
+  const updateMessageViewed = async (docRef, newMessageViewed) => {
+    setDoc(
+      docRef,
+      {
+        messagesViewed: newMessageViewed,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
+  const isFriend = userInfo.friends.findIndex((item) => item.uid === selectedUserMessaging.uidSelected)
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -60,6 +98,21 @@ const BoxChat = () => {
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
+
+            const messagesViewedIndex = room.messagesViewed.findIndex(
+              (item) => item.uid === userInfo.uid
+            );
+            const messagesViewed = room.messagesViewed.find(
+              (item) => item.uid === userInfo.uid
+            );
+
+            const newMessageViewed = [...room.messagesViewed];
+
+            newMessageViewed.splice(messagesViewedIndex, 1, {
+              ...messagesViewed,
+              count: messagesViewed.count + 1,
+            });
+
             await setDoc(
               roomRef,
               {
@@ -69,6 +122,8 @@ const BoxChat = () => {
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
                 },
+                totalMessages: room.totalMessages + 1,
+                messagesViewed: newMessageViewed,
               },
               {
                 merge: true,
@@ -110,6 +165,11 @@ const BoxChat = () => {
                   createdAt: serverTimestamp(),
                 },
                 createdAt: serverTimestamp(),
+                totalMessages: 1,
+                messagesViewed: [
+                  { uid: userInfo.uid, count: 1 },
+                  { uid: selectedUserMessaging.uidSelected, count: 0 },
+                ],
               });
 
               const response = await getDoc(roomRef);
@@ -187,6 +247,8 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    setMessages([]);
+    let unSubcribe;
     if (room.id) {
       const handleSnapShotMessage = async () => {
         const messagesRef = query(
@@ -194,7 +256,7 @@ const BoxChat = () => {
           where("roomId", "==", room.id),
           orderBy("createdAt", "asc")
         );
-        onSnapshot(messagesRef, (docsSnap) => {
+        unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
           const documents = docsSnap.docs.map((doc) => {
             const id = doc.id;
             const data = doc.data();
@@ -215,6 +277,8 @@ const BoxChat = () => {
         behavior: "auto",
       });
     }, 100);
+
+    return () => unSubcribe && unSubcribe();
   }, [room.id, rooms]);
 
   useEffect(() => {
@@ -421,10 +485,9 @@ const BoxChat = () => {
                 <div className="last-time">
                   {selectedUserMessaging.uidSelected === "my-cloud" ? (
                     <>Lưu và đồng bộ dữ liệu giữa các thiết bị</>
-                  ) : (
+                  ) : isFriend !== -1 ? (
                     <>
                       <>Truy cập 10 giờ trước</>
-
                       <span className="new-seperator"></span>
                       <div className="category">
                         {categoryUser ? (
@@ -475,7 +538,7 @@ const BoxChat = () => {
                         )}
                       </div>
                     </>
-                  )}
+                  ) : (<div style={{color: "#7589A3"}}>Người lạ</div>)}
                 </div>
               </div>
             </div>

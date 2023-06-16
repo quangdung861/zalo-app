@@ -18,6 +18,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
+import moment from "moment";
 
 export const AppContext = createContext();
 
@@ -96,9 +97,9 @@ const AppProvider = ({ children }) => {
     if (uid) {
       const roomsRef = query(
         collection(db, "rooms"),
-        where("members", "array-contains", uid),
-        orderBy("createdAt", "desc")
+        where("members", "array-contains", uid)
       );
+
       onSnapshot(roomsRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
           const id = doc.id;
@@ -108,7 +109,12 @@ const AppProvider = ({ children }) => {
             id: id,
           };
         });
-        setRooms(documents);
+
+        const newDocuments = [...documents].sort(
+          (a, b) => b.messageLastest.createdAt - a.messageLastest.createdAt
+        );
+
+        setRooms(newDocuments);
       });
     }
   }, [uid]);

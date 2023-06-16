@@ -129,9 +129,25 @@ export const Container = styled.div`
             }
             &__right {
               height: 100%;
-              padding-top: 16px;
+              padding-top: 12px;
               font-size: 12px;
               color: #7589a3;
+              display: flex;
+              flex-direction: column;
+              align-items: end;
+              .unseen {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 18px;
+                height: 18px;
+                font-size: 12px;
+                line-height: 12px;
+                margin-top: 8px;
+                border-radius: 50%;
+                color: #fff;
+                background-color: #dd0808;
+              }
             }
             :hover {
               background-color: #f1f1f1;

@@ -26,7 +26,7 @@ import moment from "moment";
 const MessagePage = () => {
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
   const { rooms, userInfo, selectedUserMessaging, setSelectedUserMessaging } =
-  useContext(AppContext);
+    useContext(AppContext);
 
   var settings = {
     dots: true,
@@ -152,6 +152,12 @@ const MessagePage = () => {
           (item) => item.uid !== userInfo.uid
         )[0];
 
+        const infoMyself = room.messagesViewed.find(
+          (item) => item.uid === userInfo.uid
+        );
+
+        const unseenMessages = room.totalMessages - infoMyself.count;
+
         return (
           <div
             key={room.id}
@@ -160,17 +166,15 @@ const MessagePage = () => {
                 ? "room-item room-item--active"
                 : "room-item"
             }
+            onClick={() =>
+              toogleBoxChat({
+                uidSelected: uidSelected,
+                photoURLSelected: infoPartner.avatar,
+                displayNameSelected: infoPartner.name,
+              })
+            }
           >
-            <div
-              className="room-item__left"
-              onClick={() =>
-                toogleBoxChat({
-                  uidSelected: uidSelected,
-                  photoURLSelected: infoPartner.avatar,
-                  displayNameSelected: infoPartner.name,
-                })
-              }
-            >
+            <div className="room-item__left">
               <img src={infoPartner.avatar} alt="" />
               <div className="info">
                 <div className="room-name">{infoPartner.name}</div>
@@ -185,7 +189,14 @@ const MessagePage = () => {
               </div>
             </div>
             <div className="room-item__right">
-              {formatDate !== "Invalid date" ? formatDate : "..."}
+              <div className="date">
+                {formatDate !== "Invalid date" ? formatDate : "..."}
+              </div>
+              {!!unseenMessages && (
+                <div className="unseen">
+                  {unseenMessages < 5 ? unseenMessages : "N" }
+                </div>
+              )}
             </div>
           </div>
         );
