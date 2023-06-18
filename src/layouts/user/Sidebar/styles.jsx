@@ -48,7 +48,7 @@ export const Wrapper = styled.div`
           }
          .unseen-messages {
             position: absolute;
-            top: 6px;
+            top: 7px;
             right: 7px;
             display: flex;
             justify-content: center;

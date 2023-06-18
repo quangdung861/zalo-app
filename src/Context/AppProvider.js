@@ -29,8 +29,6 @@ const AppProvider = ({ children }) => {
 
   const [userInfo, setUserInfo] = useState();
 
-
-
   useEffect(() => {
     let unSubcribe;
     if (uid) {
@@ -156,8 +154,6 @@ const AppProvider = ({ children }) => {
     }
   }, [selectedUserMessaging, rooms]);
 
-
-
   return (
     <AppContext.Provider
       value={{
@@ -170,7 +166,6 @@ const AppProvider = ({ children }) => {
         rooms,
         keywords,
         setKeywords,
-    
       }}
     >
       {children}

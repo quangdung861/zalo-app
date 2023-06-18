@@ -7,6 +7,8 @@ import { auth } from "firebaseConfig";
 import { ROUTES } from "routes";
 import BoxChat from "components/BoxChat";
 import { AuthContext } from "Context/AuthProvider";
+import { TITLE_BAR } from "constants/public";
+import { Helmet } from "react-helmet";
 
 export const UserLayoutContext = createContext();
 
@@ -34,9 +36,31 @@ const UserLayout = () => {
 
   const [isShowBoxChat, setIsShowBoxChat] = useState(false);
 
-
   const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
-  console.log("🚀 ~ file: index.jsx:39 ~ UserLayout ~ totalUnSeenMessage:", totalUnSeenMessage)
+
+  useEffect(() => {
+    if (window.location.hostname === "localhost") {
+      if (totalUnSeenMessage >= 1) {
+        if (totalUnSeenMessage > 99) {
+          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
+          return;
+        }
+        document.title = `(${totalUnSeenMessage}) ${TITLE_BAR.DEV}`;
+      } else {
+        document.title = TITLE_BAR.DEV;
+      }
+    } else {
+      if (totalUnSeenMessage >= 1) {
+        if (totalUnSeenMessage > 99) {
+          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
+          return;
+        }
+        document.title = `(${totalUnSeenMessage}) ${TITLE_BAR.DEPLOY}`;
+      } else {
+        document.title = TITLE_BAR.DEPLOY;
+      }
+    }
+  }, [totalUnSeenMessage]);
 
   return (
     <UserLayoutContext.Provider

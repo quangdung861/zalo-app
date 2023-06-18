@@ -278,7 +278,6 @@ const FriendList = () => {
   };
 
   const handlefilterCategory = (value) => {
-    console.log(value);
     setCategorySelected(value);
   };
 

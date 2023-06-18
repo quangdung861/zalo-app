@@ -46,7 +46,7 @@ const Sidebar = () => {
           {item.icon}
           {totalUnSeenMessage > 0 && item.id === "message" && (
             <div className="unseen-messages">
-              {totalUnSeenMessage}
+              {totalUnSeenMessage > 5 ? "N" : totalUnSeenMessage }
             </div>
           )}
         </div>

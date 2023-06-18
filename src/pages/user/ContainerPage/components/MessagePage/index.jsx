@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -26,6 +27,7 @@ import {
 import { db } from "firebaseConfig";
 import moment from "moment";
 import notificationDowloadZaloPc from "assets/notificationDowloadZaloPc.jpg";
+import ModalCreateGroup from "components/ModalCreateGroup";
 
 const MessagePage = () => {
   const { isShowBoxChat, setIsShowBoxChat, setTotalUnseenMessage } =
@@ -150,7 +152,7 @@ const MessagePage = () => {
   }, [totalUnSeenMessageRef]);
 
   const renderRooms = useMemo(() => {
-    setTotalUnseenMessageRef(0)
+    setTotalUnseenMessageRef(0);
     if (rooms[0]) {
       return rooms?.map((room, index) => {
         const formatDate = moment(
@@ -251,6 +253,9 @@ const MessagePage = () => {
     );
   };
 
+
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -264,7 +269,7 @@ const MessagePage = () => {
               <div className="add-friend">
                 <i className="fa-solid fa-user-plus icon"></i>
               </div>
-              <div className="create-groud">
+              <div className="create-groud" onClick={() => setIsShowOverlayModal(true) }>
                 <i className="fa-solid fa-users icon"></i>
               </div>
             </div>
@@ -339,6 +344,12 @@ const MessagePage = () => {
           )}
         </div>
       </S.Container>
+
+      {isShowOverlayModal && (
+        <ModalCreateGroup
+          setIsShowOverlayModal={setIsShowOverlayModal}
+        />
+      )}
     </S.Wrapper>
   );
 };

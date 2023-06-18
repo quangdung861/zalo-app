@@ -247,7 +247,6 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    setMessages([]);
     let unSubcribe;
     if (room.id) {
       const handleSnapShotMessage = async () => {
@@ -279,7 +278,7 @@ const BoxChat = () => {
     }, 100);
 
     return () => unSubcribe && unSubcribe();
-  }, [room.id, rooms]);
+  }, [room.id]);
 
   useEffect(() => {
     const chatWindow = boxChatRef?.current;

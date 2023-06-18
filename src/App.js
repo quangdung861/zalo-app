@@ -11,6 +11,8 @@ import LoginPage from "pages/user/LoginPage";
 import AppProvider from "Context/AppProvider";
 import AuthProvider from "Context/AuthProvider";
 import "moment/locale/vi";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export const DropdownContext = createContext();
 
@@ -39,6 +41,17 @@ function App() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // THAY ĐỔI FAVICON ĐỘNG
+  // useEffect(() => {
+  //   let link = document.querySelector("link[rel~='icon']");
+  //   if (!link) {
+  //     link = document.createElement("link");
+  //     link.rel = "icon";
+  //     document.getElementsByTagName("head")[0].appendChild(link);
+  //   }
+  //   link.href = favicon;
+  // }, []);
 
   return (
     <AuthProvider>
