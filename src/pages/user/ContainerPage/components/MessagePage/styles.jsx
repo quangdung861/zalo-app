@@ -223,6 +223,21 @@ export const Container = styled.div`
               }
             }
           }
+          .empty-message {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            > img {
+              margin: 30px 12px 16px;
+              width: 120px;
+              height: 120px;
+            }
+            > span {
+              color: #7589a3;
+              font-weight: 500;
+            }
+          }
         }
       }
     }

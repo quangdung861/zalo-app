@@ -29,6 +29,7 @@ import moment from "moment";
 import notificationDowloadZaloPc from "assets/notificationDowloadZaloPc.jpg";
 import ModalCreateGroup from "components/ModalCreateGroup";
 import AvatarGroup from "components/AvatarGroup";
+import emptyMessageUnssenImage from "assets/emptyMessageUnseen.png";
 
 const MessagePage = () => {
   const {
@@ -173,6 +174,12 @@ const MessagePage = () => {
     setSelectedGroupMessaging({ room, avatars, name });
   };
 
+  const [filterOption, setFilterOption] = useState("all");
+
+  const handleFilterOption = (value) => {
+    setFilterOption(value);
+  };
+
   const renderRooms = useMemo(() => {
     setTotalUnseenMessageRef(0);
     if (rooms[0]) {
@@ -197,6 +204,12 @@ const MessagePage = () => {
 
           setTotalUnseenMessageRef((current) => current + unseenMessages);
 
+          if (filterOption === "unseen") {
+            if (unseenMessages <= 0) {
+              return;
+            }
+          }
+
           return (
             <div
               key={room.id}
@@ -219,7 +232,9 @@ const MessagePage = () => {
                   <div className="room-name">{infoPartner.name}</div>
                   <div className="new-message">
                     <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid ? "Bạn: " : `${room.messageLastest.displayName}` }
+                      {room.messageLastest?.uid === userInfo.uid
+                        ? "Bạn: "
+                        : `${room.messageLastest.displayName}:`}
                     </span>
                     <span className="new-message__text">
                       {room.messageLastest?.text}
@@ -256,6 +271,12 @@ const MessagePage = () => {
           const unseenMessages = room.totalMessages - infoMyself.count;
 
           setTotalUnseenMessageRef((current) => current + unseenMessages);
+
+          if (filterOption === "unseen") {
+            if (unseenMessages <= 0) {
+              return;
+            }
+          }
 
           return (
             <div
@@ -303,6 +324,7 @@ const MessagePage = () => {
     rooms,
     selectedUserMessaging.uidSelected,
     selectedGroupMessaging.room?.id,
+    filterOption,
   ]);
 
   const renderSlideList = () => {
@@ -363,8 +385,18 @@ const MessagePage = () => {
             <div className="section-left__content">
               <div className="menu">
                 <div className="menu__left">
-                  <div className="menu-left__item">Tất cả</div>
-                  <div className="menu-left__item">Chưa đọc</div>
+                  <div
+                    className="menu-left__item"
+                    onClick={() => handleFilterOption("all")}
+                  >
+                    Tất cả
+                  </div>
+                  <div
+                    className="menu-left__item"
+                    onClick={() => handleFilterOption("unseen")}
+                  >
+                    Chưa đọc
+                  </div>
                 </div>
                 <div className="menu__right">
                   <div className="menu-right__item">
@@ -382,6 +414,18 @@ const MessagePage = () => {
               <div className="room-list">
                 {/* <RenderRooms /> */}
                 {renderRooms}
+                {renderRooms?.every((item) => item === undefined ) && filterOption === "unseen" && (
+                  <div className="empty-message">
+                    <img src={emptyMessageUnssenImage} alt="" className="empty-message__img" />
+                    <span>Không có tin nhắn chưa đọc</span>
+                  </div>
+                )}
+                  {renderRooms?.every((item) => item === undefined) && filterOption === "all" && (
+                  <div className="empty-message">
+                    <img src={emptyMessageUnssenImage} alt="" className="empty-message__img" />
+                    <span>Không có tin nhắn</span>
+                  </div>
+                )}
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">
