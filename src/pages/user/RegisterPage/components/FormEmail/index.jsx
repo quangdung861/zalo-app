@@ -12,7 +12,6 @@ import {
 import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
 
-
 const FormEmail = ({ setRegisterWay }) => {
   const [formData, setFormData] = useState({
     fullName: {
@@ -229,8 +228,12 @@ const FormEmail = ({ setRegisterWay }) => {
               status: true,
               updatedAt: serverTimestamp(),
             },
+             isOnline: {
+              value: true,
+              updatedAt: serverTimestamp(),
+            },
           });
-           addDocument("rooms", {
+          addDocument("rooms", {
             category: "my cloud",
             members: [data.user.uid, "my-cloud"],
             info: [
@@ -252,9 +255,7 @@ const FormEmail = ({ setRegisterWay }) => {
               createdAt: serverTimestamp(),
             },
             totalMessages: 0,
-            messagesViewed: [
-              { uid: data.user.uid, count: 0 },
-            ],
+            messagesViewed: [{ uid: data.user.uid, count: 0 }],
           });
         }
       }

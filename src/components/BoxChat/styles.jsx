@@ -23,15 +23,25 @@ export const Container = styled.div`
       .left {
         display: flex;
         align-items: center;
-        > img {
-          border-radius: 50%;
-          width: 48px;
-          height: 48px;
-          margin-right: 12px;
-          object-fit: cover;
-          cursor: pointer;
-          &:hover {
-            opacity: 0.9;
+        .avatar {
+          position: relative;
+          > img {
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+            object-fit: cover;
+            cursor: pointer;
+            &:hover {
+              opacity: 0.9;
+            }
+          }
+          > i {
+            position: absolute;
+            bottom: 5px;
+            right: 9px;
+            font-size: 11px;
+            color: #37b361;
           }
         }
         .user-info {
@@ -86,6 +96,11 @@ export const Container = styled.div`
                     background-color: #f1f1f1;
                   }
                 }
+              }
+            }
+            .online, .offline {
+              > span {
+                color: #7589a3;
               }
             }
           }

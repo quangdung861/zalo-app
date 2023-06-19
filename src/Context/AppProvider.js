@@ -15,7 +15,9 @@ import {
   onSnapshot,
   orderBy,
   query,
+  setDoc,
   where,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import moment from "moment";
@@ -28,6 +30,24 @@ const AppProvider = ({ children }) => {
   } = useContext(AuthContext);
 
   const [userInfo, setUserInfo] = useState();
+
+  useEffect(() => {
+    if (userInfo?.id) {
+      const docRef = doc(db, "users", userInfo.id);
+      setDoc(
+        docRef,
+        {
+          isOnline: {
+            value: true,
+            updatedAt: serverTimestamp(),
+          },
+        },
+        {
+          merge: true,
+        }
+      );
+    }
+  }, [userInfo?.id]);
 
   useEffect(() => {
     let unSubcribe;

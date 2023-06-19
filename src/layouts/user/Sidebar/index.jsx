@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { auth } from "firebaseConfig";
+import { auth, db } from "firebaseConfig";
 import { DropdownContext } from "App";
 import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const Sidebar = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
@@ -46,7 +47,7 @@ const Sidebar = () => {
           {item.icon}
           {totalUnSeenMessage > 0 && item.id === "message" && (
             <div className="unseen-messages">
-              {totalUnSeenMessage > 5 ? "N" : totalUnSeenMessage }
+              {totalUnSeenMessage > 5 ? "N" : totalUnSeenMessage}
             </div>
           )}
         </div>
@@ -55,6 +56,19 @@ const Sidebar = () => {
   };
 
   const handleLogout = async () => {
+    const docRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      docRef,
+      {
+        isOnline: {
+          value: false,
+          updatedAt: serverTimestamp(),
+        },
+      },
+      {
+        merge: true,
+      }
+    );
     await auth.signOut();
     window.location.reload();
   };

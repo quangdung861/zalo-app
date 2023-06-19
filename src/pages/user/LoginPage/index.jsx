@@ -79,6 +79,10 @@ const LoginPage = () => {
               status: true,
               updatedAt: serverTimestamp(),
             },
+             isOnline: {
+              value: true,
+              updatedAt: serverTimestamp(),
+            },
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -102,9 +106,7 @@ const LoginPage = () => {
               createdAt: serverTimestamp(),
             },
             totalMessages: 0,
-            messagesViewed: [
-              { uid: data.user.uid, count: 0 },
-            ],
+            messagesViewed: [{ uid: data.user.uid, count: 0 }],
           });
         }
       }
@@ -171,6 +173,10 @@ const LoginPage = () => {
               status: true,
               updatedAt: serverTimestamp(),
             },
+             isOnline: {
+              value: true,
+              updatedAt: serverTimestamp(),
+            },
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -194,9 +200,7 @@ const LoginPage = () => {
               createdAt: serverTimestamp(),
             },
             totalMessages: 0,
-            messagesViewed: [
-              { uid: data.user.uid, count: 0 },
-            ],
+            messagesViewed: [{ uid: data.user.uid, count: 0 }],
           });
         }
       }

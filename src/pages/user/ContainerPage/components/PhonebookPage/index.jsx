@@ -4,6 +4,7 @@ import FriendList from "./components/FriendList";
 import ChatWithStrangers from "./components/ChatWithStrangers";
 import Invitations from "./components/Invitations/Index";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import ModalCreateGroup from "components/ModalCreateGroup";
 
 const PhonebookPage = () => {
   const [sectionSelected, setSectionSelected] = useState("friend-list");
@@ -23,6 +24,8 @@ const PhonebookPage = () => {
     }
   };
 
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -36,7 +39,10 @@ const PhonebookPage = () => {
               <div className="add-friend">
                 <i className="fa-solid fa-user-plus icon"></i>
               </div>
-              <div className="create-groud">
+              <div
+                className="create-groud"
+                onClick={() => setIsShowOverlayModal(true)}
+              >
                 <i className="fa-solid fa-users icon"></i>
               </div>
             </div>
@@ -102,6 +108,9 @@ const PhonebookPage = () => {
             <div className="section-right">{renderSectionSelected()}</div>
           )}
         </div>
+        {isShowOverlayModal && (
+        <ModalCreateGroup setIsShowOverlayModal={setIsShowOverlayModal} />
+      )}
       </S.Container>
     </S.Wrapper>
   );

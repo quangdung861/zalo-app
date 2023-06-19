@@ -71,6 +71,10 @@ const LoginPage = () => {
               status: true,
               updatedAt: serverTimestamp(),
             },
+            isOnline: {
+              value: true,
+              updatedAt: serverTimestamp(),
+            },
           });
           addDocument("rooms", {
             category: "my cloud",
@@ -159,6 +163,10 @@ const LoginPage = () => {
             ],
             notificationDowloadZaloPc: {
               status: true,
+              updatedAt: serverTimestamp(),
+            },
+             isOnline: {
+              value: true,
               updatedAt: serverTimestamp(),
             },
           });

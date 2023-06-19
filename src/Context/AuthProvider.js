@@ -32,6 +32,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribed = auth.onAuthStateChanged((user) => {
+      console.log("🚀 ~ file: AuthProvider.js:35 ~ unsubscribed ~ user:", user);
       if (user) {
         const { displayName, email, uid, photoURL } = user;
         setUser({ displayName, email, uid, photoURL });

@@ -24,7 +24,7 @@ import ModalAccount from "components/ModalAccount";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
-  useContext(AppContext);
+    useContext(AppContext);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -76,7 +76,9 @@ const BoxChat = () => {
     );
   };
 
-  const isFriend = userInfo.friends.findIndex((item) => item.uid === selectedUserMessaging.uidSelected)
+  const isFriend = userInfo.friends.findIndex(
+    (item) => item.uid === selectedUserMessaging.uidSelected
+  );
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -215,31 +217,56 @@ const BoxChat = () => {
     }
   };
 
-  useEffect(() => {
-    fullInfoUserMessaging();
-  }, [selectedUserMessaging]);
-
+  // const [isOnline, setIsOnline] = useState(false);
   const [fullInfoUser, setFullInfoUser] = useState({});
+  console.log(
+    "🚀 ~ file: index.jsx:226 ~ BoxChat ~ fullInfoUser:",
+    fullInfoUser
+  );
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
+  useEffect(() => {
+    let unSubcribe;
+    if (selectedUserMessaging?.uidSelected) {
+      const fullInfoUserMessagingRef = query(
+        collection(db, "users"),
+        where("uid", "==", selectedUserMessaging.uidSelected)
+      );
+
+      unSubcribe = onSnapshot(fullInfoUserMessagingRef, (docsSnap) => {
+        const documents = docsSnap.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+        setFullInfoUser(documents[0]);
+      });
+    }
+    return () => unSubcribe && unSubcribe();
+  }, [selectedUserMessaging?.uidSelected]);
+
   const fullInfoUserMessaging = async () => {
-    const fullInfoUserMessagingRef = query(
-      collection(db, "users"),
-      where("uid", "==", selectedUserMessaging.uidSelected)
-    );
-    const response = await getDocs(fullInfoUserMessagingRef);
-    const documents = response.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    return setFullInfoUser(documents[0]);
+    // let unSubcribe;
+    // const fullInfoUserMessagingRef = query(
+    //   collection(db, "users"),
+    //   where("uid", "==", selectedUserMessaging.uidSelected)
+    // );
+    // const response = await getDocs(fullInfoUserMessagingRef);
+    // const documents = response.docs.map((doc) => {
+    //   return { id: doc.id, ...doc.data() };
+    // });
+    // return setFullInfoUser(documents[0]);
   };
 
   useEffect(() => {
     // focus to input again after submit
     if (inputRef?.current) {
       setTimeout(() => {
-        inputRef.current.focus();
+        inputRef.current?.focus();
       });
     }
   }, []);
@@ -460,6 +487,9 @@ const BoxChat = () => {
       }
     );
   };
+  const date = moment(
+    fullInfoUser?.isOnline?.updatedAt?.seconds * 1000
+  )?.fromNow();
 
   return (
     <S.Wrapper>
@@ -471,11 +501,16 @@ const BoxChat = () => {
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
-              <img
-                src={selectedUserMessaging?.photoURLSelected}
-                alt=""
-                onClick={() => setIsShowOverlayModal(true)}
-              />
+              <div className="avatar">
+                <img
+                  src={selectedUserMessaging?.photoURLSelected}
+                  alt=""
+                  onClick={() => setIsShowOverlayModal(true)}
+                />
+                {fullInfoUser?.isOnline?.value && (
+                  <i class="fa-solid fa-circle"></i>
+                )}
+              </div>
               <div className="user-info">
                 <div className="display-name">
                   {selectedUserMessaging?.displayNameSelected}
@@ -486,7 +521,17 @@ const BoxChat = () => {
                     <>Lưu và đồng bộ dữ liệu giữa các thiết bị</>
                   ) : isFriend !== -1 ? (
                     <>
-                      <>Truy cập 10 giờ trước</>
+                      <>
+                        {fullInfoUser?.isOnline?.value ? (
+                          <div className="online">
+                            <span>Vừa truy cập</span>
+                          </div>
+                        ) : (
+                          <div className="offline">
+                            <span>Truy cập {date} </span>
+                          </div>
+                        )}{" "}
+                      </>
                       <span className="new-seperator"></span>
                       <div className="category">
                         {categoryUser ? (
@@ -537,7 +582,9 @@ const BoxChat = () => {
                         )}
                       </div>
                     </>
-                  ) : (<div style={{color: "#7589A3"}}>Người lạ</div>)}
+                  ) : (
+                    <div style={{ color: "#7589A3" }}>Người lạ</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -566,7 +613,9 @@ const BoxChat = () => {
               <div className="user-info__name">
                 {selectedUserMessaging.displayNameSelected}
               </div>
-              {userInfo.friends.includes(selectedUserMessaging.uidSelected) ? (
+              {userInfo.friends.find(
+                (item) => item.uid === selectedUserMessaging.uidSelected
+              ) ? (
                 <div className="user-info__description">
                   {selectedUserMessaging.displayNameSelected} là bạn bè của bạn
                   trên Zalo
