@@ -9,7 +9,7 @@ import ModalCreateGroup from "components/ModalCreateGroup";
 const PhonebookPage = () => {
   const [sectionSelected, setSectionSelected] = useState("friend-list");
 
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   const renderSectionSelected = () => {
     switch (sectionSelected) {
@@ -56,6 +56,7 @@ const PhonebookPage = () => {
                   }
                   onClick={() => {
                     setIsShowBoxChat(false);
+                    setIsShowBoxChatGroup(false);
                     setSectionSelected("friend-list");
                   }}
                 >

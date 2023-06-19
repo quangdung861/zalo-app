@@ -23,8 +23,9 @@ import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
 
 const BoxChat = () => {
-  const { userInfo, room, selectedUserMessaging, setRoom, rooms } =
-    useContext(AppContext);
+  const { userInfo, room, selectedUserMessaging, setRoom } =
+  useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:27 ~ BoxChat ~ room:", room)
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -219,10 +220,6 @@ const BoxChat = () => {
 
   // const [isOnline, setIsOnline] = useState(false);
   const [fullInfoUser, setFullInfoUser] = useState({});
-  console.log(
-    "🚀 ~ file: index.jsx:226 ~ BoxChat ~ fullInfoUser:",
-    fullInfoUser
-  );
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
@@ -272,6 +269,7 @@ const BoxChat = () => {
   }, []);
 
   const [messages, setMessages] = useState([]);
+  console.log("🚀 ~ file: index.jsx:271 ~ BoxChat ~ messages:", messages)
 
   useEffect(() => {
     let unSubcribe;
@@ -508,7 +506,7 @@ const BoxChat = () => {
                   onClick={() => setIsShowOverlayModal(true)}
                 />
                 {fullInfoUser?.isOnline?.value && (
-                  <i class="fa-solid fa-circle"></i>
+                  <i className="fa-solid fa-circle"></i>
                 )}
               </div>
               <div className="user-info">

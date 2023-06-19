@@ -38,7 +38,7 @@ const ChatWithStrangers = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   const {
     userInfo,
@@ -46,6 +46,7 @@ const ChatWithStrangers = () => {
     setSelectedUserMessaging,
     keywords,
     setKeywords,
+    setSelectedGroupMessaging,
   } = useContext(AppContext);
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
@@ -101,6 +102,8 @@ const ChatWithStrangers = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
+    setSelectedGroupMessaging({})
+    setIsShowBoxChatGroup(false);
     setIsShowBoxChat(!isShowBoxChat);
     setSelectedUserMessaging({
       uidSelected,

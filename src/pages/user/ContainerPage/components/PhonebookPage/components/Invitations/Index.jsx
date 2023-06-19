@@ -20,7 +20,7 @@ import ModalAccount from "components/ModalAccount";
 
 const Invitations = () => {
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   const [invitationSent, setInvitationSent] = useState([]);
   const [invitationReceive, setInvitationReceive] = useState([]);
@@ -342,6 +342,7 @@ const Invitations = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
+    setIsShowBoxChatGroup(false)
     setIsShowBoxChat(!isShowBoxChat);
     setSelectedUserMessaging({
       uidSelected,

@@ -225,7 +225,7 @@ const FormEmail = ({ setRegisterWay }) => {
               },
             ],
             notificationDowloadZaloPc: {
-              status: true,
+              value: true,
               updatedAt: serverTimestamp(),
             },
              isOnline: {

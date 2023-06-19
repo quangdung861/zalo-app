@@ -15,8 +15,8 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const FriendList = () => {
-  const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } = useContext(AppContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
   const [keywords, setKeywords] = useState("");
 
   const [friends, setFriends] = useState([]);
@@ -130,7 +130,9 @@ const FriendList = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
-    setIsShowBoxChat(!isShowBoxChat);
+    setIsShowBoxChatGroup(false);
+    setSelectedGroupMessaging({});
+    setIsShowBoxChat(true);
     setSelectedUserMessaging({
       uidSelected,
       photoURLSelected,

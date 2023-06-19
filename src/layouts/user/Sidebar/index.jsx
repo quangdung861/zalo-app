@@ -14,8 +14,12 @@ const Sidebar = () => {
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
     useContext(DropdownContext);
 
-  const { sidebarSelected, setSidebarSelected, totalUnSeenMessage } =
-    useContext(UserLayoutContext);
+  const {
+    sidebarSelected,
+    setSidebarSelected,
+    totalUnSeenMessage,
+    setIsShowBoxChatGroup,
+  } = useContext(UserLayoutContext);
   const { userInfo, rooms, setSelectedUserMessaging } = useContext(AppContext);
 
   const listItemTop = [
@@ -31,6 +35,13 @@ const Sidebar = () => {
     },
   ];
 
+  const handleOpenBoxChat = (id) => {
+    if (id === "phonebook") {
+      setIsShowBoxChatGroup(false);
+      setIsShowBoxChat(false);
+    }
+  };
+
   const renderActionList = (list) => {
     return list.map((item, index) => {
       return (
@@ -42,7 +53,10 @@ const Sidebar = () => {
               : "action-item"
           }
           title={item.name}
-          onClick={() => setSidebarSelected(item.id)}
+          onClick={() => {
+            handleOpenBoxChat(item.id);
+            setSidebarSelected(item.id);
+          }}
         >
           {item.icon}
           {totalUnSeenMessage > 0 && item.id === "message" && (
@@ -91,6 +105,7 @@ const Sidebar = () => {
   }, [rooms]);
 
   const toogleBoxChat = () => {
+    setIsShowBoxChatGroup(false);
     setIsShowBoxChat(true);
     setSelectedUserMessaging({
       uidSelected: roomCloud.uid,

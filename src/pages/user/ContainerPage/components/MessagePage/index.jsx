@@ -219,7 +219,7 @@ const MessagePage = () => {
                   <div className="room-name">{infoPartner.name}</div>
                   <div className="new-message">
                     <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                      {room.messageLastest?.uid === userInfo.uid ? "Bạn: " : `${room.messageLastest.displayName}` }
                     </span>
                     <span className="new-message__text">
                       {room.messageLastest?.text}
@@ -328,7 +328,7 @@ const MessagePage = () => {
       docRef,
       {
         notificationDowloadZaloPc: {
-          status: false,
+          value: false,
           updatedAt: serverTimestamp(),
         },
       },
@@ -382,7 +382,7 @@ const MessagePage = () => {
               <div className="room-list">
                 {/* <RenderRooms /> */}
                 {renderRooms}
-                {userInfo?.notificationDowloadZaloPc.status && (
+                {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">
                       <img src={notificationDowloadZaloPc} alt="" />

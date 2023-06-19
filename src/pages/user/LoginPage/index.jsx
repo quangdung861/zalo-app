@@ -76,7 +76,7 @@ const LoginPage = () => {
               },
             ],
             notificationDowloadZaloPc: {
-              status: true,
+              value: true,
               updatedAt: serverTimestamp(),
             },
              isOnline: {
@@ -170,7 +170,7 @@ const LoginPage = () => {
               },
             ],
             notificationDowloadZaloPc: {
-              status: true,
+              value: true,
               updatedAt: serverTimestamp(),
             },
              isOnline: {

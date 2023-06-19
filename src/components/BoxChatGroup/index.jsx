@@ -32,10 +32,6 @@ const BoxChat = () => {
     setSelectedGroupMessaging,
     selectedGroupMessaging,
   } = useContext(AppContext);
-  console.log(
-    "🚀 ~ file: index.jsx:34 ~ BoxChat ~ selectedGroupMessaging:",
-    selectedGroupMessaging
-  );
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -45,7 +41,6 @@ const BoxChat = () => {
 
   const audio = new Audio(messageSend);
 
-  const [categoryDropdown, setCategoryDropdown] = useState(false);
 
   useEffect(() => {
     if (inputRef) {
@@ -86,19 +81,6 @@ const BoxChat = () => {
       }
     );
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -371,8 +353,8 @@ const BoxChat = () => {
 
                 <div className="last-time">
                   <>
-                    <>Truy cập 10 giờ trước</>
-                    <span className="new-seperator"></span>
+                    {/* <></>
+                    <span className="new-seperator"></span> */}
                     <div style={{ color: "#7589A3" }}>Nhóm</div>
                   </>
                 </div>

@@ -46,6 +46,28 @@ const AppProvider = ({ children }) => {
           merge: true,
         }
       );
+      // REFRESH REMIND MESSAGE
+      const currentTime = moment();
+      const previousTime = moment(
+        userInfo.notificationDowloadZaloPc?.updatedAt?.toDate()
+      );
+      const duration = moment.duration(currentTime.diff(previousTime));
+      const hoursDifference = duration.asHours();
+      if (hoursDifference > 24) {
+        const docRef = doc(db, "users", userInfo.id);
+        setDoc(
+          docRef,
+          {
+            notificationDowloadZaloPc: {
+              value: true,
+              updatedAt: serverTimestamp(),
+            },
+          },
+          {
+            merge: true,
+          }
+        );
+      }
     }
   }, [userInfo?.id]);
 
@@ -112,9 +134,14 @@ const AppProvider = ({ children }) => {
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
+  console.log(
+    "🚀 ~ file: AppProvider.js:137 ~ AppProvider ~ selectedGroupMessaging:",
+    selectedGroupMessaging
+  );
 
   const [room, setRoom] = useState({});
   const [rooms, setRooms] = useState({});
+  console.log("🚀 ~ file: AppProvider.js:141 ~ AppProvider ~ rooms:", rooms);
 
   useEffect(() => {
     let unSubcribe;
@@ -147,24 +174,12 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
       const getRoom = async () => {
-        const roomsRef = query(
-          collection(db, "rooms"),
-          where("members", "array-contains", userInfo.uid)
+        const room = rooms.filter(
+          (item) =>
+            item.members.includes(selectedUserMessaging.uidSelected) &&
+            item.category === "single"
         );
-        const responseRooms = await getDocs(roomsRef);
 
-        const rooms = responseRooms.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-
-        const room = rooms.filter((item) =>
-          item.members.includes(selectedUserMessaging.uidSelected)
-        );
         if (room[0]) {
           setRoom(room[0]);
         } else {
@@ -174,6 +189,22 @@ const AppProvider = ({ children }) => {
       getRoom();
     }
   }, [selectedUserMessaging, rooms]);
+
+  useEffect(() => {
+    if (selectedGroupMessaging?.room?.id) {
+      const getRoom = async () => {
+        const room = rooms.filter(
+          (item) => item.id === selectedGroupMessaging?.room?.id
+        );
+        if (room[0]) {
+          setRoom(room[0]);
+        } else {
+          setRoom({});
+        }
+      };
+      getRoom();
+    }
+  }, [rooms, selectedGroupMessaging?.room?.id]);
 
   return (
     <AppContext.Provider

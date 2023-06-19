@@ -18,7 +18,7 @@ const ModalAccount = ({
   const accountInfoRef = useRef(null);
 
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  const { setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   // PHONENUMBER
   const [updatePhoneNumber, setUpdatePhoneNumber] = useState();
@@ -129,6 +129,7 @@ const ModalAccount = ({
     photoURLSelected,
     displayNameSelected,
   }) => {
+    setIsShowBoxChatGroup(false)
     setIsShowBoxChat(true);
     setSelectedUserMessaging({
       uidSelected,
