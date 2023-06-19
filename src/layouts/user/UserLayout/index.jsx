@@ -9,6 +9,7 @@ import BoxChat from "components/BoxChat";
 import { AuthContext } from "Context/AuthProvider";
 import { TITLE_BAR } from "constants/public";
 import { Helmet } from "react-helmet";
+import BoxChatGroup from "components/BoxChatGroup";
 
 export const UserLayoutContext = createContext();
 
@@ -35,6 +36,8 @@ const UserLayout = () => {
   }, []);
 
   const [isShowBoxChat, setIsShowBoxChat] = useState(false);
+
+  const [isShowBoxChatGroup, setIsShowBoxChatGroup] = useState(false);
 
   const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
 
@@ -71,6 +74,8 @@ const UserLayout = () => {
         setIsShowBoxChat,
         totalUnSeenMessage,
         setTotalUnseenMessage,
+        isShowBoxChatGroup,
+        setIsShowBoxChatGroup,
       }}
     >
       <S.Wrapper>
@@ -78,6 +83,7 @@ const UserLayout = () => {
           <Sidebar />
           <Outlet className="outlet" />
           {isShowBoxChat && <BoxChat className="box-chat" />}
+          {isShowBoxChatGroup && <BoxChatGroup className="box-chat" />}
         </S.Container>
       </S.Wrapper>
     </UserLayoutContext.Provider>

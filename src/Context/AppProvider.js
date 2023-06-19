@@ -91,6 +91,7 @@ const AppProvider = ({ children }) => {
   }, [userInfo, keywords]);
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
+  const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
 
   const [room, setRoom] = useState({});
   const [rooms, setRooms] = useState({});
@@ -161,6 +162,8 @@ const AppProvider = ({ children }) => {
         strangerList,
         setSelectedUserMessaging,
         selectedUserMessaging,
+        setSelectedGroupMessaging,
+        selectedGroupMessaging,
         room,
         setRoom,
         rooms,

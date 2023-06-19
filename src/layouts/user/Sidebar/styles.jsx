@@ -95,6 +95,7 @@ export const Wrapper = styled.div`
           position: relative;
           .dropdown-setting {
             position: absolute;
+            z-index: 99;
             bottom: 65px;
             left: 8px;
             background-color: #fff;

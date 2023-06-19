@@ -28,12 +28,24 @@ import { db } from "firebaseConfig";
 import moment from "moment";
 import notificationDowloadZaloPc from "assets/notificationDowloadZaloPc.jpg";
 import ModalCreateGroup from "components/ModalCreateGroup";
+import AvatarGroup from "components/AvatarGroup";
 
 const MessagePage = () => {
-  const { isShowBoxChat, setIsShowBoxChat, setTotalUnseenMessage } =
-    useContext(UserLayoutContext);
-  const { rooms, userInfo, selectedUserMessaging, setSelectedUserMessaging } =
-    useContext(AppContext);
+  const {
+    isShowBoxChat,
+    setIsShowBoxChat,
+    setTotalUnseenMessage,
+    isShowBoxChatGroup,
+    setIsShowBoxChatGroup,
+  } = useContext(UserLayoutContext);
+  const {
+    rooms,
+    userInfo,
+    selectedUserMessaging,
+    setSelectedUserMessaging,
+    setSelectedGroupMessaging,
+    selectedGroupMessaging,
+  } = useContext(AppContext);
 
   var settings = {
     dots: true,
@@ -137,6 +149,8 @@ const MessagePage = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
+    setIsShowBoxChatGroup(false);
+    setSelectedGroupMessaging(false);
     setIsShowBoxChat(true);
     setSelectedUserMessaging({
       uidSelected,
@@ -151,74 +165,145 @@ const MessagePage = () => {
     setTotalUnseenMessage(totalUnSeenMessageRef);
   }, [totalUnSeenMessageRef]);
 
+  const toogleBoxChatGroup = (room, avatars, name) => {
+    setIsShowBoxChat(false);
+    setSelectedUserMessaging(false);
+    setIsShowBoxChatGroup(true);
+
+    setSelectedGroupMessaging({ room, avatars, name });
+  };
+
   const renderRooms = useMemo(() => {
     setTotalUnseenMessageRef(0);
     if (rooms[0]) {
       return rooms?.map((room, index) => {
-        const formatDate = moment(
-          room.messageLastest?.createdAt?.seconds * 1000
-        )?.fromNow();
-        const uidSelected = room.members.filter(
-          (member) => member !== userInfo.uid
-        )[0];
+        if (room.category === "single" || room.category === "my cloud") {
+          const formatDate = moment(
+            room.messageLastest?.createdAt?.seconds * 1000
+          )?.fromNow();
+          const uidSelected = room.members.filter(
+            (member) => member !== userInfo.uid
+          )[0];
 
-        const infoPartner = room.info.filter(
-          (item) => item.uid !== userInfo.uid
-        )[0];
+          const infoPartner = room.info.filter(
+            (item) => item.uid !== userInfo.uid
+          )[0];
 
-        const infoMyself = room.messagesViewed.find(
-          (item) => item.uid === userInfo.uid
-        );
+          const infoMyself = room.messagesViewed.find(
+            (item) => item.uid === userInfo.uid
+          );
 
-        const unseenMessages = room.totalMessages - infoMyself.count;
+          const unseenMessages = room.totalMessages - infoMyself.count;
 
-        setTotalUnseenMessageRef((current) => current + unseenMessages);
+          setTotalUnseenMessageRef((current) => current + unseenMessages);
 
-        return (
-          <div
-            key={room.id}
-            className={
-              uidSelected === selectedUserMessaging.uidSelected
-                ? "room-item room-item--active"
-                : "room-item"
-            }
-            onClick={() =>
-              toogleBoxChat({
-                uidSelected: uidSelected,
-                photoURLSelected: infoPartner.avatar,
-                displayNameSelected: infoPartner.name,
-              })
-            }
-          >
-            <div className="room-item__left">
-              <img src={infoPartner.avatar} alt="" />
-              <div className="info">
-                <div className="room-name">{infoPartner.name}</div>
-                <div className="new-message">
-                  <span className="new-message__author">
-                    {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
-                  </span>
-                  <span className="new-message__text">
-                    {room.messageLastest?.text}
-                  </span>
+          return (
+            <div
+              key={room.id}
+              className={
+                uidSelected === selectedUserMessaging.uidSelected
+                  ? "room-item room-item--active"
+                  : "room-item"
+              }
+              onClick={() =>
+                toogleBoxChat({
+                  uidSelected: uidSelected,
+                  photoURLSelected: infoPartner.avatar,
+                  displayNameSelected: infoPartner.name,
+                })
+              }
+            >
+              <div className="room-item__left">
+                <img src={infoPartner.avatar} alt="" />
+                <div className="info">
+                  <div className="room-name">{infoPartner.name}</div>
+                  <div className="new-message">
+                    <span className="new-message__author">
+                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                    </span>
+                    <span className="new-message__text">
+                      {room.messageLastest?.text}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="room-item__right">
-              <div className="date">
-                {formatDate !== "Invalid date" ? formatDate : "..."}
-              </div>
-              {!!unseenMessages && (
-                <div className="unseen">
-                  {unseenMessages < 5 ? unseenMessages : "N"}
+              <div className="room-item__right">
+                <div className="date">
+                  {formatDate !== "Invalid date" ? formatDate : "..."}
                 </div>
-              )}
+                {!!unseenMessages && (
+                  <div className="unseen">
+                    {unseenMessages < 5 ? unseenMessages : "N"}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        );
+          );
+        }
+        if (room.category === "group") {
+          const formatDate = moment(
+            room.messageLastest?.createdAt?.seconds * 1000
+          )?.fromNow();
+
+          const avatars = room.info.map((item) => item.avatar);
+
+          const name = room.info.map((item) => item.name).join(", ");
+
+          const infoMyself = room.messagesViewed.find(
+            (item) => item.uid === userInfo.uid
+          );
+
+          const unseenMessages = room.totalMessages - infoMyself.count;
+
+          setTotalUnseenMessageRef((current) => current + unseenMessages);
+
+          return (
+            <div
+              key={room.id}
+              className={
+                room.id === selectedGroupMessaging?.room?.id
+                  ? "room-item room-item--active"
+                  : "room-item"
+              }
+              onClick={() => toogleBoxChatGroup(room, avatars, name)}
+            >
+              <div className="room-item__left">
+                {room.avatar.url && <img src={room.avatar.url} alt="" />}
+
+                {!room.avatar.url && <AvatarGroup props={{ room, avatars }} />}
+
+                <div className="info">
+                  <div className="room-name">{room.name || name}</div>
+                  <div className="new-message">
+                    <span className="new-message__author">
+                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                    </span>
+                    <span className="new-message__text">
+                      {room.messageLastest?.text}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="room-item__right">
+                <div className="date">
+                  {formatDate !== "Invalid date" ? formatDate : "..."}
+                </div>
+                {!!unseenMessages && (
+                  <div className="unseen">
+                    {unseenMessages < 5 ? unseenMessages : "N"}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
       });
     }
-  }, [rooms, selectedUserMessaging.uidSelected]);
+  }, [
+    rooms,
+    selectedUserMessaging.uidSelected,
+    selectedGroupMessaging.room?.id,
+  ]);
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
@@ -253,7 +338,6 @@ const MessagePage = () => {
     );
   };
 
-
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   return (
@@ -269,7 +353,10 @@ const MessagePage = () => {
               <div className="add-friend">
                 <i className="fa-solid fa-user-plus icon"></i>
               </div>
-              <div className="create-groud" onClick={() => setIsShowOverlayModal(true) }>
+              <div
+                className="create-groud"
+                onClick={() => setIsShowOverlayModal(true)}
+              >
                 <i className="fa-solid fa-users icon"></i>
               </div>
             </div>
@@ -326,7 +413,7 @@ const MessagePage = () => {
               </div>
             </div>
           </div>
-          {!isShowBoxChat && (
+          {!isShowBoxChatGroup && !isShowBoxChat && (
             <div className="section-right">
               <div className="content-welcome">
                 <div className="content-welcome__header">
@@ -346,9 +433,7 @@ const MessagePage = () => {
       </S.Container>
 
       {isShowOverlayModal && (
-        <ModalCreateGroup
-          setIsShowOverlayModal={setIsShowOverlayModal}
-        />
+        <ModalCreateGroup setIsShowOverlayModal={setIsShowOverlayModal} />
       )}
     </S.Wrapper>
   );

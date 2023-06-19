@@ -4,7 +4,7 @@ export const Wrapper = styled.div``;
 
 export const Container = styled.div`
   .modal-overlay {
-    z-index: 2;
+    z-index: 99;
     background-color: rgba(0, 0, 0, 0.4);
     position: fixed;
     inset: 0 0 0 0;
@@ -53,6 +53,7 @@ export const Container = styled.div`
         }
         .content {
           flex: 1;
+          width: 100%;
           .create-group-header {
             display: flex;
             align-items: center;
@@ -191,6 +192,8 @@ export const Container = styled.div`
             padding-top: 2px;
             border-top: 1px solid var(--boder-dividing-color);
             display: flex;
+            overflow: hidden;
+            white-space: nowrap;
             .friend-list {
               padding-top: 12px;
               flex: 1;
@@ -244,13 +247,13 @@ export const Container = styled.div`
               }
             }
             .friend-selected-container {
-              width: 184px;
+              width: 0px;
               height: 276px;
               max-height: 276px;
               padding-top: 12px;
               margin: 12px 0 0 14px;
-              border: 1px solid var(--boder-dividing-color);
               border-radius: 4px;
+              transition: width 0.4s ease;
               .total-selected {
                 margin: 0 12px;
                 margin-bottom: 12px;
@@ -315,6 +318,24 @@ export const Container = styled.div`
                 }
               }
             }
+            .friend-selected-container--active {
+              width: 184px;
+              border: 1px solid var(--boder-dividing-color);
+            }
+          }
+          .container-empty {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 70px;
+            > img {
+              margin-bottom: 12px;
+            }
+            > div {
+              font-weight: 500;
+              color: rgb(151, 164, 181);
+            }
           }
         }
         .footer {
@@ -346,7 +367,25 @@ export const Container = styled.div`
             background-color: #abcdff;
             color: #e5efff;
           }
+          .btn-create-group--active {
+            color: #fff;
+            background-color: #0091ff;
+            pointer-events: auto;
+            cursor: pointer;
+            &:hover {
+              opacity: 0.9;
+            }
+          }
         }
+      }
+    }
+
+    @keyframes moveToLeft {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(0);
       }
     }
 

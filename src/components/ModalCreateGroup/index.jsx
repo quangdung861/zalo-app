@@ -10,9 +10,12 @@ import {
   query,
   setDoc,
   where,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { convertImageToBase64 } from "utils/file";
+import { addDocument } from "services";
+import empty from "assets/empty.png";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
@@ -22,6 +25,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   const [groupName, setGroupName] = useState("");
   const [imgPreviewAvatar, setImgPreviewAvatar] = useState(null);
+  const [friendsSelected, setFriendsSelected] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -179,8 +183,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     }
   };
 
-  const [friendsSelected, setFriendsSelected] = useState([]);
-
   const handleSelecteFriend = (friend) => {
     if (friendsSelected[0]) {
       const friendsSelectedIndex = friendsSelected.findIndex(
@@ -265,6 +267,43 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   //   }
   // }
 
+  const handleCreateGroup = () => {
+    const newFriendsSelected = friendsSelected.map((item) => ({
+      avatar: item.photoURL,
+      name: item.displayName,
+      uid: item.uid,
+    }));
+
+    const members = newFriendsSelected.map((item) => item.uid);
+    const messagesViewed = newFriendsSelected.map((item) => ({
+      uid: item.uid,
+      count: 0,
+    }));
+
+    const data = {
+      category: "group",
+      info: [
+        ...newFriendsSelected,
+        {
+          avatar: userInfo.photoURL,
+          name: userInfo.displayName,
+          uid: userInfo.uid,
+        },
+      ],
+      members: [...members, userInfo.uid],
+      messageLastest: {
+        createdAt: serverTimestamp(),
+      },
+      messagesViewed: [...messagesViewed, { uid: userInfo.uid, count: 0 }],
+      totalMessages: 0,
+      //
+      name: groupName,
+      avatar: imgPreviewAvatar || "",
+    };
+    addDocument("rooms", data);
+    setIsShowOverlayModal(false);
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -346,24 +385,51 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   )}
                 </div>
 
-                <div className="friends-container">
-                  <div className="friend-list">{renderFriendList()} </div>
-                  <div className="friend-selected-container">
-                    <div className="total-selected">
-                      <span className="total-selected__title">Đã chọn</span>
-                      <span className="total-selected__count">
-                        {friendsSelected?.length}/{friends?.length}
-                      </span>
-                    </div>
-                    <div className="friend-selected-list">
-                      {renderFriendSelected}
+                {userInfo.friends.length >= 1 ? (
+                  <div className="friends-container">
+                    <div className="friend-list">{renderFriendList()} </div>
+                    <div
+                      className={
+                        friendsSelected.length > 0
+                          ? "friend-selected-container friend-selected-container--active"
+                          : "friend-selected-container "
+                      }
+                    >
+                      <div className="total-selected">
+                        <span className="total-selected__title">Đã chọn</span>
+                        <span className="total-selected__count">
+                          {friendsSelected?.length}/{friends?.length}
+                        </span>
+                      </div>
+                      <div className="friend-selected-list">
+                        {renderFriendSelected}
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="container-empty">
+                    <img src={empty} alt="" />
+                    <div>Bạn không có bạn bè nào</div>
+                  </div>
+                )}
               </div>
               <div className="footer">
-                <div className="btn-cancel">Hủy</div>
-                <div className="btn-create-group">Tạo Nhóm</div>
+                <div
+                  className="btn-cancel"
+                  onClick={() => setIsShowOverlayModal(false)}
+                >
+                  Hủy
+                </div>
+                <div
+                  className={
+                    friendsSelected.length > 1
+                      ? "btn-create-group btn-create-group--active"
+                      : "btn-create-group"
+                  }
+                  onClick={() => handleCreateGroup()}
+                >
+                  Tạo Nhóm
+                </div>
               </div>
             </div>
           </div>

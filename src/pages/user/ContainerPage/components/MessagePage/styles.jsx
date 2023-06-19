@@ -7,6 +7,7 @@ export const Wrapper = styled.div`
 export const Container = styled.div`
   width: 100%;
   user-select: none;
+  z-index: 98;
   .message {
     display: flex;
     width: 100%;
@@ -148,7 +149,7 @@ export const Container = styled.div`
                 margin-top: 8px;
                 border-radius: 50%;
                 color: #fff;
-                background-color: #C31818;
+                background-color: #c31818;
               }
             }
             :hover {
@@ -165,6 +166,7 @@ export const Container = styled.div`
             user-select: none;
             width: 93%;
             position: absolute;
+            z-index: 98;
             margin: 0 auto;
             left: 0;
             right: 0;
@@ -200,7 +202,7 @@ export const Container = styled.div`
                   font-weight: 500;
                   margin-right: 12px;
                   &:hover {
-                    opacity: .9;
+                    opacity: 0.9;
                     cursor: pointer;
                   }
                 }
@@ -214,11 +216,10 @@ export const Container = styled.div`
                     color: #005ae0;
                   }
                   &:hover {
-                    opacity: .9;
+                    opacity: 0.9;
                     cursor: pointer;
                   }
                 }
-
               }
             }
           }
