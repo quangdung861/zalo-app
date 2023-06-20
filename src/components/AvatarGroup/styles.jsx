@@ -18,6 +18,7 @@ export const Container = styled.div`
         left: 0;
         position: absolute;
         width: ${(props) => (props.styleIcon ? props.styleIcon.width : "26px")};
+        height: ${(props) => (props.styleIcon ? props.styleIcon.height : "26px")};
         object-fit: cover;
         border-radius: 50%;
         border: 1px solid #fff;
@@ -28,6 +29,7 @@ export const Container = styled.div`
         right: 0;
         position: absolute;
         width: ${(props) => (props.styleIcon ? props.styleIcon.width : "26px")};
+        height: ${(props) => (props.styleIcon ? props.styleIcon.height : "26px")};
         object-fit: cover;
         border-radius: 50%;
         border: 1px solid #fff;
@@ -38,6 +40,7 @@ export const Container = styled.div`
         left: 0;
         position: absolute;
         width: ${(props) => (props.styleIcon ? props.styleIcon.width : "26px")};
+        height: ${(props) => (props.styleIcon ? props.styleIcon.height : "26px")};
         object-fit: cover;
         border-radius: 50%;
         border: 1px solid #fff;
@@ -48,6 +51,7 @@ export const Container = styled.div`
         right: 0;
         position: absolute;
         width: ${(props) => (props.styleIcon ? props.styleIcon.width : "26px")};
+        height: ${(props) => (props.styleIcon ? props.styleIcon.height : "26px")};
         object-fit: cover;
         border-radius: 50%;
         border: 1px solid #fff;

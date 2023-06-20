@@ -26,7 +26,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
 
-  const { setIsShowBoxChat, setIsShowBoxChatGroup } =
+  const { setIsShowBoxChat, setIsShowBoxChatGroup, setSidebarSelected } =
     useContext(UserLayoutContext);
   const [categorySelected, setCategorySelected] = useState("Tất cả");
 
@@ -258,25 +258,10 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     });
   };
 
-  // async function uploadImage() {
-  //   if (imgPreviewCover) {
-  //     const userInfoRef = doc(db, "users", userInfo.id);
-  //     await setDoc(
-  //       userInfoRef,
-  //       {
-  //         photoCover: imgPreviewCover.url,
-  //       },
-  //       {
-  //         merge: true,
-  //       }
-  //     );
-  //     return setImgPreviewCover("");
-  //   }
-  // }
-
   const toogleBoxChatGroup = (room, avatars, name) => {
     setIsShowBoxChatGroup(true);
     setSelectedGroupMessaging({ room, avatars, name });
+    setSidebarSelected("message");
   };
 
   const handleCreateGroup = async () => {
@@ -295,12 +280,12 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     const data = {
       category: "group",
       info: [
-        ...newFriendsSelected,
         {
           avatar: userInfo.photoURL,
           name: userInfo.displayName,
           uid: userInfo.uid,
         },
+        ...newFriendsSelected,
       ],
       members: [...members, userInfo.uid],
       messageLastest: {
@@ -332,7 +317,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       setIsShowBoxChat(false);
       setIsShowOverlayModal(false);
 
-      
       const avatars = room.info.map((item) => item.avatar);
 
       const name = room.info.map((item) => item.name).join(", ");

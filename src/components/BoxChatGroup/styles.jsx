@@ -123,12 +123,7 @@ export const Container = styled.div`
     }
     &__content {
       padding-top: 20px;
-      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
-      background-blend-mode: multiply;
-      background-color: rgba(
-        ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
-      );
-      background-size: cover;
+      background-color: #EEF0F1;
       background-repeat: no-repeat;
       height: calc(100vh - var(--header-height) - var(--footer-height));
       .message-view-blur-overlay {

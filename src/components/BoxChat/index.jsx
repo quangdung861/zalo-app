@@ -149,18 +149,18 @@ const BoxChat = () => {
               const roomRef = await addDoc(collection(db, "rooms"), {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
-                info: [
-                  {
-                    avatar: selectedUserMessaging.photoURLSelected,
-                    name: selectedUserMessaging.displayNameSelected,
-                    uid: selectedUserMessaging.uidSelected,
-                  },
-                  {
-                    avatar: userInfo.photoURL,
-                    name: userInfo.displayName,
-                    uid: userInfo.uid,
-                  },
-                ],
+                // info: [
+                //   {
+                //     avatar: selectedUserMessaging.photoURLSelected,
+                //     name: selectedUserMessaging.displayNameSelected,
+                //     uid: selectedUserMessaging.uidSelected,
+                //   },
+                //   {
+                //     avatar: userInfo.photoURL,
+                //     name: userInfo.displayName,
+                //     uid: userInfo.uid,
+                //   },
+                // ],
                 messageLastest: {
                   text: inputValue,
                   displayName: userInfo.displayName,

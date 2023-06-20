@@ -23,20 +23,17 @@ import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
 import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
+import ModalAccountGroup from "components/ModalAccoutGroup";
 
-const BoxChat = () => {
+const BoxChatGroup = () => {
   const {
     userInfo,
     room,
-    setRoom,
-    rooms,
-    setSelectedGroupMessaging,
     selectedGroupMessaging,
   } = useContext(AppContext);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
-  const categoryRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
 
@@ -156,6 +153,10 @@ const BoxChat = () => {
   const [fullInfoUser, setFullInfoUser] = useState({});
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  console.log(
+    "🚀 ~ file: index.jsx:160 ~ BoxChat ~ isShowOverlayModal:",
+    isShowOverlayModal
+  );
 
   useEffect(() => {
     // focus to input again after submit
@@ -332,7 +333,10 @@ const BoxChat = () => {
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
-              <div className="avatar">
+              <div
+                className="avatar"
+                onClick={() => setIsShowOverlayModal(true)}
+              >
                 {selectedGroupMessaging?.room?.avatar?.url ? (
                   <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
                 ) : (
@@ -341,7 +345,6 @@ const BoxChat = () => {
                       room: selectedGroupMessaging?.room,
                       avatars: selectedGroupMessaging?.avatars,
                     }}
-                    onClick={() => setIsShowOverlayModal(true)}
                   />
                 )}
               </div>
@@ -458,11 +461,9 @@ const BoxChat = () => {
           </div>
         </div>
         {isShowOverlayModal && (
-          <ModalAccount
+          <ModalAccountGroup
             setIsShowOverlayModal={setIsShowOverlayModal}
-            // accountSelected={
-            //   fullInfoUser ? fullInfoUser : { myCloud: selectedUserMessaging }
-            // }
+            accountSelected={selectedGroupMessaging}
             isShowOverlayModal={isShowOverlayModal}
           />
         )}
@@ -471,4 +472,4 @@ const BoxChat = () => {
   );
 };
 
-export default BoxChat;
+export default BoxChatGroup;
