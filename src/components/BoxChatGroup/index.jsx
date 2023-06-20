@@ -22,6 +22,7 @@ import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
 import AvatarGroup from "components/AvatarGroup";
+import UserManual from "components/UserManual";
 
 const BoxChat = () => {
   const {
@@ -40,7 +41,6 @@ const BoxChat = () => {
   const [inputValue, setInputValue] = useState("");
 
   const audio = new Audio(messageSend);
-
 
   useEffect(() => {
     if (inputRef) {
@@ -333,13 +333,13 @@ const BoxChat = () => {
           <div className="box-chat__header">
             <div className="left">
               <div className="avatar">
-                {selectedGroupMessaging.room.avatar.url ? (
-                  <img src={selectedGroupMessaging.room.avatar.url} alt="" />
+                {selectedGroupMessaging?.room?.avatar?.url ? (
+                  <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
                 ) : (
                   <AvatarGroup
                     props={{
-                      room: selectedGroupMessaging.room,
-                      avatars: selectedGroupMessaging.avatars,
+                      room: selectedGroupMessaging?.room,
+                      avatars: selectedGroupMessaging?.avatars,
                     }}
                     onClick={() => setIsShowOverlayModal(true)}
                   />
@@ -348,7 +348,9 @@ const BoxChat = () => {
 
               <div className="user-info">
                 <div className="display-name">
-                  {selectedGroupMessaging?.name}
+                  {selectedGroupMessaging?.room.name
+                    ? selectedGroupMessaging?.room.name
+                    : selectedGroupMessaging.name}
                 </div>
 
                 <div className="last-time">
@@ -378,13 +380,13 @@ const BoxChat = () => {
           <div className="box-chat__content" ref={boxChatRef}>
             <div className="user-info">
               <div className="user-info__avatar">
-                {selectedGroupMessaging.room.avatar.url ? (
-                  <img src={selectedGroupMessaging.room.avatar.url} alt="" />
+                {selectedGroupMessaging?.room?.avatar.url ? (
+                  <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
                 ) : (
                   <AvatarGroup
                     props={{
-                      room: selectedGroupMessaging.room,
-                      avatars: selectedGroupMessaging.avatars,
+                      room: selectedGroupMessaging?.room,
+                      avatars: selectedGroupMessaging?.avatars,
                     }}
                     styleBox={{
                       width: "100px",
@@ -399,11 +401,14 @@ const BoxChat = () => {
                 )}
               </div>
               <div className="user-info__name">
-                {selectedGroupMessaging.name}
+                {selectedGroupMessaging?.room.name
+                  ? selectedGroupMessaging?.room.name
+                  : selectedGroupMessaging.name}
               </div>
               <div className="user-info__description">
-                Trò chuyện cùng nhau trên Zalo
+                Bắt đầu chia sẽ những câu chuyện thú vị cùng nhau
               </div>
+              <UserManual selectedGroupMessaging={selectedGroupMessaging} />
             </div>
             <div className="created-room">{renderCreatedAt()}</div>
             {renderMessages()}

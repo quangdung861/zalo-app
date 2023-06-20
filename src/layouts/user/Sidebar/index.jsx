@@ -20,7 +20,7 @@ const Sidebar = () => {
     totalUnSeenMessage,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, rooms, setSelectedUserMessaging } = useContext(AppContext);
+  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -105,6 +105,7 @@ const Sidebar = () => {
   }, [rooms]);
 
   const toogleBoxChat = () => {
+    setSelectedGroupMessaging({})
     setIsShowBoxChatGroup(false);
     setIsShowBoxChat(true);
     setSelectedUserMessaging({

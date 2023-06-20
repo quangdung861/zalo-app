@@ -232,9 +232,7 @@ const MessagePage = () => {
                   <div className="room-name">{infoPartner.name}</div>
                   <div className="new-message">
                     <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid
-                        ? "Bạn: "
-                        : `${room.messageLastest.displayName}:`}
+                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
                     </span>
                     <span className="new-message__text">
                       {room.messageLastest?.text}
@@ -297,10 +295,13 @@ const MessagePage = () => {
                   <div className="room-name">{room.name || name}</div>
                   <div className="new-message">
                     <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                      {room.messageLastest?.uid === userInfo.uid
+                        ? "Bạn: "
+                        : room?.messageLastest?.displayName &&
+                          `${room?.messageLastest?.displayName}:`}
                     </span>
                     <span className="new-message__text">
-                      {room.messageLastest?.text}
+                      {room?.messageLastest?.text}
                     </span>
                   </div>
                 </div>
@@ -414,18 +415,28 @@ const MessagePage = () => {
               <div className="room-list">
                 {/* <RenderRooms /> */}
                 {renderRooms}
-                {renderRooms?.every((item) => item === undefined ) && filterOption === "unseen" && (
-                  <div className="empty-message">
-                    <img src={emptyMessageUnssenImage} alt="" className="empty-message__img" />
-                    <span>Không có tin nhắn chưa đọc</span>
-                  </div>
-                )}
-                  {renderRooms?.every((item) => item === undefined) && filterOption === "all" && (
-                  <div className="empty-message">
-                    <img src={emptyMessageUnssenImage} alt="" className="empty-message__img" />
-                    <span>Không có tin nhắn</span>
-                  </div>
-                )}
+                {renderRooms?.every((item) => item === undefined) &&
+                  filterOption === "unseen" && (
+                    <div className="empty-message">
+                      <img
+                        src={emptyMessageUnssenImage}
+                        alt=""
+                        className="empty-message__img"
+                      />
+                      <span>Không có tin nhắn chưa đọc</span>
+                    </div>
+                  )}
+                {renderRooms?.every((item) => item === undefined) &&
+                  filterOption === "all" && (
+                    <div className="empty-message">
+                      <img
+                        src={emptyMessageUnssenImage}
+                        alt=""
+                        className="empty-message__img"
+                      />
+                      <span>Không có tin nhắn</span>
+                    </div>
+                  )}
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">

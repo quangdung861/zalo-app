@@ -172,6 +172,7 @@ export const Container = styled.div`
         }
         &__name {
           width: 330px;
+          text-align: center;
           font-size: 20px;
           font-weight: 500;
           margin-bottom: 2px;
@@ -182,6 +183,7 @@ export const Container = styled.div`
         &__description {
           margin-bottom: 10px;
         }
+      
       }
 
       .created-room {

@@ -1,0 +1,49 @@
+.user-manual {
+  width: 380px;
+  height: 175px;
+  background-color: hsla(0, 0%, 100%, 0.8);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 40px;
+  &__item {
+    height: 42px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    .left {
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      > i {
+        font-size: 16px;
+        color: #fff;
+      }
+    }
+    .left--users {
+      background-color: #3989ff;
+    }
+    .left--tag {
+      background-color: #e05a00;
+      > span {
+        font-size: 24px;
+        color: #fff;
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+    }
+    .left--forward {
+      background-color: #8b64d8;
+      > i {
+        font-size: 18px;
+      }
+    }
+    .right {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

@@ -13,10 +13,13 @@ import empty from "assets/empty.png";
 import ModalAccount from "components/ModalAccount";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import searchEmpty from "assets/searchEmpty.png";
 
 const FriendList = () => {
-  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
+  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
+    useContext(AppContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+    useContext(UserLayoutContext);
   const [keywords, setKeywords] = useState("");
 
   const [friends, setFriends] = useState([]);
@@ -261,6 +264,50 @@ const FriendList = () => {
         );
       });
     } else {
+      if (keywords || (categorySelected && categorySelected !== "Tất cả")) {
+        return (
+          <div
+            className="container-empty"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "62px 0px",
+              minHeight: `calc(100vh - 65px - 64px - 68px)`,
+              backgroundColor: "#fff",
+            }}
+          >
+            <img
+              src={searchEmpty}
+              alt=""
+              style={{
+                marginBottom: "20px",
+                width: "160px",
+                objectFit: "cover",
+              }}
+            />
+            <div
+              style={{
+                fontWeight: 500,
+                marginBottom: "8px",
+                color: "#081c36",
+              }}
+            >
+              Không tìm thấy kết quả
+            </div>
+            <div
+              className="text"
+              style={{
+                color: "#081c36",
+                fontWeight: 400,
+              }}
+            >
+              Vui lòng thử lại từ khóa hoặc bộ lọc khác
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="container-empty">
           <img src={empty} alt="" />
@@ -292,9 +339,7 @@ const FriendList = () => {
             Danh sách bạn bè
           </div>
           <div className="friendlist-content">
-            <div className="total-friends">
-              Bạn bè ({totalFriends})
-            </div>
+            <div className="total-friends">Bạn bè ({totalFriends})</div>
             <div className="filter-friends">
               <div className="filter-item search">
                 <i className="fa-solid fa-magnifying-glass"></i>

@@ -13,6 +13,8 @@ import {
 import { db } from "firebaseConfig";
 import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import empty from "assets/empty.png";
+import searchEmpty from "assets/searchEmpty.png";
 
 async function fetchUserList(search) {
   let array = [];
@@ -38,7 +40,8 @@ const ChatWithStrangers = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+    useContext(UserLayoutContext);
 
   const {
     userInfo,
@@ -102,7 +105,7 @@ const ChatWithStrangers = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
-    setSelectedGroupMessaging({})
+    setSelectedGroupMessaging({});
     setIsShowBoxChatGroup(false);
     setIsShowBoxChat(!isShowBoxChat);
     setSelectedUserMessaging({
@@ -121,68 +124,125 @@ const ChatWithStrangers = () => {
     } else {
       strangerList.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
     }
-    return strangerList?.map((item, index) => {
-      return (
-        <div className="item-stranger" key={index}>
-          <div
-            className="item-stranger__left"
-            onClick={() =>
-              toogleBoxChat({
-                uidSelected: item.uid,
-                photoURLSelected: item.photoURL,
-                displayNameSelected: item.displayName,
-              })
-            }
-          >
-            <img src={item.photoURL} alt="" />
-            <span>{item.displayName}</span>
-          </div>
-          <div className="item-stranger__right">
-            <i
-              className="fa-solid fa-ellipsis"
-              onClick={() => {
-                setIsShowDropdown(item.id);
-              }}
-            ></i>
-            {isShowDropdown === item.id && (
-              <div className="dropdown-menu" ref={dropdownRef}>
-                <div
-                  className="dropdown-menu__item"
-                  onClick={() => handleWatchInfo({ id: item.id })}
-                >
-                  Xem Thông tin
+    if (strangerList[0]) {
+      return strangerList?.map((item, index) => {
+        return (
+          <div className="item-stranger" key={index}>
+            <div
+              className="item-stranger__left"
+              onClick={() =>
+                toogleBoxChat({
+                  uidSelected: item.uid,
+                  photoURLSelected: item.photoURL,
+                  displayNameSelected: item.displayName,
+                })
+              }
+            >
+              <img src={item.photoURL} alt="" />
+              <span>{item.displayName}</span>
+            </div>
+            <div className="item-stranger__right">
+              <i
+                className="fa-solid fa-ellipsis"
+                onClick={() => {
+                  setIsShowDropdown(item.id);
+                }}
+              ></i>
+              {isShowDropdown === item.id && (
+                <div className="dropdown-menu" ref={dropdownRef}>
+                  <div
+                    className="dropdown-menu__item"
+                    onClick={() => handleWatchInfo({ id: item.id })}
+                  >
+                    Xem Thông tin
+                  </div>
+                  <div className="divding-line" />
+                  <div className="dropdown-menu__item">Phân loại</div>
+                  <div className="dropdown-menu__item">Đặt tên gợi nhớ</div>
+                  <div className="divding-line" />
+                  <div className="dropdown-menu__item">Chặn người này</div>
+                  {userInfo.invitationSent.includes(item.uid) ||
+                  userInfo.invitationReceive.includes(item.uid) ? (
+                    <></>
+                  ) : (
+                    <>
+                      <div className="divding-line" />
+                      <div
+                        className="dropdown-menu__item add-friend"
+                        onClick={() =>
+                          handleInvitationSent({
+                            uid: item.uid,
+                            id: item.id,
+                            invitationReceive: item.invitationReceive,
+                          })
+                        }
+                      >
+                        Thêm bạn
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div className="divding-line" />
-                <div className="dropdown-menu__item">Phân loại</div>
-                <div className="dropdown-menu__item">Đặt tên gợi nhớ</div>
-                <div className="divding-line" />
-                <div className="dropdown-menu__item">Chặn người này</div>
-                {userInfo.invitationSent.includes(item.uid) ||
-                userInfo.invitationReceive.includes(item.uid) ? (
-                  <></>
-                ) : (
-                  <>
-                    <div className="divding-line" />
-                    <div
-                      className="dropdown-menu__item add-friend"
-                      onClick={() =>
-                        handleInvitationSent({
-                          uid: item.uid,
-                          id: item.id,
-                          invitationReceive: item.invitationReceive,
-                        })
-                      }
-                    >
-                      Thêm bạn
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+        );
+      });
+    } else {
+      if (keywords) {
+        return (
+          <div
+            className="container-empty"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "62px 0px",
+              minHeight: `calc(100vh - 65px - 64px - 68px)`,
+            }}
+          >
+            <img
+              src={searchEmpty}
+              alt=""
+              style={{
+                marginBottom: "20px",
+                width: "160px",
+                objectFit: "cover",
+              }}
+            />
+            <div
+              style={{
+                fontWeight: 500,
+                marginBottom: "8px",
+              }}
+            >
+              Không tìm thấy kết quả
+            </div>
+            <div className="text">
+              Vui lòng thử lại từ khóa hoặc bộ lọc khác
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div
+          className="container-empty"
+          style={{
+            backgroundColor: "#F1F1F1",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "62px 0px",
+          }}
+        >
+          <img src={empty} alt="" style={{ marginBottom: "12px" }} />
+          <div style={{ color: "rgb(151, 164, 181)", fontWeight: 500 }}>
+            Không có người lạ nào
           </div>
         </div>
       );
-    });
+    }
   }, [strangerList, isShowDropdown, orderBy]);
 
   const handleSearch = async (value) => {

@@ -11,16 +11,23 @@ import {
   setDoc,
   where,
   serverTimestamp,
+  addDoc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { convertImageToBase64 } from "utils/file";
 import { addDocument } from "services";
 import empty from "assets/empty.png";
+import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
 
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
+    useContext(AppContext);
+
+  const { setIsShowBoxChat, setIsShowBoxChatGroup } =
+    useContext(UserLayoutContext);
   const [categorySelected, setCategorySelected] = useState("Tất cả");
 
   const [groupName, setGroupName] = useState("");
@@ -267,7 +274,12 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   //   }
   // }
 
-  const handleCreateGroup = () => {
+  const toogleBoxChatGroup = (room, avatars, name) => {
+    setIsShowBoxChatGroup(true);
+    setSelectedGroupMessaging({ room, avatars, name });
+  };
+
+  const handleCreateGroup = async () => {
     const newFriendsSelected = friendsSelected.map((item) => ({
       avatar: item.photoURL,
       name: item.displayName,
@@ -300,8 +312,35 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       name: groupName,
       avatar: imgPreviewAvatar || "",
     };
-    addDocument("rooms", data);
-    setIsShowOverlayModal(false);
+
+    try {
+      const collectionRef = collection(db, "rooms");
+      const docRef = await addDoc(collectionRef, data);
+      const response = await getDoc(docRef);
+
+      let room;
+      if (response.exists()) {
+        room = {
+          id: response.id,
+          ...response.data(),
+        };
+      } else {
+        console.log("Tài liệu không tồn tại");
+      }
+
+      setSelectedUserMessaging({});
+      setIsShowBoxChat(false);
+      setIsShowOverlayModal(false);
+
+      
+      const avatars = room.info.map((item) => item.avatar);
+
+      const name = room.info.map((item) => item.name).join(", ");
+
+      toogleBoxChatGroup(room, avatars, name);
+    } catch (error) {
+      console.error("Lỗi khi thêm tài liệu:", error);
+    }
   };
 
   return (
