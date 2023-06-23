@@ -10,7 +10,7 @@ export const addDocument = async (collectionName, data) => {
 
 // tao keywords cho displayName, su dung cho search
 export const generateKeywords = (displayName) => {
-  // liet ke tat cac hoan vi. vd: name = ["David", "Van", "Teo"]
+  // liet ke tat ca cac hoan vi. vd: name = ["David", "Van", "Teo"]
   // => ["David", "Van", "Teo"], ["David", "Teo", "Van"], ["Teo", "David", "Van"],...
   const name = displayName.split(" ").filter((word) => word);
 

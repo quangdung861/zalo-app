@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import moment from "moment";
+import { generateKeywords } from "services";
 
 export const AppContext = createContext();
 
@@ -141,7 +142,8 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     let unSubcribe;
     if (uid) {
-      const roomsRef = query(
+      let roomsRef;
+      roomsRef = query(
         collection(db, "rooms"),
         where("members", "array-contains", uid)
       );
@@ -156,7 +158,7 @@ const AppProvider = ({ children }) => {
           };
         });
 
-        const newDocuments = [...documents].sort(
+        let newDocuments = [...documents].sort(
           (a, b) => b.messageLastest.createdAt - a.messageLastest.createdAt
         );
 
@@ -164,7 +166,7 @@ const AppProvider = ({ children }) => {
       });
     }
     return () => unSubcribe && unSubcribe();
-  }, [uid]);
+  }, [uid, keywords, userInfo]);
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
@@ -183,7 +185,7 @@ const AppProvider = ({ children }) => {
       };
       getRoom();
     }
-  }, [selectedUserMessaging, rooms]);
+  }, [selectedUserMessaging, rooms, userInfo]);
 
   useEffect(() => {
     if (selectedGroupMessaging?.room?.id) {
@@ -199,7 +201,7 @@ const AppProvider = ({ children }) => {
       };
       getRoom();
     }
-  }, [rooms, selectedGroupMessaging?.room?.id]);
+  }, [rooms, selectedGroupMessaging?.room?.id, userInfo]);
 
   return (
     <AppContext.Provider

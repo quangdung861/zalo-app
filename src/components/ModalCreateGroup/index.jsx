@@ -279,14 +279,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
     const data = {
       category: "group",
-      info: [
-        {
-          avatar: userInfo.photoURL,
-          name: userInfo.displayName,
-          uid: userInfo.uid,
-        },
-        ...newFriendsSelected,
-      ],
       members: [...members, userInfo.uid],
       messageLastest: {
         createdAt: serverTimestamp(),
@@ -313,13 +305,29 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
         console.log("Tài liệu không tồn tại");
       }
 
+      console.log(room);
+
+      const userRef = query(
+        collection(db, "users"),
+        where("uid", "in", room.members)
+      );
+      const responseUser = await getDocs(userRef);
+      const documents = responseUser.docs.map((doc) => {
+        const id = doc.id;
+        const data = doc.data();
+        return {
+          id,
+          ...data,
+        };
+      });
+
       setSelectedUserMessaging({});
       setIsShowBoxChat(false);
       setIsShowOverlayModal(false);
 
-      const avatars = room.info.map((item) => item.avatar);
-
-      const name = room.info.map((item) => item.name).join(", ");
+      const avatars = documents.map((item) => item?.photoURL);
+    
+      const name = documents.map((item) => item.displayName).join(", ");
 
       toogleBoxChatGroup(room, avatars, name);
     } catch (error) {

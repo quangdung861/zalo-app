@@ -13,7 +13,6 @@ import AuthProvider from "Context/AuthProvider";
 import "moment/locale/vi";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 export const DropdownContext = createContext();
 
 function App() {

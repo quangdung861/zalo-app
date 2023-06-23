@@ -1,12 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 
 import "./styles.scss";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "firebaseConfig";
+
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
-import { convertImageToBase64 } from "utils/file";
-import coverCloud from "assets/coverCloud.png";
 import AvatarGroup from "components/AvatarGroup";
 
 const ModalAccount = ({
@@ -14,25 +11,12 @@ const ModalAccount = ({
   isShowOverlayModal,
   accountSelected,
 }) => {
-  const phoneNumberRef = useRef(null);
-
   const accountInfoRef = useRef(null);
 
-  const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
+  const { setSelectedUserMessaging, setSelectedGroupMessaging } =
+    useContext(AppContext);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
-
-  // PHONENUMBER
-  const [updatePhoneNumber, setUpdatePhoneNumber] = useState();
-  const [inputValuePhoneNumber, setInputValuePhoneNumber] = useState();
-  // SEX
-  const [updateSex, setUpdateSex] = useState();
-  const [inputValueSex, setInputValueSex] = useState();
-  // DATE OF BIRTH
-  const [updateDateOfBirth, setUpdateDateOfBirth] = useState();
-  const [inputValueDateOfBirth, setInputValueDateOfBirth] = useState();
-  // IMAGE
-  const [imgPreviewCover, setImgPreviewCover] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -49,22 +33,12 @@ const ModalAccount = ({
     };
   }, []);
 
-  // if (!accountSelected) {
-  //   return <div></div>;
-  // }
+  const toogleBoxChat = () => {
+    setSelectedUserMessaging({});
+    setIsShowBoxChat(false);
+    setIsShowBoxChatGroup(true);
 
-  const toogleBoxChat = ({
-    uidSelected,
-    photoURLSelected,
-    displayNameSelected,
-  }) => {
-    setIsShowBoxChatGroup(false);
-    setIsShowBoxChat(true);
-    setSelectedUserMessaging({
-      uidSelected,
-      photoURLSelected,
-      displayNameSelected,
-    });
+    setSelectedGroupMessaging(accountSelected);
     setIsShowOverlayModal(!isShowOverlayModal);
   };
 
@@ -87,7 +61,7 @@ const ModalAccount = ({
               <div className="box-image">
                 {accountSelected?.room?.avatar ? (
                   <img
-                    src={accountSelected?.room?.avatar}
+                    src={accountSelected?.room?.avatar?.url}
                     alt=""
                     className="photo-avatar"
                   />
@@ -114,7 +88,9 @@ const ModalAccount = ({
                 <div className="display-name">
                   {accountSelected?.room?.name || accountSelected.name}
                 </div>
-                <div className="btn-texting">Nhắn tin</div>
+                <div className="btn-texting" onClick={() => toogleBoxChat()}>
+                  Nhắn tin
+                </div>
               </div>
             </div>
             <div className="content">

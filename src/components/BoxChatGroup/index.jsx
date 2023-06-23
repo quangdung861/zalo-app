@@ -26,11 +26,7 @@ import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
 
 const BoxChatGroup = () => {
-  const {
-    userInfo,
-    room,
-    selectedGroupMessaging,
-  } = useContext(AppContext);
+  const { userInfo, room, selectedGroupMessaging } = useContext(AppContext);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -153,10 +149,6 @@ const BoxChatGroup = () => {
   const [fullInfoUser, setFullInfoUser] = useState({});
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
-  console.log(
-    "🚀 ~ file: index.jsx:160 ~ BoxChat ~ isShowOverlayModal:",
-    isShowOverlayModal
-  );
 
   useEffect(() => {
     // focus to input again after submit
@@ -327,6 +319,37 @@ const BoxChatGroup = () => {
 
   const [categoryUser, setCategoryUser] = useState({});
 
+  const [avatars, setAvatars] = useState();
+  const [name, setName] = useState();
+
+  useEffect(() => {
+    if (room.id) {
+      const fetchData = async () => {
+        const partnerRef = query(
+          collection(db, "users"),
+          where("uid", "in", room.members)
+        );
+        const response = await getDocs(partnerRef);
+        const documents = response.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            id: id,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+          };
+        });
+
+        const avatars = documents.map((item) => item.photoURL);
+        setAvatars(avatars);
+
+        const name = documents.map((item) => item.displayName).join(", ");
+        setName(name);
+      };
+      fetchData();
+    }
+  }, [userInfo, selectedGroupMessaging, room]);
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -343,7 +366,7 @@ const BoxChatGroup = () => {
                   <AvatarGroup
                     props={{
                       room: selectedGroupMessaging?.room,
-                      avatars: selectedGroupMessaging?.avatars,
+                      avatars: avatars,
                     }}
                   />
                 )}
@@ -351,8 +374,8 @@ const BoxChatGroup = () => {
 
               <div className="user-info">
                 <div className="display-name">
-                  {selectedGroupMessaging?.room.name
-                    ? selectedGroupMessaging?.room.name
+                  {selectedGroupMessaging?.room?.name
+                    ? selectedGroupMessaging?.room?.name
                     : selectedGroupMessaging.name}
                 </div>
 
@@ -389,7 +412,7 @@ const BoxChatGroup = () => {
                   <AvatarGroup
                     props={{
                       room: selectedGroupMessaging?.room,
-                      avatars: selectedGroupMessaging?.avatars,
+                      avatars: avatars,
                     }}
                     styleBox={{
                       width: "100px",
@@ -404,8 +427,8 @@ const BoxChatGroup = () => {
                 )}
               </div>
               <div className="user-info__name">
-                {selectedGroupMessaging?.room.name
-                  ? selectedGroupMessaging?.room.name
+                {selectedGroupMessaging?.room?.name
+                  ? selectedGroupMessaging?.room?.name
                   : selectedGroupMessaging.name}
               </div>
               <div className="user-info__description">
@@ -463,7 +486,7 @@ const BoxChatGroup = () => {
         {isShowOverlayModal && (
           <ModalAccountGroup
             setIsShowOverlayModal={setIsShowOverlayModal}
-            accountSelected={selectedGroupMessaging}
+            accountSelected={{ ...selectedGroupMessaging, avatars, name }}
             isShowOverlayModal={isShowOverlayModal}
           />
         )}
