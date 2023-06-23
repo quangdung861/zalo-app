@@ -85,6 +85,17 @@ export const Container = styled.div`
         .room-list {
           height: calc(100vh - 64px - 32px);
           position: relative;
+          overflow: hidden;
+          overflow-y: auto;
+          &::-webkit-scrollbar {
+            -webkit-appearance: none;
+          }
+          &::-webkit-scrollbar:vertical {
+            width: 0px;
+          }
+          &::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+          }
           .room-item {
             height: 72px;
             padding: 0 16px;

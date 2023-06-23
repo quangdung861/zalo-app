@@ -134,10 +134,20 @@ const AppProvider = ({ children }) => {
   }, [userInfo, keywords]);
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
+  console.log(
+    "🚀 ~ file: AppProvider.js:137 ~ AppProvider ~ selectedUserMessaging:",
+    selectedUserMessaging
+  );
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
+  console.log(
+    "🚀 ~ file: AppProvider.js:139 ~ AppProvider ~ selectedGroupMessaging:",
+    selectedGroupMessaging
+  );
 
   const [room, setRoom] = useState({});
+  console.log("🚀 ~ file: AppProvider.js:140 ~ AppProvider ~ room:", room);
   const [rooms, setRooms] = useState({});
+  console.log("🚀 ~ file: AppProvider.js:142 ~ AppProvider ~ rooms:", rooms);
 
   useEffect(() => {
     let unSubcribe;
@@ -171,10 +181,12 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
       const getRoom = async () => {
-        const room = rooms.filter(
-          (item) =>
-            item.members.includes(selectedUserMessaging.uidSelected) &&
-            item.category === "single"
+        const room = rooms.filter((item) =>
+          selectedUserMessaging.uidSelected === "my-cloud"
+            ? item.members.includes(selectedUserMessaging.uidSelected) &&
+              item.category === "my cloud"
+            : item.members.includes(selectedUserMessaging.uidSelected) &&
+              item.category === "single"
         );
 
         if (room[0]) {

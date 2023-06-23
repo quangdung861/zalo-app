@@ -11,6 +11,7 @@ const ModalAccount = ({
   isShowOverlayModal,
   accountSelected,
 }) => {
+  console.log("🚀 ~ file: index.jsx:14 ~ accountSelected:", accountSelected)
   const accountInfoRef = useRef(null);
 
   const { setSelectedUserMessaging, setSelectedGroupMessaging } =
@@ -94,9 +95,11 @@ const ModalAccount = ({
               </div>
             </div>
             <div className="content">
-              <div className="content__title">Thành viên (3)</div>
+              <div className="content__title">
+                Thành viên ({accountSelected?.room?.members?.length})
+              </div>
               <div className="member-list">
-                {accountSelected?.avatars?.length <= 3 &&
+                {accountSelected?.avatars?.length <= 6 &&
                   accountSelected?.avatars.map((item, index) => (
                     <img
                       src={item}
@@ -107,17 +110,29 @@ const ModalAccount = ({
                       }}
                     />
                   ))}
-                {accountSelected?.avatars?.length > 3 &&
-                  accountSelected?.avatars.map((item, index) => (
-                    <img
-                      src={item}
-                      alt=""
-                      className="member-item"
-                      style={{
-                        zIndex: accountSelected?.avatars?.length - index,
-                      }}
-                    />
-                  ))}
+                {accountSelected?.avatars?.length > 6 && (
+                  <>
+                    {accountSelected?.avatars.map(
+                      (item, index) =>
+                        index < 6 && (
+                          <img
+                            src={item}
+                            alt=""
+                            className="member-item"
+                            style={{
+                              zIndex: accountSelected?.avatars?.length - index,
+                            }}
+                            title={[...accountSelected.name.split(", ")][index]}
+                          />
+                        )
+                    )}
+                    <div
+                      className="view-more"
+                    >
+                      <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div className="footer">

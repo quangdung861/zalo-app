@@ -86,7 +86,7 @@ const MessagePage = () => {
     displayNameSelected,
   }) => {
     setIsShowBoxChatGroup(false);
-    setSelectedGroupMessaging(false);
+    setSelectedGroupMessaging({});
     setIsShowBoxChat(true);
     setSelectedUserMessaging({
       uidSelected,
@@ -116,6 +116,7 @@ const MessagePage = () => {
   };
 
   const [infoPartner, setInfoPartner] = useState([]);
+  console.log("🚀 ~ file: index.jsx:119 ~ MessagePage ~ infoPartner:", infoPartner)
 
   useEffect(() => {
     if (rooms[0]) {

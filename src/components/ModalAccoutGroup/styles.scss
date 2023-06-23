@@ -203,6 +203,20 @@
               margin-right: -8px;
               position: relative;
             }
+            > .view-more {
+              width: 48px;
+              height: 48px;
+              border-radius: 50%;
+              border: 1px solid #fff;
+              position: relative;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background-color: #f1f1f1;
+              > i {
+                font-size: 20px;
+              }
+            }
           }
         }
         .content-cloud {

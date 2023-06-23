@@ -25,6 +25,7 @@ import ModalAccount from "components/ModalAccount";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
   useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:27 ~ BoxChat ~ room:", room)
 
   const inputRef = useRef();
   const boxChatRef = useRef();
