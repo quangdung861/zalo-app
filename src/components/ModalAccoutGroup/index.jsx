@@ -11,7 +11,6 @@ const ModalAccount = ({
   isShowOverlayModal,
   accountSelected,
 }) => {
-  console.log("🚀 ~ file: index.jsx:14 ~ accountSelected:", accountSelected)
   const accountInfoRef = useRef(null);
 
   const { setSelectedUserMessaging, setSelectedGroupMessaging } =

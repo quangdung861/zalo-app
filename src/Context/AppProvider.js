@@ -134,20 +134,11 @@ const AppProvider = ({ children }) => {
   }, [userInfo, keywords]);
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
-  console.log(
-    "🚀 ~ file: AppProvider.js:137 ~ AppProvider ~ selectedUserMessaging:",
-    selectedUserMessaging
-  );
+
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
-  console.log(
-    "🚀 ~ file: AppProvider.js:139 ~ AppProvider ~ selectedGroupMessaging:",
-    selectedGroupMessaging
-  );
 
   const [room, setRoom] = useState({});
-  console.log("🚀 ~ file: AppProvider.js:140 ~ AppProvider ~ room:", room);
   const [rooms, setRooms] = useState({});
-  console.log("🚀 ~ file: AppProvider.js:142 ~ AppProvider ~ rooms:", rooms);
 
   useEffect(() => {
     let unSubcribe;

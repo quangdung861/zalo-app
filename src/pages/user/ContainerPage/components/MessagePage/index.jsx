@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -15,10 +8,7 @@ import { AppContext } from "Context/AppProvider";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
-  onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -32,6 +22,7 @@ import AvatarGroup from "components/AvatarGroup";
 import emptyMessageUnssenImage from "assets/emptyMessageUnseen.png";
 import slideList from "./slideList";
 import { generateKeywords } from "services";
+import Skeleton from "react-loading-skeleton";
 
 const MessagePage = () => {
   const {
@@ -80,6 +71,8 @@ const MessagePage = () => {
     );
   }
 
+  const [loading, setLoading] = useState(false);
+
   const toogleBoxChat = ({
     uidSelected,
     photoURLSelected,
@@ -116,13 +109,15 @@ const MessagePage = () => {
   };
 
   const [infoPartner, setInfoPartner] = useState([]);
-  console.log("🚀 ~ file: index.jsx:119 ~ MessagePage ~ infoPartner:", infoPartner)
 
   useEffect(() => {
     if (rooms[0]) {
+      setLoading(true);
       const fetchDataAsync = async () => {
         const fetchedData = await fetchData();
+
         setInfoPartner(fetchedData);
+        setLoading(false);
       };
 
       fetchDataAsync();
@@ -146,11 +141,16 @@ const MessagePage = () => {
           response.docs.map((doc) => {
             const id = doc.id;
             const data = doc.data();
+            const keywordsName = generateKeywords(
+              data.displayName.toLowerCase()
+            );
+
             infoPartner.push({
               id: id,
               displayName: data.displayName,
               photoURL: data.photoURL,
               uid: data.uid,
+              keywordsName,
             });
           });
         } else if (room.category === "group") {
@@ -174,18 +174,29 @@ const MessagePage = () => {
 
           const name = documents.map((item) => item.displayName).join(", ");
 
+          let keywordsName;
+
+          if (room.name) {
+            keywordsName = generateKeywords(room.name.toLowerCase());
+          } else {
+            keywordsName = generateKeywords(name.toLowerCase());
+          }
+
           infoPartner.push({
             id: room.id,
             photoURL: avatars,
             displayName: name,
+            keywordsName,
           });
         }
       } else {
+        const keywordsName = generateKeywords("Cloud của tôi".toLowerCase());
         infoPartner.push({
           photoURL:
             "https://res-zalo.zadn.vn/upload/media/2021/6/4/2_1622800570007_369788.jpg",
           displayName: "Cloud của tôi",
           id: "my-cloud",
+          keywordsName,
         });
       }
     }
@@ -210,18 +221,24 @@ const MessagePage = () => {
           (member) => member !== userInfo.uid
         )[0];
 
+        const infoMyself = room.messagesViewed.find(
+          (item) => item.uid === userInfo.uid
+        );
+
+        const unseenMessages = room.totalMessages - infoMyself.count;
+
+        setTotalUnseenMessageRef((current) => current + unseenMessages);
+
         let keywordsName;
 
         if (room.category === "single") {
-          const displayName = infoPartner.find(
+          keywordsName = infoPartner.find(
             (item) => item.uid === uidSelected
-          ).displayName;
-          keywordsName = generateKeywords(displayName.toLowerCase());
+          ).keywordsName;
         } else if (room.category === "my cloud") {
-          const displayName = infoPartner.find(
+          keywordsName = infoPartner.find(
             (item) => item.id === "my-cloud"
-          ).displayName;
-          keywordsName = generateKeywords(displayName.toLowerCase());
+          ).keywordsName;
         }
 
         if (keywords) {
@@ -230,14 +247,6 @@ const MessagePage = () => {
             return;
           }
         }
-
-        const infoMyself = room.messagesViewed.find(
-          (item) => item.uid === userInfo.uid
-        );
-
-        const unseenMessages = room.totalMessages - infoMyself.count;
-
-        setTotalUnseenMessageRef((current) => current + unseenMessages);
 
         if (filterOption === "unseen") {
           if (unseenMessages <= 0) {
@@ -262,7 +271,12 @@ const MessagePage = () => {
             }
           >
             <div className="room-item__left">
-              <img src={infoPartner[index]?.photoURL} alt="" />
+              {infoPartner[index]?.photoURL ? (
+                <img src={infoPartner[index]?.photoURL} alt="" />
+              ) : (
+                <div className="image-temporary"> </div>
+              )}
+
               <div className="info">
                 <div className="room-name">
                   {infoPartner[index]?.displayName}
@@ -305,6 +319,15 @@ const MessagePage = () => {
 
         setTotalUnseenMessageRef((current) => current + unseenMessages);
 
+        if (keywords) {
+          const isKeywords = infoGroup.keywordsName.includes(
+            keywords.toLowerCase()
+          );
+          if (!isKeywords) {
+            return;
+          }
+        }
+
         if (filterOption === "unseen") {
           if (unseenMessages <= 0) {
             return;
@@ -343,7 +366,7 @@ const MessagePage = () => {
                     {room.messageLastest?.uid === userInfo.uid
                       ? "Bạn: "
                       : room?.messageLastest?.displayName &&
-                        `${room?.messageLastest?.displayName}:`}
+                        `${room?.messageLastest?.displayName}: `}
                   </span>
                   <span className="new-message__text">
                     {room?.messageLastest?.text}
@@ -462,7 +485,35 @@ const MessagePage = () => {
                 </div>
               </div>
               <div className="room-list">
-                {/* <RenderRooms /> */}
+                {/* {loading && (
+                  <div className="room-item">
+                    <div className="room-item__left">
+                      <Skeleton
+                        circle={true}
+                        style={{
+                          width: "48px",
+                          height: "48px",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      <div className="info">
+                        <div className="room-name">
+                          <Skeleton />
+                        </div>
+                        <div className="new-message">
+                          <span className="new-message__text">
+                            <Skeleton />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="room-item__right" style={{ width: "100%" }}>
+                 
+                    </div>
+                  </div>
+                )} */}
+
+                {/*  */}
                 {renderRooms}
                 {renderRooms?.length > 0 &&
                   renderRooms?.every((item) => item === undefined) &&

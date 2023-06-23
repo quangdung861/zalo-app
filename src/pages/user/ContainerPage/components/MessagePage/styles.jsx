@@ -109,12 +109,19 @@ export const Container = styled.div`
               align-items: center;
               gap: 12px;
               flex: 1;
-              > img {
+              > img{
                 width: 48px;
                 flex-shrink: 0;
                 height: 48px;
                 object-fit: cover;
                 border-radius: 50%;
+              }
+              > .image-temporary {
+                width: 48px;
+                flex-shrink: 0;
+                height: 48px;
+                border-radius: 50%;
+                background-color: red;
               }
               .info {
                 .room-name {

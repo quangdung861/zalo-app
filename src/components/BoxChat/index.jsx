@@ -25,7 +25,6 @@ import ModalAccount from "components/ModalAccount";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
   useContext(AppContext);
-  console.log("🚀 ~ file: index.jsx:27 ~ BoxChat ~ room:", room)
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -245,19 +244,6 @@ const BoxChat = () => {
     }
     return () => unSubcribe && unSubcribe();
   }, [selectedUserMessaging?.uidSelected]);
-
-  const fullInfoUserMessaging = async () => {
-    // let unSubcribe;
-    // const fullInfoUserMessagingRef = query(
-    //   collection(db, "users"),
-    //   where("uid", "==", selectedUserMessaging.uidSelected)
-    // );
-    // const response = await getDocs(fullInfoUserMessagingRef);
-    // const documents = response.docs.map((doc) => {
-    //   return { id: doc.id, ...doc.data() };
-    // });
-    // return setFullInfoUser(documents[0]);
-  };
 
   useEffect(() => {
     // focus to input again after submit
