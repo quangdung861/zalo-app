@@ -61,6 +61,7 @@ export const Container = styled.div`
           align-items: center;
           padding: 4px 16px 8px 16px;
           border-bottom: 1px solid var(--boder-dividing-color);
+          position: relative;
           &__left {
             display: flex;
             align-items: center;
@@ -80,6 +81,15 @@ export const Container = styled.div`
             .menu-right__item {
               cursor: pointer;
             }
+          }
+          .dividing-selected {
+            width: ${({ width }) => width && `${width}px`};
+            left: ${({ left }) => left && `${left}px`};
+            height: 2px;
+            background-color: #005ae0;
+            position: absolute;
+            bottom: 0;
+            transition: all 0.3s;
           }
         }
         .room-list {
@@ -109,7 +119,7 @@ export const Container = styled.div`
               align-items: center;
               gap: 12px;
               flex: 1;
-              > img{
+              > img {
                 width: 48px;
                 flex-shrink: 0;
                 height: 48px;

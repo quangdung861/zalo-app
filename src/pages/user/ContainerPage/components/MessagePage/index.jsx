@@ -431,9 +431,27 @@ const MessagePage = () => {
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
+  const [width, setWidth] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  useEffect(() => {
+    if (filterOption === "all") {
+      const element = document.querySelector(".menu-left__item--all");
+      const width = element.offsetWidth;
+      setWidth(width);
+      setLeft(16);
+    }
+    if (filterOption === "unseen") {
+      const element = document.querySelector(".menu-left__item--unseen");
+      const width = element.offsetWidth;
+      setWidth(width);
+      setLeft(64);
+    }
+  }, [filterOption]);
+
   return (
     <S.Wrapper>
-      <S.Container>
+      <S.Container width={width} left={left}>
         <div className="message">
           <div className="section-left">
             <div className="section-left__header">
@@ -459,14 +477,18 @@ const MessagePage = () => {
               <div className="menu">
                 <div className="menu__left">
                   <div
-                    className="menu-left__item"
+                    className="menu-left__item menu-left__item--all"
                     onClick={() => handleFilterOption("all")}
+                    style={filterOption === "all" ? { color: "#005ae0" } : {}}
                   >
                     Tất cả
                   </div>
                   <div
-                    className="menu-left__item"
+                    className="menu-left__item menu-left__item--unseen"
                     onClick={() => handleFilterOption("unseen")}
+                    style={
+                      filterOption === "unseen" ? { color: "#005ae0" } : {}
+                    }
                   >
                     Chưa đọc
                   </div>
@@ -483,6 +505,7 @@ const MessagePage = () => {
                     <i className="fa-solid fa-ellipsis"></i>
                   </div>
                 </div>
+                <div className="dividing-selected"></div>
               </div>
               <div className="room-list">
                 {/* {loading && (
