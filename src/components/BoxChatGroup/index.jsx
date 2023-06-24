@@ -20,7 +20,6 @@ import moment from "moment";
 import messageSend from "assets/audio/messageSend.wav";
 import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
-import ModalAccount from "components/ModalAccount";
 import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
@@ -150,8 +149,6 @@ const BoxChatGroup = () => {
     }
   };
 
-  const [fullInfoUser, setFullInfoUser] = useState({});
-
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   useEffect(() => {
@@ -164,6 +161,10 @@ const BoxChatGroup = () => {
   }, []);
 
   const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    return () => setMessages([])
+  }, [])
 
   useEffect(() => {
     let unSubcribe;

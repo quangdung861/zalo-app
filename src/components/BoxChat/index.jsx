@@ -243,6 +243,10 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    return () => setMessages([])
+  }, [])
+
+  useEffect(() => {
     setMessages([]);
     let unSubcribe;
     if (room.id) {

@@ -59,6 +59,8 @@ const PhonebookPage = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const switchOverStranger = () => {
+    setIsShowBoxChatGroup(false);
+    setIsShowBoxChat(false);
     if (isShowSectionLeft) {
       setIsShowSectionLeft(false);
     }

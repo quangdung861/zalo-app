@@ -510,6 +510,8 @@ const MessagePage = () => {
   const switchOverStranger = () => {
     setSidebarSelected("phonebook");
     setSectionSelected("chat-with-strangers");
+    setIsShowBoxChatGroup(false);
+    setIsShowBoxChat(false);
     if (isShowSectionLeft) {
       setIsShowSectionLeft(false);
     }
