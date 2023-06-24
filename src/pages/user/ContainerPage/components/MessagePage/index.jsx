@@ -34,6 +34,10 @@ const MessagePage = () => {
     setIsShowBoxChatGroup,
     setSidebarSelected,
     setSectionSelected,
+    isShowSectionLeft,
+    setIsShowSectionLeft,
+    isShowSectionRight,
+    setIsShowSectionRight,
   } = useContext(UserLayoutContext);
   const {
     rooms,
@@ -122,7 +126,6 @@ const MessagePage = () => {
       setLoading(true);
       const fetchDataAsync = async () => {
         const fetchedData = await fetchData();
-
         setInfoPartner(fetchedData);
         setLoading(false);
       };
@@ -507,6 +510,12 @@ const MessagePage = () => {
   const switchOverStranger = () => {
     setSidebarSelected("phonebook");
     setSectionSelected("chat-with-strangers");
+    if (isShowSectionLeft) {
+      setIsShowSectionLeft(false);
+    }
+    if (!isShowSectionRight) {
+      setIsShowSectionRight(true);
+    }
   };
 
   return (

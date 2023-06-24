@@ -29,10 +29,7 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
-  console.log(
-    "🚀 ~ file: index.jsx:31 ~ BoxChatGroup ~ selectedGroupMessaging:",
-    selectedGroupMessaging
-  );
+
   const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   const inputRef = useRef();

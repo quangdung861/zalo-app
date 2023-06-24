@@ -20,10 +20,13 @@ export const Container = styled.div`
       justify-content: space-between;
       align-items: center;
       user-select: none;
+   
       .left {
         display: flex;
         align-items: center;
-
+        max-width: 100%;
+        width: 380px;
+        overflow: hidden;
         .btn-come-back {
           display: none;
           min-width: 32px;
@@ -370,6 +373,17 @@ export const Container = styled.div`
           .btn-come-back {
             display: flex;
             flex-shrink: 1;
+          }
+        }
+      }
+    }
+  }
+  @media only screen and (max-width: 500px) {
+    .box-chat {
+      &__header {
+        .left {
+          > .avatar {
+            display: none;
           }
         }
       }

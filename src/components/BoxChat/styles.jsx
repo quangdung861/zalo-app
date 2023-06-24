@@ -380,4 +380,15 @@ export const Container = styled.div`
       }
     }
   }
+  @media only screen and (max-width: 500px) {
+    .box-chat {
+      &__header {
+        .left {
+          > .avatar {
+            display: none;
+          }
+        }
+      }
+    }
+  }
 `;

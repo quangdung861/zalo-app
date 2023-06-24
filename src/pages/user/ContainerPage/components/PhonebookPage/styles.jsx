@@ -87,17 +87,10 @@ export const Container = styled.div`
     }
   }
 
-  /* @media only screen and (max-width: 768px) {
-    .phonebook {
-      .section-left {
-        display: none;
-      }
-    }
-  } */
   @media only screen and (max-width: 992px) {
     .phonebook {
       .section-left {
-        display: ${({ isShowSectionLeft, setIsShowBoxChat }) =>
+        display: ${({ isShowSectionLeft }) =>
           isShowSectionLeft ? "block" : "none"};
         min-width: 100%;
       }
@@ -107,7 +100,6 @@ export const Container = styled.div`
   @media only screen and (min-width: 993px) {
     .phonebook {
       .section-right {
-        /* ${({ setIsShowSectionRight }) => setIsShowSectionRight(true)} */
       }
       .section-left {
         display: block;

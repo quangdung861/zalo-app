@@ -1,8 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useLayoutEffect } from "react";
 import * as S from "./styles";
 import FriendList from "./components/FriendList";
 import ChatWithStrangers from "./components/ChatWithStrangers";
 import Invitations from "./components/Invitations/Index";
+import GroupList from "./components/GroupList";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import ModalCreateGroup from "components/ModalCreateGroup";
 
@@ -10,22 +11,15 @@ const PhonebookPage = () => {
   const {
     isShowBoxChat,
     setIsShowBoxChat,
+    isShowBoxChatGroup,
     setIsShowBoxChatGroup,
     sectionSelected,
     setSectionSelected,
+    isShowSectionLeft,
+    setIsShowSectionLeft,
+    isShowSectionRight,
+    setIsShowSectionRight,
   } = useContext(UserLayoutContext);
-
-  const [isShowSectionLeft, setIsShowSectionLeft] = useState(true);
-  const [isShowSectionRight, setIsShowSectionRight] = useState(true);
-  console.log(
-    "🚀 ~ file: index.jsx:20 ~ PhonebookPage ~ isShowSectionLeft:",
-    isShowSectionLeft
-  );
-
-  console.log(
-    "🚀 ~ file: index.jsx:19 ~ PhonebookPage ~ isShowSectionRight:",
-    isShowSectionRight
-  );
 
   const renderSectionSelected = () => {
     switch (sectionSelected) {
@@ -50,6 +44,13 @@ const PhonebookPage = () => {
             setIsShowSectionLeft={setIsShowSectionLeft}
           />
         );
+      case "group-list":
+        return (
+          <GroupList
+            setIsShowSectionRight={setIsShowSectionRight}
+            setIsShowSectionLeft={setIsShowSectionLeft}
+          />
+        );
       default:
         break;
     }
@@ -58,6 +59,12 @@ const PhonebookPage = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   const switchOverStranger = () => {
+    if (isShowSectionLeft) {
+      setIsShowSectionLeft(false);
+    }
+    if (!isShowSectionRight) {
+      setIsShowSectionRight(true);
+    }
     setSectionSelected("chat-with-strangers");
   };
 
@@ -109,7 +116,13 @@ const PhonebookPage = () => {
                       ? "content-item content-item--active"
                       : "content-item"
                   }
-                  onClick={() => setSectionSelected("group-list")}
+                  onClick={() => {
+                    setIsShowBoxChat(false);
+                    setIsShowBoxChatGroup(false);
+                    setSectionSelected("group-list");
+                    setIsShowSectionRight(true);
+                    setIsShowSectionLeft(!isShowSectionLeft);
+                  }}
                 >
                   <i className="fa-solid fa-users"></i>
                   Danh sách nhóm
@@ -152,7 +165,7 @@ const PhonebookPage = () => {
             </div>
           </div>
 
-          {isShowSectionRight && !isShowBoxChat && (
+          {isShowSectionRight && !isShowBoxChat && !isShowBoxChatGroup && (
             <div className="section-right">{renderSectionSelected()}</div>
           )}
         </div>

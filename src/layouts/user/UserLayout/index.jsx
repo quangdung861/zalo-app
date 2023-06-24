@@ -8,7 +8,6 @@ import { ROUTES } from "routes";
 import BoxChat from "components/BoxChat";
 import { AuthContext } from "Context/AuthProvider";
 import { TITLE_BAR } from "constants/public";
-import { Helmet } from "react-helmet";
 import BoxChatGroup from "components/BoxChatGroup";
 
 export const UserLayoutContext = createContext();
@@ -67,6 +66,9 @@ const UserLayout = () => {
     }
   }, [totalUnSeenMessage]);
 
+  const [isShowSectionLeft, setIsShowSectionLeft] = useState(true);
+  const [isShowSectionRight, setIsShowSectionRight] = useState(true);
+
   return (
     <UserLayoutContext.Provider
       value={{
@@ -80,6 +82,10 @@ const UserLayout = () => {
         setIsShowBoxChatGroup,
         sectionSelected,
         setSectionSelected,
+        isShowSectionLeft,
+        setIsShowSectionLeft,
+        isShowSectionRight,
+        setIsShowSectionRight,
       }}
     >
       <S.Wrapper>
