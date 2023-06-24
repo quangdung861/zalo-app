@@ -15,14 +15,41 @@ const PhonebookPage = () => {
     setSectionSelected,
   } = useContext(UserLayoutContext);
 
+  const [isShowSectionLeft, setIsShowSectionLeft] = useState(true);
+  const [isShowSectionRight, setIsShowSectionRight] = useState(true);
+  console.log(
+    "🚀 ~ file: index.jsx:20 ~ PhonebookPage ~ isShowSectionLeft:",
+    isShowSectionLeft
+  );
+
+  console.log(
+    "🚀 ~ file: index.jsx:19 ~ PhonebookPage ~ isShowSectionRight:",
+    isShowSectionRight
+  );
+
   const renderSectionSelected = () => {
     switch (sectionSelected) {
       case "friend-list":
-        return <FriendList />;
+        return (
+          <FriendList
+            setIsShowSectionRight={setIsShowSectionRight}
+            setIsShowSectionLeft={setIsShowSectionLeft}
+          />
+        );
       case "chat-with-strangers":
-        return <ChatWithStrangers />;
+        return (
+          <ChatWithStrangers
+            setIsShowSectionRight={setIsShowSectionRight}
+            setIsShowSectionLeft={setIsShowSectionLeft}
+          />
+        );
       case "invitations":
-        return <Invitations />;
+        return (
+          <Invitations
+            setIsShowSectionRight={setIsShowSectionRight}
+            setIsShowSectionLeft={setIsShowSectionLeft}
+          />
+        );
       default:
         break;
     }
@@ -30,9 +57,16 @@ const PhonebookPage = () => {
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
+  const switchOverStranger = () => {
+    setSectionSelected("chat-with-strangers");
+  };
+
   return (
-    <S.Wrapper>
-      <S.Container>
+    <S.Wrapper isShowBoxChat={isShowBoxChat}>
+      <S.Container
+        isShowSectionLeft={isShowSectionLeft}
+        setIsShowSectionRight={setIsShowSectionRight}
+      >
         <div className="phonebook">
           <div className="section-left">
             <div className="section-left__header">
@@ -40,7 +74,7 @@ const PhonebookPage = () => {
                 <i className="fa-solid fa-magnifying-glass"></i>
                 <input placeholder="Tìm kiếm" />
               </div>
-              <div className="add-friend">
+              <div className="add-friend" onClick={() => switchOverStranger()}>
                 <i className="fa-solid fa-user-plus icon"></i>
               </div>
               <div
@@ -62,6 +96,8 @@ const PhonebookPage = () => {
                     setIsShowBoxChat(false);
                     setIsShowBoxChatGroup(false);
                     setSectionSelected("friend-list");
+                    setIsShowSectionRight(true);
+                    setIsShowSectionLeft(!isShowSectionLeft);
                   }}
                 >
                   <i className="fa-solid fa-user-group"></i>
@@ -80,13 +116,16 @@ const PhonebookPage = () => {
                 </div>
                 <div
                   className={
-                    sectionSelected === "friend-request"
+                    sectionSelected === "invitations"
                       ? "content-item content-item--active"
                       : "content-item"
                   }
                   onClick={() => {
                     setIsShowBoxChat(false);
+                    setIsShowBoxChatGroup(false);
                     setSectionSelected("invitations");
+                    setIsShowSectionRight(true);
+                    setIsShowSectionLeft(!isShowSectionLeft);
                   }}
                 >
                   <i className="fa-regular fa-envelope-open"></i>
@@ -100,7 +139,10 @@ const PhonebookPage = () => {
                   }
                   onClick={() => {
                     setIsShowBoxChat(false);
+                    setIsShowBoxChatGroup(false);
                     setSectionSelected("chat-with-strangers");
+                    setIsShowSectionRight(true);
+                    setIsShowSectionLeft(!isShowSectionLeft);
                   }}
                 >
                   <i className="fa-solid fa-comments"></i>
@@ -109,7 +151,8 @@ const PhonebookPage = () => {
               </div>
             </div>
           </div>
-          {!isShowBoxChat && (
+
+          {isShowSectionRight && !isShowBoxChat && (
             <div className="section-right">{renderSectionSelected()}</div>
           )}
         </div>

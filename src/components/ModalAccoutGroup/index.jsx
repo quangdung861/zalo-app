@@ -127,7 +127,7 @@ const ModalAccount = ({
                         )
                     )}
                     <div className="view-more">
-                      <i class="fa-solid fa-ellipsis"></i>
+                      <i className="fa-solid fa-ellipsis"></i>
                     </div>
                   </>
                 )}

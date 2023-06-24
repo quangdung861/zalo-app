@@ -21,11 +21,13 @@ import messageSend from "assets/audio/messageSend.wav";
 import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
+import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
     useContext(AppContext);
 
+  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
   const inputRef = useRef();
   const boxChatRef = useRef();
   const categoryRef = useRef();
@@ -289,12 +291,10 @@ const BoxChat = () => {
 
   useEffect(() => {
     if (messages[0]) {
-      const allUser = messages.map((item) => item.uid);    
+      const allUser = messages.map((item) => item.uid);
       var uniqueArr = [...new Set(allUser)];
 
-
       const fetchData = async () => {
-
         const docRef = query(
           collection(db, "users"),
           where("uid", "in", uniqueArr)
@@ -369,7 +369,7 @@ const BoxChat = () => {
         </div>
       );
     });
-  },[messages, infoUsers]);
+  }, [messages, infoUsers]);
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
@@ -485,11 +485,16 @@ const BoxChat = () => {
         merge: true,
       }
     );
+    setCategoryDropdown(false);
   };
-  
+
   const date = moment(
     fullInfoUser?.isOnline?.updatedAt?.seconds * 1000
   )?.fromNow();
+
+  const handleComeBack = () => {
+    setIsShowBoxChat(false);
+  };
 
   return (
     <S.Wrapper>
@@ -501,6 +506,9 @@ const BoxChat = () => {
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
+              <div className="btn-come-back" onClick={() => handleComeBack()}>
+                <i className="fa-solid fa-chevron-left"></i>
+              </div>
               <div className="avatar">
                 <img
                   src={selectedUserMessaging?.photoURLSelected}

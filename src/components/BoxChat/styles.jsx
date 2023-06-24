@@ -20,9 +20,26 @@ export const Container = styled.div`
       justify-content: space-between;
       align-items: center;
       user-select: none;
+      z-index: 100;
       .left {
         display: flex;
         align-items: center;
+        max-width: 100%;
+        width: 380px;
+        overflow: hidden;
+        .btn-come-back {
+          display: none;
+          min-width: 32px;
+          min-height: 32px;
+          border-radius: 50%;
+          margin-right: 8px;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          &:hover {
+            background-color: #f1f1f1;
+          }
+        }
         .avatar {
           position: relative;
           > img {
@@ -65,7 +82,6 @@ export const Container = styled.div`
             font-weight: 500;
             color: #7589a3;
             .category {
-              position: relative;
               .category-icon {
                 color: #7589a3;
                 font-size: 16px;
@@ -76,7 +92,8 @@ export const Container = styled.div`
               }
               .category-dropdown {
                 position: absolute;
-                top: 24px;
+                z-index: 99;
+                top: 62px;
                 background-color: #fff;
                 border-radius: 4px;
                 padding: 8px 0;
@@ -98,7 +115,8 @@ export const Container = styled.div`
                 }
               }
             }
-            .online, .offline {
+            .online,
+            .offline {
               > span {
                 color: #7589a3;
               }
@@ -109,6 +127,7 @@ export const Container = styled.div`
       .right {
         display: flex;
         gap: 4px;
+        padding-left: 16px;
         .box-icon {
           width: 32px;
           height: 32px;
@@ -345,6 +364,18 @@ export const Container = styled.div`
           }
         }
         &__right {
+        }
+      }
+    }
+  }
+  @media only screen and (max-width: 992px) {
+    .box-chat {
+      &__header {
+        .left {
+          .btn-come-back {
+            display: flex;
+            flex-shrink: 1;
+          }
         }
       }
     }

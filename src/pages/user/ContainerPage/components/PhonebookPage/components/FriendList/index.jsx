@@ -15,7 +15,7 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import searchEmpty from "assets/searchEmpty.png";
 
-const FriendList = () => {
+const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
   const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
@@ -330,11 +330,20 @@ const FriendList = () => {
     setCategorySelected(value);
   };
 
+  const handleComeBack = () => {
+    setIsShowBoxChat(false);
+    setIsShowSectionRight(false);
+    setIsShowSectionLeft(true);
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
         <div className="friendlist">
           <div className="friendlist-header">
+            <div className="btn-come-back" onClick={() => handleComeBack()}>
+              <i className="fa-solid fa-chevron-left"></i>
+            </div>
             <i className="fa-solid fa-user-group"></i>
             Danh sách bạn bè
           </div>

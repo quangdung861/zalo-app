@@ -17,6 +17,19 @@ export const Container = styled.div`
       font-weight: 600;
       border-bottom: 1px solid var(--boder-dividing-color);
       user-select: none;
+      .btn-come-back {
+        display: none;
+        min-width: 32px;
+        min-height: 32px;
+        border-radius: 50%;
+        margin-right: 8px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        &:hover {
+          background-color: #f1f1f1;
+        }
+      }
       > i {
         width: 24px;
       }
@@ -221,6 +234,15 @@ export const Container = styled.div`
           bottom: 0;
           width: calc(100% - 72px);
           border-bottom: 1px solid var(--boder-dividing-color);
+        }
+      }
+    }
+  }
+  @media only screen and (max-width: 992px) {
+    .strangerlist {
+      .strangerlist-header {
+        .btn-come-back {
+          display: flex;
         }
       }
     }

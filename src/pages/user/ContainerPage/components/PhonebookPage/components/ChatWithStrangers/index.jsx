@@ -36,7 +36,7 @@ async function fetchUserList(search) {
   return array;
 }
 
-const ChatWithStrangers = () => {
+const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
@@ -250,11 +250,20 @@ const ChatWithStrangers = () => {
     setKeywords(value);
   };
 
+  const handleComeBack = () => {
+    setIsShowBoxChat(false);
+    setIsShowSectionRight(false);
+    setIsShowSectionLeft(true);
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
         <div className="strangerlist">
           <div className="strangerlist-header">
+            <div className="btn-come-back" onClick={() => handleComeBack()}>
+              <i className="fa-solid fa-chevron-left"></i>
+            </div>
             <i className="fa-solid fa-comments"></i>
             Trò chuyện với người lạ
           </div>

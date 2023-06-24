@@ -18,9 +18,10 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import ModalAccount from "components/ModalAccount";
 
-const Invitations = () => {
+const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+    useContext(UserLayoutContext);
 
   const [invitationSent, setInvitationSent] = useState([]);
   const [invitationReceive, setInvitationReceive] = useState([]);
@@ -342,7 +343,7 @@ const Invitations = () => {
     photoURLSelected,
     displayNameSelected,
   }) => {
-    setIsShowBoxChatGroup(false)
+    setIsShowBoxChatGroup(false);
     setIsShowBoxChat(!isShowBoxChat);
     setSelectedUserMessaging({
       uidSelected,
@@ -351,11 +352,20 @@ const Invitations = () => {
     });
   };
 
+  const handleComeBack = () => {
+    setIsShowBoxChat(false);
+    setIsShowSectionRight(false);
+    setIsShowSectionLeft(true);
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
         <div className="invitations">
           <div className="header">
+            <div className="btn-come-back" onClick={() => handleComeBack()}>
+              <i className="fa-solid fa-chevron-left"></i>
+            </div>
             <i className="fa-regular fa-envelope-open"></i>
             Lời mời kết bạn
           </div>

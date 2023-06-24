@@ -14,6 +14,19 @@ export const Container = styled.div`
       font-size: 16px;
       gap: 10px;
       border-bottom: 1px solid var(--boder-dividing-color);
+      .btn-come-back {
+        display: none;
+        min-width: 32px;
+        min-height: 32px;
+        border-radius: 50%;
+        margin-right: 8px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        &:hover {
+          background-color: #f1f1f1;
+        }
+      }
       > i {
         width: 24px;
       }
@@ -286,6 +299,12 @@ export const Container = styled.div`
   }
   @media only screen and (max-width: 992px) {
     .invitations {
+      .header {
+        .btn-come-back {
+          display: flex;
+          flex-shrink: 1;
+        }
+      }
       .content {
         .invitation__receive {
           .receive-list {

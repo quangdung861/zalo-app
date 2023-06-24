@@ -511,7 +511,12 @@ const MessagePage = () => {
 
   return (
     <S.Wrapper>
-      <S.Container width={width} left={left}>
+      <S.Container
+        width={width}
+        left={left}
+        isShowBoxChat={isShowBoxChat}
+        isShowBoxChatGroup={isShowBoxChatGroup}
+      >
         <div className="message">
           <div className="section-left">
             <div className="section-left__header">
@@ -567,7 +572,7 @@ const MessagePage = () => {
                     &nbsp;{" "}
                     {categorySelected ? (
                       <i
-                        class="fa-solid fa-circle-xmark "
+                        className="fa-solid fa-circle-xmark "
                         onClick={() => handlefilterCategory("")}
                         style={{ color: "#005ae0" }}
                       ></i>

@@ -15,6 +15,7 @@ export const Container = styled.div`
       min-width: var(--section-left-width);
       height: 100vh;
       border-right: 1px solid var(--boder-dividing-color);
+      transition: min-width 0.3s ease;
       &__header {
         display: flex;
         align-items: center;
@@ -231,6 +232,7 @@ export const Container = styled.div`
           .notification-compatible {
             user-select: none;
             width: 93%;
+            max-width: 324px;
             position: absolute;
             z-index: 98;
             margin: 0 auto;
@@ -409,12 +411,33 @@ export const Container = styled.div`
         }
       }
     }
+
+    @media only screen and (max-width: 768px) {
+      .section-left {
+        display: ${({ isShowBoxChatGroup, isShowBoxChat }) =>
+          isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
+      }
+      .section-right {
+        display: none;
+      }
+    }
   }
 
   @media only screen and (max-width: 992px) {
     .message {
       .section-left {
-        display: none;
+        min-width: 100%;
+        display: ${({ isShowBoxChatGroup, isShowBoxChat }) =>
+          isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
+
+        &__content {
+          .room-list {
+            .notification-compatible {
+              left: auto;
+              right: 12px;
+            }
+          }
+        }
       }
     }
   }

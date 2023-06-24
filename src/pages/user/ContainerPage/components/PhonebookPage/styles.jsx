@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const Wrapper = styled.div``;
+export const Wrapper = styled.div`
+  @media only screen and (max-width: 992px) {
+    display: ${({ isShowBoxChat }) => (isShowBoxChat ? "none" : "block")};
+  }
+`;
 
 export const Container = styled.div`
   .phonebook {
@@ -10,6 +14,7 @@ export const Container = styled.div`
       min-width: var(--section-left-width);
       height: 100vh;
       border-right: 1px solid var(--boder-dividing-color);
+      transition: min-width 0.3s ease;
       &__header {
         display: flex;
         align-items: center;
@@ -82,10 +87,30 @@ export const Container = styled.div`
     }
   }
 
-  @media only screen and (max-width: 768px) {
+  /* @media only screen and (max-width: 768px) {
     .phonebook {
       .section-left {
         display: none;
+      }
+    }
+  } */
+  @media only screen and (max-width: 992px) {
+    .phonebook {
+      .section-left {
+        display: ${({ isShowSectionLeft, setIsShowBoxChat }) =>
+          isShowSectionLeft ? "block" : "none"};
+        min-width: 100%;
+      }
+    }
+  }
+
+  @media only screen and (min-width: 993px) {
+    .phonebook {
+      .section-right {
+        /* ${({ setIsShowSectionRight }) => setIsShowSectionRight(true)} */
+      }
+      .section-left {
+        display: block;
       }
     }
   }

@@ -23,6 +23,20 @@ export const Container = styled.div`
       .left {
         display: flex;
         align-items: center;
+
+        .btn-come-back {
+          display: none;
+          min-width: 32px;
+          min-height: 32px;
+          border-radius: 50%;
+          margin-right: 8px;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          &:hover {
+            background-color: #f1f1f1;
+          }
+        }
         > .avatar {
           margin-right: 12px;
           height: 48px;
@@ -123,7 +137,7 @@ export const Container = styled.div`
     }
     &__content {
       padding-top: 20px;
-      background-color: #EEF0F1;
+      background-color: #eef0f1;
       background-repeat: no-repeat;
       height: calc(100vh - var(--header-height) - var(--footer-height));
       .message-view-blur-overlay {
@@ -178,7 +192,6 @@ export const Container = styled.div`
         &__description {
           margin-bottom: 10px;
         }
-      
       }
 
       .created-room {
@@ -346,6 +359,18 @@ export const Container = styled.div`
           }
         }
         &__right {
+        }
+      }
+    }
+  }
+  @media only screen and (max-width: 992px) {
+    .box-chat {
+      &__header {
+        .left {
+          .btn-come-back {
+            display: flex;
+            flex-shrink: 1;
+          }
         }
       }
     }

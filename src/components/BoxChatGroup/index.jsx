@@ -24,9 +24,16 @@ import ModalAccount from "components/ModalAccount";
 import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
+import { UserLayoutContext } from "layouts/user/UserLayout";
 
 const BoxChatGroup = () => {
-  const { userInfo, room, selectedGroupMessaging } = useContext(AppContext);
+  const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
+    useContext(AppContext);
+  console.log(
+    "🚀 ~ file: index.jsx:31 ~ BoxChatGroup ~ selectedGroupMessaging:",
+    selectedGroupMessaging
+  );
+  const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -249,6 +256,9 @@ const BoxChatGroup = () => {
               <div className="box-image">
                 <img src={item.photoURL} alt="" className="avatar" />
                 <div className="text">
+                  <div style={{ fontSize: "13px", color: "#7589A3" }}>
+                    {item.displayName}
+                  </div>
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
                 </div>
@@ -350,12 +360,20 @@ const BoxChatGroup = () => {
     }
   }, [userInfo, selectedGroupMessaging, room]);
 
+  const handleComeBack = () => {
+    setIsShowBoxChatGroup(false);
+    setSelectedGroupMessaging({});
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
+              <div className="btn-come-back" onClick={() => handleComeBack()}>
+                <i className="fa-solid fa-chevron-left"></i>
+              </div>
               <div
                 className="avatar"
                 onClick={() => setIsShowOverlayModal(true)}
@@ -472,7 +490,9 @@ const BoxChatGroup = () => {
                   className="input-message-text"
                   type="text"
                   // style={{ textTransform: "capitalize" }}
-                  // placeholder={`Nhắn tin tới ${selectedUserMessaging.displayNameSelected}`}
+                  placeholder={`Nhắn tin tới ${
+                    room?.name || selectedGroupMessaging?.name
+                  }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e)}
