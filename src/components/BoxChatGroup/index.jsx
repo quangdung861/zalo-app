@@ -115,7 +115,7 @@ const BoxChatGroup = () => {
             );
 
             addDocument("messages", {
-              category: "single",
+              category: "group",
               roomId: room.id,
               uid: userInfo.uid,
               displayName: userInfo.displayName,

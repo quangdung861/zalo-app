@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, { useContext, useState, useRef, useEffect, useMemo } from "react";
 import * as S from "./styles";
 import {
   collection,
@@ -24,7 +24,7 @@ import ModalAccount from "components/ModalAccount";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
-  useContext(AppContext);
+    useContext(AppContext);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -136,8 +136,6 @@ const BoxChat = () => {
               category: "single",
               roomId: room.id,
               uid: userInfo.uid,
-              displayName: userInfo.displayName,
-              photoURL: userInfo.photoURL,
               text: inputValue,
             });
           };
@@ -148,18 +146,6 @@ const BoxChat = () => {
               const roomRef = await addDoc(collection(db, "rooms"), {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
-                // info: [
-                //   {
-                //     avatar: selectedUserMessaging.photoURLSelected,
-                //     name: selectedUserMessaging.displayNameSelected,
-                //     uid: selectedUserMessaging.uidSelected,
-                //   },
-                //   {
-                //     avatar: userInfo.photoURL,
-                //     name: userInfo.displayName,
-                //     uid: userInfo.uid,
-                //   },
-                // ],
                 messageLastest: {
                   text: inputValue,
                   displayName: userInfo.displayName,
@@ -182,8 +168,6 @@ const BoxChat = () => {
                   category: "single",
                   roomId: response.id,
                   uid: userInfo.uid,
-                  displayName: userInfo.displayName,
-                  photoURL: userInfo.photoURL,
                   text: inputValue,
                 });
               } else {
@@ -257,7 +241,7 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    setMessages([])
+    setMessages([]);
     let unSubcribe;
     if (room.id) {
       const handleSnapShotMessage = async () => {
@@ -301,8 +285,39 @@ const BoxChat = () => {
     }, 100);
   }, [messages]);
 
-  const renderMessages = () => {
+  const [infoUsers, setInfoUsers] = useState();
+
+  useEffect(() => {
+    if (messages[0]) {
+      const allUser = messages.map((item) => item.uid);    
+      var uniqueArr = [...new Set(allUser)];
+
+
+      const fetchData = async () => {
+
+        const docRef = query(
+          collection(db, "users"),
+          where("uid", "in", uniqueArr)
+        );
+        const reponse = await getDocs(docRef);
+        const documents = reponse.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setInfoUsers(documents);
+      };
+      fetchData();
+    }
+  }, [messages, userInfo]);
+
+  const renderMessages = useMemo(() => {
     return messages?.map((item) => {
+      const newInfoUser = infoUsers?.find(
+        (infoUser) => infoUser.uid === item.uid
+      );
+
       const renderCreatedAtMessage = () => {
         if (item.createdAt) {
           let formattedDate = "";
@@ -337,13 +352,13 @@ const BoxChat = () => {
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()}</div>
                 </div>
-                <img src={item.photoURL} alt="" className="avatar" />
+                <img src={newInfoUser?.photoURL} alt="" className="avatar" />
               </div>
             </div>
           ) : (
             <div className="message-item__other">
               <div className="box-image">
-                <img src={item.photoURL} alt="" className="avatar" />
+                <img src={newInfoUser?.photoURL} alt="" className="avatar" />
                 <div className="text">
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
@@ -354,7 +369,7 @@ const BoxChat = () => {
         </div>
       );
     });
-  };
+  },[messages, infoUsers]);
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
@@ -471,6 +486,7 @@ const BoxChat = () => {
       }
     );
   };
+  
   const date = moment(
     fullInfoUser?.isOnline?.updatedAt?.seconds * 1000
   )?.fromNow();
@@ -616,7 +632,7 @@ const BoxChat = () => {
               )}
             </div>
             <div className="created-room">{renderCreatedAt()}</div>
-            {renderMessages()}
+            {renderMessages}
           </div>
           <div className="box-chat__footer">
             <div className="toolbar-chat-input">

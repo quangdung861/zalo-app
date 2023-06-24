@@ -7,9 +7,13 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import ModalCreateGroup from "components/ModalCreateGroup";
 
 const PhonebookPage = () => {
-  const [sectionSelected, setSectionSelected] = useState("friend-list");
-
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } = useContext(UserLayoutContext);
+  const {
+    isShowBoxChat,
+    setIsShowBoxChat,
+    setIsShowBoxChatGroup,
+    sectionSelected,
+    setSectionSelected,
+  } = useContext(UserLayoutContext);
 
   const renderSectionSelected = () => {
     switch (sectionSelected) {
@@ -110,8 +114,8 @@ const PhonebookPage = () => {
           )}
         </div>
         {isShowOverlayModal && (
-        <ModalCreateGroup setIsShowOverlayModal={setIsShowOverlayModal} />
-      )}
+          <ModalCreateGroup setIsShowOverlayModal={setIsShowOverlayModal} />
+        )}
       </S.Container>
     </S.Wrapper>
   );

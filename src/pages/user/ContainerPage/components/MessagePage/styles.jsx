@@ -77,9 +77,47 @@ export const Container = styled.div`
           &__right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 4px;
             .menu-right__item {
               cursor: pointer;
+              border-radius: 20px;
+              padding: 2px 10px;
+              &:hover {
+                background-color: #f1f1f1;
+              }
+            }
+            .menu-right__item--more {
+              border-radius: 50%;
+              padding: 0;
+              width: 22px;
+              height: 22px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            .category-dropdown {
+              position: absolute;
+              top: 32px;
+              background-color: #fff;
+              border-radius: 4px;
+              padding: 8px 0;
+              box-shadow: var(--box-shadow-default);
+              z-index: 99;
+              &__item {
+                width: 190px;
+                height: 40px;
+                padding: 0 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                > i {
+                  font-size: 16px;
+                }
+                &:hover {
+                  cursor: pointer;
+                  background-color: #f1f1f1;
+                }
+              }
             }
           }
           .dividing-selected {
@@ -264,6 +302,12 @@ export const Container = styled.div`
             > span {
               color: #7589a3;
               font-weight: 500;
+            }
+            .btn-tag {
+              background-color: #e5efff;
+            }
+            .btn-tag:hover {
+              background-color: #c7e0ff;
             }
           }
         }

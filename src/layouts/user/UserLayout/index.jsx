@@ -41,6 +41,8 @@ const UserLayout = () => {
 
   const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
 
+  const [sectionSelected, setSectionSelected] = useState("friend-list");
+
   useEffect(() => {
     if (window.location.hostname === "localhost") {
       if (totalUnSeenMessage >= 1) {
@@ -76,6 +78,8 @@ const UserLayout = () => {
         setTotalUnseenMessage,
         isShowBoxChatGroup,
         setIsShowBoxChatGroup,
+        sectionSelected,
+        setSectionSelected,
       }}
     >
       <S.Wrapper>

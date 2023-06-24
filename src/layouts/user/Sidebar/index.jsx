@@ -92,7 +92,7 @@ const Sidebar = () => {
   const [roomCloud, setRoomCloud] = useState();
   const getRoomCloud = () => {
     const roomCloudResult = rooms?.find((item) => item.category === "my cloud");
-    const cloudInfo = roomCloudResult.info.find(
+    const cloudInfo = roomCloudResult?.info.find(
       (item) => item.uid === "my-cloud"
     );
     setRoomCloud(cloudInfo);

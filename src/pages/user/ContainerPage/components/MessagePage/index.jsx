@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -23,6 +23,7 @@ import emptyMessageUnssenImage from "assets/emptyMessageUnseen.png";
 import slideList from "./slideList";
 import { generateKeywords } from "services";
 import Skeleton from "react-loading-skeleton";
+import searchEmpty2 from "assets/searchEmpty2.png";
 
 const MessagePage = () => {
   const {
@@ -31,6 +32,8 @@ const MessagePage = () => {
     setTotalUnseenMessage,
     isShowBoxChatGroup,
     setIsShowBoxChatGroup,
+    setSidebarSelected,
+    setSectionSelected,
   } = useContext(UserLayoutContext);
   const {
     rooms,
@@ -71,7 +74,10 @@ const MessagePage = () => {
     );
   }
 
+  const categoryRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
+  const [categorySelected, setCategorySelected] = useState("");
 
   const toogleBoxChat = ({
     uidSelected,
@@ -103,6 +109,7 @@ const MessagePage = () => {
   };
 
   const [filterOption, setFilterOption] = useState("all");
+  const [categoryDropdown, setCategoryDropdown] = useState(false);
 
   const handleFilterOption = (value) => {
     setFilterOption(value);
@@ -217,9 +224,20 @@ const MessagePage = () => {
         const formatDate = moment(
           room.messageLastest?.createdAt?.seconds * 1000
         )?.fromNow();
+
         const uidSelected = room.members.filter(
           (member) => member !== userInfo.uid
         )[0];
+
+        let categoryData;
+        const friendData = userInfo.friends.find(
+          (item) => item.uid === uidSelected
+        );
+        if (friendData) {
+          categoryData = userInfo.categoriesTemplate.find(
+            (item) => item.name === friendData.category
+          );
+        }
 
         const infoMyself = room.messagesViewed.find(
           (item) => item.uid === userInfo.uid
@@ -244,6 +262,15 @@ const MessagePage = () => {
         if (keywords) {
           const isKeywords = keywordsName.includes(keywords.toLowerCase());
           if (!isKeywords) {
+            return;
+          }
+        }
+
+        if (categorySelected) {
+          if (!categoryData?.name) {
+            return;
+          }
+          if (categorySelected !== categoryData?.name) {
             return;
           }
         }
@@ -282,6 +309,16 @@ const MessagePage = () => {
                   {infoPartner[index]?.displayName}
                 </div>
                 <div className="new-message">
+                  {categoryData && (
+                    <i
+                      className="fa-solid fa-bookmark category-icon"
+                      style={{
+                        color: categoryData.color,
+                        marginRight: "8px",
+                      }}
+                      title={categoryData.name}
+                    ></i>
+                  )}
                   <span className="new-message__author">
                     {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
                   </span>
@@ -394,6 +431,7 @@ const MessagePage = () => {
     filterOption,
     infoPartner,
     keywords,
+    categorySelected,
   ]);
 
   const renderSlideList = () => {
@@ -449,6 +487,28 @@ const MessagePage = () => {
     }
   }, [filterOption]);
 
+  const handlefilterCategory = (value) => {
+    setCategorySelected(value);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+        setCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const switchOverStranger = () => {
+    setSidebarSelected("phonebook");
+    setSectionSelected("chat-with-strangers");
+  };
+
   return (
     <S.Wrapper>
       <S.Container width={width} left={left}>
@@ -463,7 +523,7 @@ const MessagePage = () => {
                   onChange={(e) => setKeywords(e.target.value)}
                 />
               </div>
-              <div className="add-friend">
+              <div className="add-friend" onClick={() => switchOverStranger()}>
                 <i className="fa-solid fa-user-plus icon"></i>
               </div>
               <div
@@ -494,14 +554,46 @@ const MessagePage = () => {
                   </div>
                 </div>
                 <div className="menu__right">
-                  <div className="menu-right__item">
-                    Phân loại &nbsp;{" "}
-                    <i className="fa-solid fa-chevron-down"></i>
-                  </div>
                   <div
                     className="menu-right__item"
-                    style={{ marginRight: "8px", marginLeft: "4px" }}
+                    onClick={() => setCategoryDropdown(true)}
+                    style={
+                      categorySelected
+                        ? { backgroundColor: "#E5EFFF", color: "#005ae0" }
+                        : {}
+                    }
                   >
+                    {categorySelected ? categorySelected : "Phân loại"}
+                    &nbsp;{" "}
+                    {categorySelected ? (
+                      <i
+                        class="fa-solid fa-circle-xmark "
+                        onClick={() => handlefilterCategory("")}
+                        style={{ color: "#005ae0" }}
+                      ></i>
+                    ) : (
+                      <i className="fa-solid fa-chevron-down"></i>
+                    )}
+                  </div>
+
+                  {categoryDropdown && (
+                    <div className="category-dropdown" ref={categoryRef}>
+                      {userInfo?.categoriesTemplate?.map((item, index) => (
+                        <div
+                          key={index}
+                          className="category-dropdown__item"
+                          onClick={() => handlefilterCategory(item.name)}
+                        >
+                          <i
+                            className="fa-solid fa-bookmark"
+                            style={{ color: item.color }}
+                          ></i>
+                          {item.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="menu-right__item menu-right__item--more">
                     <i className="fa-solid fa-ellipsis"></i>
                   </div>
                 </div>
@@ -540,7 +632,8 @@ const MessagePage = () => {
                 {renderRooms}
                 {renderRooms?.length > 0 &&
                   renderRooms?.every((item) => item === undefined) &&
-                  filterOption === "unseen" && (
+                  filterOption === "unseen" &&
+                  !categorySelected && (
                     <div className="empty-message">
                       <img
                         src={emptyMessageUnssenImage}
@@ -552,16 +645,54 @@ const MessagePage = () => {
                   )}
                 {renderRooms?.length > 0 &&
                   renderRooms?.every((item) => item === undefined) &&
-                  filterOption === "all" && (
+                  (!categorySelected ? (
+                    filterOption === "all" && (
+                      <div className="empty-message">
+                        <img
+                          src={emptyMessageUnssenImage}
+                          alt=""
+                          className="empty-message__img"
+                        />
+                        <span>Không có tin nhắn</span>
+                      </div>
+                    )
+                  ) : (
                     <div className="empty-message">
                       <img
-                        src={emptyMessageUnssenImage}
+                        src={searchEmpty2}
                         alt=""
                         className="empty-message__img"
                       />
-                      <span>Không có tin nhắn</span>
+                      <span style={{ color: "#081C36" }}>
+                        Không có kết quả phù hợp
+                      </span>
+                      <div
+                        style={{
+                          width: "248px",
+                          textAlign: "center",
+                          margin: "16px 0px",
+                          color: "#7589a3",
+                        }}
+                      >
+                        Phân loại hội thoại để ghi nhớ và nhận biết dễ dàng hơn
+                      </div>
+                      <div
+                        className="btn-tag"
+                        style={{
+                          height: "32px",
+                          lineHeight: "32px",
+                          fontSize: "16px",
+                          fontWeight: "600",
+                          padding: "0 16px",
+                          color: "#005ae0",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Gắn thẻ trò chuyện
+                      </div>
                     </div>
-                  )}
+                  ))}
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">

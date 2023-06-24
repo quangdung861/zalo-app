@@ -101,6 +101,7 @@ const ModalAccount = ({
                 {accountSelected?.avatars?.length <= 6 &&
                   accountSelected?.avatars.map((item, index) => (
                     <img
+                      key={index}
                       src={item}
                       alt=""
                       className="member-item"
@@ -125,9 +126,7 @@ const ModalAccount = ({
                           />
                         )
                     )}
-                    <div
-                      className="view-more"
-                    >
+                    <div className="view-more">
                       <i class="fa-solid fa-ellipsis"></i>
                     </div>
                   </>
