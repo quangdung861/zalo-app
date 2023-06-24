@@ -307,10 +307,10 @@ const FormEmail = ({ setRegisterWay }) => {
               >
                 <span>Email</span>
                 <span
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setRegisterWay("phoneNumber")}
+                  // style={{ cursor: "pointer" }}
+                  // onClick={() => setRegisterWay("phoneNumber")}
                 >
-                  Đăng ký với SĐT
+                  {/* Đăng ký với SĐT */}
                 </span>
               </div>
 
