@@ -52,6 +52,8 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setSelectedGroupMessaging,
   } = useContext(AppContext);
 
+  const [loading, setLoading] = useState(false);
+
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
@@ -119,12 +121,15 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
 
   const renderStrangerList = useMemo(() => {
-    if (orderBy === "desc") {
-      strangerList.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
-    } else {
-      strangerList.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
-    }
+    setLoading(true);
     if (strangerList[0]) {
+      setLoading(false);
+      if (orderBy === "desc") {
+        strangerList.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
+      } else {
+        strangerList.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
+      }
+
       return strangerList?.map((item, index) => {
         return (
           <div className="item-stranger" key={index}>
@@ -337,7 +342,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                 )}
               </div>
             </div>
-            <div className="list-strangers">{renderStrangerList}</div>
+            <div className="list-strangers"> {renderStrangerList}</div>
           </div>
         </div>
         {isShowOverlayModal && (

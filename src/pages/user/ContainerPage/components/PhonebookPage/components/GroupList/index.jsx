@@ -6,6 +6,7 @@ import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import AvatarGroup from "components/AvatarGroup";
 import { generateKeywords } from "services";
+import empty from "assets/empty.png";
 
 const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const {
@@ -84,19 +85,19 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
 
         const name = documents.map((item) => item.displayName).join(", ");
 
-        let keywordsName;
+        // let keywordsName;
 
-        if (room.name) {
-          keywordsName = generateKeywords(room.name.toLowerCase());
-        } else {
-          keywordsName = generateKeywords(name.toLowerCase());
-        }
+        // if (room.name) {
+        //   keywordsName = generateKeywords(room.name.toLowerCase());
+        // } else {
+        //   keywordsName = generateKeywords(name.toLowerCase());
+        // }
 
         infoPartner.push({
           id: room.id,
           photoURL: avatars,
           displayName: name,
-          keywordsName,
+          keywordsName: room.name.toLowerCase() || name.toLowerCase(),
         });
 
         newRooms.push({
@@ -173,6 +174,12 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
         }
       });
     }
+    return (
+      <div className="container-empty">
+        <img src={empty} alt="" />
+        <div>Bạn không có nhóm nào</div>
+      </div>
+    );
   }, [infoPartner, keywords, newRooms, orderBy]);
 
   const handleComeBack = () => {

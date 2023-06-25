@@ -11,6 +11,8 @@ import {
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
+import avatarDefault from "assets/avatar-mac-dinh-1.png";
+import avatarCloud from "assets/avatarCloudjpg.jpg"
 
 const FormEmail = ({ setRegisterWay }) => {
   const [formData, setFormData] = useState({
@@ -184,9 +186,7 @@ const FormEmail = ({ setRegisterWay }) => {
           addDocument("users", {
             displayName: formData.fullName.value,
             email: data.user.email,
-            photoURL: data.user.photoURL
-              ? data.user.photoURL
-              : "https://dvdn247.net/wp-content/uploads/2020/07/avatar-mac-dinh-1.png",
+            photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
             photoCover:
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
@@ -228,7 +228,7 @@ const FormEmail = ({ setRegisterWay }) => {
               value: true,
               updatedAt: serverTimestamp(),
             },
-             isOnline: {
+            isOnline: {
               value: true,
               updatedAt: serverTimestamp(),
             },
@@ -239,14 +239,12 @@ const FormEmail = ({ setRegisterWay }) => {
             info: [
               {
                 avatar:
-                  "https://res-zalo.zadn.vn/upload/media/2021/6/4/2_1622800570007_369788.jpg",
+                  avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },
               {
-                avatar: data.user.photoURL
-                  ? data.user.photoURL
-                  : "https://dvdn247.net/wp-content/uploads/2020/07/avatar-mac-dinh-1.png",
+                avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
                 name: data.user.displayName,
                 uid: data.user.uid,
               },
@@ -307,8 +305,8 @@ const FormEmail = ({ setRegisterWay }) => {
               >
                 <span>Email</span>
                 <span
-                  // style={{ cursor: "pointer" }}
-                  // onClick={() => setRegisterWay("phoneNumber")}
+                // style={{ cursor: "pointer" }}
+                // onClick={() => setRegisterWay("phoneNumber")}
                 >
                   {/* Đăng ký với SĐT */}
                 </span>

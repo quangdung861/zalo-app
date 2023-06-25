@@ -74,6 +74,7 @@ const PhonebookPage = () => {
     <S.Wrapper isShowBoxChat={isShowBoxChat}>
       <S.Container
         isShowSectionLeft={isShowSectionLeft}
+        isShowSectionRight={isShowSectionRight}
         setIsShowSectionRight={setIsShowSectionRight}
       >
         <div className="phonebook">

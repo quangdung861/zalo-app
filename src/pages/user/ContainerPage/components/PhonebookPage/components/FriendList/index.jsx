@@ -14,6 +14,7 @@ import ModalAccount from "components/ModalAccount";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import searchEmpty from "assets/searchEmpty.png";
+import Skeleton from "react-loading-skeleton";
 
 const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
@@ -22,9 +23,12 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     useContext(UserLayoutContext);
   const [keywords, setKeywords] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const [friends, setFriends] = useState([]);
   useEffect(() => {
     const getFriends = async () => {
+      setLoading(true);
       let friendsRef;
       if (userInfo?.friends[0]) {
         const uidFriends = userInfo.friends.map((friend) => friend.uid);
@@ -51,8 +55,10 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           };
         });
         setFriends(documents);
+        setLoading(false);
       } else {
         setFriends([]);
+        setLoading(false);
       }
     };
     getFriends();
@@ -148,15 +154,15 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [totalFriends, setTotalFriends] = useState(0);
 
   const renderFriendlist = useMemo(() => {
-    if (orderBy === "desc") {
-      friends.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
-    } else {
-      friends.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
-    }
-
     setTotalFriends(0);
 
     if (friends[0]) {
+      if (orderBy === "desc") {
+        friends.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
+      } else {
+        friends.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
+      }
+
       return friends.map((item) => {
         let categoryName;
         let color;
@@ -486,7 +492,49 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                 )}
               </div>
             </div>
-            <div className="list-friends">{renderFriendlist}</div>
+            <div className="list-friends">
+              {loading ? (
+                <>
+                  {Array.from({ length: 2 }).map((_, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "0 16px",
+                        paddingBottom: "8px",
+                      }}
+                    >
+                      <div className="left">
+                        <Skeleton
+                          style={{
+                            width: "48px",
+                            height: "48px",
+                            marginRight: "12px",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
+                      <div
+                        className="right"
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        <Skeleton
+                          style={{
+                            height: "20px",
+                            width: "200px",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                renderFriendlist
+              )}
+            </div>
           </div>
         </div>
         {isShowOverlayModal && (

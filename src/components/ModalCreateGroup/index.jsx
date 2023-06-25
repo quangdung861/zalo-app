@@ -19,6 +19,7 @@ import { convertImageToBase64 } from "utils/file";
 import { addDocument } from "services";
 import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import Skeleton from "react-loading-skeleton";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
@@ -80,9 +81,10 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   const [friends, setFriends] = useState([]);
   const [keywords, setKeywords] = useState("");
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const getFriends = async () => {
+      setLoading(true);
       let friendsRef;
       if (userInfo?.friends[0]) {
         const uidFriends = userInfo.friends.map((friend) => friend.uid);
@@ -111,8 +113,10 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
           };
         });
         setFriends(documents);
+        setLoading(false);
       } else {
         setFriends([]);
+        setLoading(false);
       }
     };
     getFriends();
@@ -279,11 +283,11 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
     const data = {
       category: "group",
-      members: [...members, userInfo.uid],
+      members: [userInfo.uid, ...members],
       messageLastest: {
         createdAt: serverTimestamp(),
       },
-      messagesViewed: [...messagesViewed, { uid: userInfo.uid, count: 0 }],
+      messagesViewed: [{ uid: userInfo.uid, count: 0 }, ...messagesViewed],
       totalMessages: 0,
       //
       name: groupName,
@@ -326,7 +330,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       setIsShowOverlayModal(false);
 
       const avatars = documents.map((item) => item?.photoURL);
-    
+
       const name = documents.map((item) => item.displayName).join(", ");
 
       toogleBoxChatGroup(room, avatars, name);
@@ -418,7 +422,49 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
                 {userInfo.friends.length >= 1 ? (
                   <div className="friends-container">
-                    <div className="friend-list">{renderFriendList()} </div>
+                    <div className="friend-list">
+                      {loading ? (
+                        <>
+                          {Array.from({ length: 2 }).map((_, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: "0 16px",
+                                paddingBottom: "8px",
+                              }}
+                            >
+                              <div className="left">
+                                <Skeleton
+                                  style={{
+                                    width: "48px",
+                                    height: "48px",
+                                    marginRight: "12px",
+                                    borderRadius: "50%",
+                                  }}
+                                />
+                              </div>
+                              <div
+                                className="right"
+                                style={{
+                                  width: "100%",
+                                }}
+                              >
+                                <Skeleton
+                                  style={{
+                                    height: "20px",
+                                    width: "200px",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        renderFriendList()
+                      )}{" "}
+                    </div>
                     <div
                       className={
                         friendsSelected.length > 0

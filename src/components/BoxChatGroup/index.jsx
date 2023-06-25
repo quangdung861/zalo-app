@@ -346,7 +346,7 @@ const BoxChatGroup = () => {
             displayName: data.displayName,
             photoURL: data.photoURL,
           };
-        });
+        }).reverse();
 
         const avatars = documents.map((item) => item.photoURL);
         setAvatars(avatars);

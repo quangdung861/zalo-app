@@ -24,6 +24,9 @@ import slideList from "./slideList";
 import { generateKeywords } from "services";
 import Skeleton from "react-loading-skeleton";
 import searchEmpty2 from "assets/searchEmpty2.png";
+import avatarDefault from "assets/avatar-mac-dinh-1.png";
+import avatarCloud from "assets/avatarCloudjpg.jpg";
+import { convertBase64ToImage } from "utils/file";
 
 const MessagePage = () => {
   const {
@@ -151,16 +154,16 @@ const MessagePage = () => {
           response.docs.map((doc) => {
             const id = doc.id;
             const data = doc.data();
-            const keywordsName = generateKeywords(
-              data.displayName.toLowerCase()
-            );
+            // const keywordsName = generateKeywords(
+            //   data.displayName.toLowerCase()
+            // );
 
             infoPartner.push({
               id: id,
               displayName: data.displayName,
               photoURL: data.photoURL,
               uid: data.uid,
-              keywordsName,
+              keywordsName: data.displayName.toLowerCase(),
             });
           });
         } else if (room.category === "group") {
@@ -170,15 +173,17 @@ const MessagePage = () => {
           );
 
           const response = await getDocs(partnerRef);
-          const documents = response.docs.map((doc) => {
-            const id = doc.id;
-            const data = doc.data();
-            return {
-              id: id,
-              displayName: data.displayName,
-              photoURL: data.photoURL,
-            };
-          });
+          const documents = response.docs
+            .map((doc) => {
+              const id = doc.id;
+              const data = doc.data();
+              return {
+                id: id,
+                displayName: data.displayName,
+                photoURL: data.photoURL,
+              };
+            })
+            .reverse();
 
           const avatars = documents.map((item) => item.photoURL);
 
@@ -186,27 +191,26 @@ const MessagePage = () => {
 
           let keywordsName;
 
-          if (room.name) {
-            keywordsName = generateKeywords(room.name.toLowerCase());
-          } else {
-            keywordsName = generateKeywords(name.toLowerCase());
-          }
+          // if (room.name) {
+          // keywordsName = generateKeywords(room.name.toLowerCase());
+          // } else {
+          // keywordsName = generateKeywords(name.toLowerCase());
+          // }
 
           infoPartner.push({
             id: room.id,
             photoURL: avatars,
             displayName: name,
-            keywordsName,
+            keywordsName: room.name.toLowerCase() || name.toLowerCase(),
           });
         }
       } else {
-        const keywordsName = generateKeywords("Cloud của tôi".toLowerCase());
+        // const keywordsName = generateKeywords("Cloud của tôi".toLowerCase());
         infoPartner.push({
-          photoURL:
-            "https://res-zalo.zadn.vn/upload/media/2021/6/4/2_1622800570007_369788.jpg",
+          photoURL: avatarCloud,
           displayName: "Cloud của tôi",
           id: "my-cloud",
-          keywordsName,
+          keywordsName: "Cloud của tôi".toLowerCase(),
         });
       }
     }
@@ -215,11 +219,13 @@ const MessagePage = () => {
 
   const [keywords, setKeywords] = useState("");
 
+
+
   const renderRooms = useMemo(() => {
     setTotalUnseenMessageRef(0);
 
     if (!infoPartner[0]) {
-      return <></>;
+      return;
     }
 
     return rooms?.map((room, index) => {
@@ -263,8 +269,11 @@ const MessagePage = () => {
         }
 
         if (keywords) {
-          const isKeywords = keywordsName.includes(keywords.toLowerCase());
-          if (!isKeywords) {
+          // const isKeywords = keywordsName.includes(keywords.toLowerCase());
+
+          let index = keywordsName.indexOf(keywords.toLowerCase());
+
+          if (index < 0) {
             return;
           }
         }
@@ -393,7 +402,7 @@ const MessagePage = () => {
             <div className="room-item__left">
               {room.avatar?.url && <img src={room.avatar?.url} alt="" />}
 
-              {!room.avatar?.url && (
+              {!room.avatar?.url && infoGroup?.photoURL && (
                 <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
               )}
 
@@ -429,13 +438,19 @@ const MessagePage = () => {
       }
     });
   }, [
-    selectedUserMessaging.uidSelected,
-    selectedGroupMessaging.room?.id,
     filterOption,
     infoPartner,
     keywords,
     categorySelected,
+    selectedUserMessaging,
+    selectedGroupMessaging,
   ]);
+
+  // useEffect(() => {
+  //   let searcharray = [];
+  //   let x = 0;
+  //   if ()
+  // }, [])
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
@@ -492,7 +507,7 @@ const MessagePage = () => {
 
   const handlefilterCategory = (value) => {
     setCategorySelected(value);
-    setCategoryDropdown(false)
+    setCategoryDropdown(false);
   };
 
   useEffect(() => {
@@ -646,6 +661,7 @@ const MessagePage = () => {
                 )} */}
 
                 {/*  */}
+
                 {renderRooms}
                 {renderRooms?.length > 0 &&
                   renderRooms?.every((item) => item === undefined) &&
@@ -710,6 +726,7 @@ const MessagePage = () => {
                       </div>
                     </div>
                   ))}
+
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">

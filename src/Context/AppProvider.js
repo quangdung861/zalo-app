@@ -142,11 +142,11 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     let unSubcribe;
-    if (userInfo?.uid) {
+    if (uid) {
       let roomsRef;
       roomsRef = query(
         collection(db, "rooms"),
-        where("members", "array-contains", userInfo?.uid)
+        where("members", "array-contains", uid)
       );
 
       unSubcribe = onSnapshot(roomsRef, (docsSnap) => {
@@ -167,7 +167,7 @@ const AppProvider = ({ children }) => {
       });
     }
     return () => unSubcribe && unSubcribe();
-  }, [keywords, userInfo]);
+  }, [uid, keywords, userInfo]);
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
@@ -188,7 +188,7 @@ const AppProvider = ({ children }) => {
       };
       getRoom();
     }
-  }, [selectedUserMessaging]);
+  }, [selectedUserMessaging, rooms, userInfo]);
 
   useEffect(() => {
     if (selectedGroupMessaging?.room?.id) {
@@ -204,7 +204,7 @@ const AppProvider = ({ children }) => {
       };
       getRoom();
     }
-  }, [selectedGroupMessaging?.room?.id]);
+  }, [rooms, selectedGroupMessaging?.room?.id, userInfo]);
 
   return (
     <AppContext.Provider

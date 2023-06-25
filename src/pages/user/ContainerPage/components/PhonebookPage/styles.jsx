@@ -100,6 +100,13 @@ export const Container = styled.div`
   @media only screen and (min-width: 993px) {
     .phonebook {
       .section-right {
+        ${({ isShowSectionRight, setIsShowSectionRight }) => {
+          if (!isShowSectionRight) {
+            setTimeout(() => {
+              setIsShowSectionRight(true);
+            }, 100);
+          }
+        }};
       }
       .section-left {
         display: block;
