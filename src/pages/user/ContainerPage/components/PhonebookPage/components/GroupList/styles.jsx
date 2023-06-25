@@ -159,6 +159,10 @@ export const Container = styled.div`
               height: 48px;
             }
             > .box-info {
+              max-width: 380px;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
               > span {
                 font-size: 16px;
                 font-weight: 500;

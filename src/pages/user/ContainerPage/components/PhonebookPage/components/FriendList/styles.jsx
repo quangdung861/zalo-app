@@ -81,7 +81,6 @@ export const Container = styled.div`
         }
         .asc-desc-order {
           width: 33.33%;
-
           &__current {
             display: flex;
             align-items: center;
@@ -240,9 +239,13 @@ export const Container = styled.div`
               height: 48px;
             }
             > .box-info {
+              max-width: 380px;
+              overflow: hidden;
+              text-overflow: ellipsis;
               > span {
                 font-size: 16px;
                 font-weight: 500;
+                white-space: nowrap;
               }
               > div {
                 margin-top: 4px;

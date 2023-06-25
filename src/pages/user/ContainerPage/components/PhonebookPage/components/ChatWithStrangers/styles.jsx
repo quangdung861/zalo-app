@@ -166,6 +166,9 @@ export const Container = styled.div`
             align-items: center;
             flex: 1;
             gap: 12px;
+            width: 380px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             > img {
               border-radius: 50%;
               object-fit: cover;
