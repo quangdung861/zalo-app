@@ -492,6 +492,7 @@ const MessagePage = () => {
 
   const handlefilterCategory = (value) => {
     setCategorySelected(value);
+    setCategoryDropdown(false)
   };
 
   useEffect(() => {

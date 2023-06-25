@@ -352,6 +352,7 @@ export const Container = styled.div`
       .box-chat-input {
         height: 58px;
         display: flex;
+        align-items: center;
         &__left {
           flex: 1;
           .input-message-text {
@@ -364,6 +365,20 @@ export const Container = styled.div`
           }
         }
         &__right {
+          > .btn-sent-message {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 16px;
+            margin-right: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #005ae0;
+            border-radius: 4px;
+            cursor: pointer;
+            &:hover {
+              background-color: #e5efff;
+            }
+          }
         }
       }
     }

@@ -66,6 +66,50 @@ const BoxChat = () => {
     }
   }, [room]);
 
+  const handleFocus = () => {
+    const toolbarChatInputElement = document.querySelector(
+      ".toolbar-chat-input"
+    );
+    Object.assign(toolbarChatInputElement.style, {
+      borderBottom: "1px solid #0068FF",
+    });
+  };
+
+  const handleBlur = () => {
+    const toolbarChatInputElement = document.querySelector(
+      ".toolbar-chat-input"
+    );
+    Object.assign(toolbarChatInputElement.style, {
+      borderBottom: "1px solid var(--boder-dividing-color)",
+    });
+  };
+
+  // useEffect(() => {
+  //   const inputElement = inputRef.current;
+  //   const toolbarChatInputElement = document.querySelector(
+  //     ".toolbar-chat-input"
+  //   );
+  //   const handleFocus = () => {
+  //     Object.assign(toolbarChatInputElement.style, {
+  //       borderBottom: "1px solid #0068FF",
+  //     });
+  //   };
+
+  //   const handleBlur = () => {
+  //     Object.assign(toolbarChatInputElement.style, {
+  //       borderBottom: `1px solid var(--boder-dividing-color)`,
+  //     });
+  //   };
+
+  //   inputElement.addEventListener("focus", handleFocus);
+  //   inputElement.addEventListener("blur", handleBlur);
+
+  //   return () => {
+  //     inputElement.removeEventListener("focus", handleFocus);
+  //     inputElement.removeEventListener("blur", handleBlur);
+  //   };
+  // }, []);
+
   const updateMessageViewed = async (docRef, newMessageViewed) => {
     setDoc(
       docRef,
@@ -203,6 +247,112 @@ const BoxChat = () => {
     }
   };
 
+  const handleClickSentMessage = () => {
+      if (inputValue) {
+        if (room.id) {
+          audio.play();
+          const createMes = async () => {
+            const roomRef = doc(db, "rooms", room.id);
+
+            const messagesViewedIndex = room.messagesViewed.findIndex(
+              (item) => item.uid === userInfo.uid
+            );
+            const messagesViewed = room.messagesViewed.find(
+              (item) => item.uid === userInfo.uid
+            );
+
+            const newMessageViewed = [...room.messagesViewed];
+
+            newMessageViewed.splice(messagesViewedIndex, 1, {
+              ...messagesViewed,
+              count: messagesViewed.count + 1,
+            });
+
+            await setDoc(
+              roomRef,
+              {
+                messageLastest: {
+                  text: inputValue,
+                  displayName: userInfo.displayName,
+                  uid: userInfo.uid,
+                  createdAt: serverTimestamp(),
+                },
+                totalMessages: room.totalMessages + 1,
+                messagesViewed: newMessageViewed,
+              },
+              {
+                merge: true,
+              }
+            );
+
+            addDocument("messages", {
+              category: "single",
+              roomId: room.id,
+              uid: userInfo.uid,
+              text: inputValue,
+            });
+          };
+          createMes();
+        } else {
+          const createRoomAndMes = async () => {
+            try {
+              const roomRef = await addDoc(collection(db, "rooms"), {
+                category: "single",
+                members: [userInfo.uid, selectedUserMessaging.uidSelected],
+                messageLastest: {
+                  text: inputValue,
+                  displayName: userInfo.displayName,
+                  uid: userInfo.uid,
+                  createdAt: serverTimestamp(),
+                },
+                createdAt: serverTimestamp(),
+                totalMessages: 1,
+                messagesViewed: [
+                  { uid: userInfo.uid, count: 1 },
+                  { uid: selectedUserMessaging.uidSelected, count: 0 },
+                ],
+              });
+
+              const response = await getDoc(roomRef);
+
+              if (roomRef && roomRef.id) {
+                setRoom({ id: response.id, ...response.data() });
+                addDocument("messages", {
+                  category: "single",
+                  roomId: response.id,
+                  uid: userInfo.uid,
+                  text: inputValue,
+                });
+              } else {
+                console.log("false");
+              }
+            } catch (error) {
+              console.error("Error creating room:", error);
+            }
+          };
+
+          createRoomAndMes();
+        }
+      }
+      // focus to input again after submit
+
+      setInputValue("");
+
+      if (inputRef?.current) {
+        setTimeout(() => {
+          inputRef.current.focus();
+        });
+      }
+
+      const chatWindow = boxChatRef?.current;
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 200);
+  };
+
   // const [isOnline, setIsOnline] = useState(false);
   const [fullInfoUser, setFullInfoUser] = useState({});
 
@@ -243,8 +393,8 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    return () => setMessages([])
-  }, [])
+    return () => setMessages([]);
+  }, []);
 
   useEffect(() => {
     setMessages([]);
@@ -684,9 +834,20 @@ const BoxChat = () => {
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e)}
                   value={inputValue}
+                  onFocus={() => handleFocus()}
+                  onBlur={() => handleBlur()}
                 />
               </div>
-              <div className="box-chat-input__right"></div>
+              <div className="box-chat-input__right">
+                {inputValue.length > 0 && (
+                  <div
+                    className="btn-sent-message"
+                    onClick={() => handleClickSentMessage()}
+                  >
+                    GỬI
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
