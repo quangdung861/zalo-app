@@ -223,7 +223,7 @@ export const Container = styled.div`
         &__myself {
           width: 100%;
           display: flex;
-          justify-content: end;
+          justify-content: flex-end;
           align-items: center;
           margin-bottom: 6px;
           margin-right: 8px;
@@ -259,7 +259,7 @@ export const Container = styled.div`
         &__other {
           width: 100%;
           display: flex;
-          justify-content: start;
+          justify-content: flex-start;
           align-items: center;
           margin-bottom: 6px;
           .box-image {
