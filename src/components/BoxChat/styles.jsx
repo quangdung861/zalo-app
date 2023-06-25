@@ -150,6 +150,7 @@ export const Container = styled.div`
       }
     }
     &__content {
+      width: 100%;
       padding-top: 20px;
       background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
@@ -218,7 +219,9 @@ export const Container = styled.div`
         }
       }
       .message-item {
+        width: 100%;
         &__myself {
+          width: 100%;
           display: flex;
           justify-content: end;
           align-items: center;
@@ -254,6 +257,7 @@ export const Container = styled.div`
           }
         }
         &__other {
+          width: 100%;
           display: flex;
           justify-content: start;
           align-items: center;
