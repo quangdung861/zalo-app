@@ -343,7 +343,7 @@ export const Container = styled.div`
           padding: 14px 16px;
           border-top: 1px solid var(--boder-dividing-color);
           display: flex;
-          justify-content: end;
+          justify-content: flex-end;
           align-items: center;
           > * {
             height: 40px;

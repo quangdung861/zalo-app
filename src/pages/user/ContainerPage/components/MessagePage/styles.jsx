@@ -204,7 +204,7 @@ export const Container = styled.div`
               color: #7589a3;
               display: flex;
               flex-direction: column;
-              align-items: end;
+              align-items: flex-end;
               .unseen {
                 display: flex;
                 justify-content: center;
@@ -261,7 +261,7 @@ export const Container = styled.div`
               }
               .footer {
                 display: flex;
-                justify-content: end;
+                justify-content: flex-end;
                 .remind-me-later-btn {
                   background-color: #eaedf0;
                   display: inline-block;

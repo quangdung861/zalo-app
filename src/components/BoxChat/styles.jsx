@@ -178,7 +178,7 @@ export const Container = styled.div`
       }
       /* display: flex;
       flex-direction: column;
-      justify-content: end; */
+      justify-content: flex-end; */
 
       .user-info {
         text-align: center;
@@ -230,7 +230,7 @@ export const Container = styled.div`
           .box-image {
             height: 100%;
             display: flex;
-            align-items: start;
+            align-items: flex-start;
             > img {
               width: 40px;
               height: 40px;
@@ -266,7 +266,7 @@ export const Container = styled.div`
             min-width: 83px;
             height: 100%;
             display: flex;
-            align-items: start;
+            align-items: flex-start;
             > img {
               width: 40px;
               height: 40px;

@@ -161,7 +161,7 @@ export const Container = styled.div`
       }
       /* display: flex;
       flex-direction: column;
-      justify-content: end; */
+      justify-content: flex-end; */
 
       .user-info {
         user-select: none;
@@ -218,14 +218,14 @@ export const Container = styled.div`
       .message-item {
         &__myself {
           display: flex;
-          justify-content: end;
+          justify-content: flex-end;
           align-items: center;
           margin-bottom: 6px;
           margin-right: 8px;
           .box-image {
             height: 100%;
             display: flex;
-            align-items: start;
+            align-items: flex-start;
             > img {
               width: 40px;
               height: 40px;
@@ -253,14 +253,14 @@ export const Container = styled.div`
         }
         &__other {
           display: flex;
-          justify-content: start;
+          justify-content: flex-start;
           align-items: center;
           margin-bottom: 6px;
           .box-image {
             min-width: 83px;
             height: 100%;
             display: flex;
-            align-items: start;
+            align-items: flex-start;
             > img {
               width: 40px;
               height: 40px;
