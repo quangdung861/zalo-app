@@ -328,6 +328,8 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
 
   const handlefilterCategory = (value) => {
     setCategorySelected(value);
+    setIsShowDropdownCategories(false);
+    setDropdownCategorySecond(false);
   };
 
   const handleComeBack = () => {
