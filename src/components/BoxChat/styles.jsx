@@ -366,11 +366,12 @@ export const Container = styled.div`
             height: 58px;
             font-size: 15px;
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
-            &::placeholder {
-              max-width: 380px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+          }
+          .input-message-text[placeholder] {
+            max-width: 380px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
         }
         &__right {
