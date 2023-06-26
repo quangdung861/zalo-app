@@ -248,109 +248,109 @@ const BoxChat = () => {
   };
 
   const handleClickSentMessage = () => {
-      if (inputValue) {
-        if (room.id) {
-          audio.play();
-          const createMes = async () => {
-            const roomRef = doc(db, "rooms", room.id);
+    if (inputValue) {
+      if (room.id) {
+        audio.play();
+        const createMes = async () => {
+          const roomRef = doc(db, "rooms", room.id);
 
-            const messagesViewedIndex = room.messagesViewed.findIndex(
-              (item) => item.uid === userInfo.uid
-            );
-            const messagesViewed = room.messagesViewed.find(
-              (item) => item.uid === userInfo.uid
-            );
+          const messagesViewedIndex = room.messagesViewed.findIndex(
+            (item) => item.uid === userInfo.uid
+          );
+          const messagesViewed = room.messagesViewed.find(
+            (item) => item.uid === userInfo.uid
+          );
 
-            const newMessageViewed = [...room.messagesViewed];
+          const newMessageViewed = [...room.messagesViewed];
 
-            newMessageViewed.splice(messagesViewedIndex, 1, {
-              ...messagesViewed,
-              count: messagesViewed.count + 1,
-            });
+          newMessageViewed.splice(messagesViewedIndex, 1, {
+            ...messagesViewed,
+            count: messagesViewed.count + 1,
+          });
 
-            await setDoc(
-              roomRef,
-              {
-                messageLastest: {
-                  text: inputValue,
-                  displayName: userInfo.displayName,
-                  uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
-                },
-                totalMessages: room.totalMessages + 1,
-                messagesViewed: newMessageViewed,
-              },
-              {
-                merge: true,
-              }
-            );
-
-            addDocument("messages", {
-              category: "single",
-              roomId: room.id,
-              uid: userInfo.uid,
-              text: inputValue,
-            });
-          };
-          createMes();
-        } else {
-          const createRoomAndMes = async () => {
-            try {
-              const roomRef = await addDoc(collection(db, "rooms"), {
-                category: "single",
-                members: [userInfo.uid, selectedUserMessaging.uidSelected],
-                messageLastest: {
-                  text: inputValue,
-                  displayName: userInfo.displayName,
-                  uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
-                },
+          await setDoc(
+            roomRef,
+            {
+              messageLastest: {
+                text: inputValue,
+                displayName: userInfo.displayName,
+                uid: userInfo.uid,
                 createdAt: serverTimestamp(),
-                totalMessages: 1,
-                messagesViewed: [
-                  { uid: userInfo.uid, count: 1 },
-                  { uid: selectedUserMessaging.uidSelected, count: 0 },
-                ],
-              });
-
-              const response = await getDoc(roomRef);
-
-              if (roomRef && roomRef.id) {
-                setRoom({ id: response.id, ...response.data() });
-                addDocument("messages", {
-                  category: "single",
-                  roomId: response.id,
-                  uid: userInfo.uid,
-                  text: inputValue,
-                });
-              } else {
-                console.log("false");
-              }
-            } catch (error) {
-              console.error("Error creating room:", error);
+              },
+              totalMessages: room.totalMessages + 1,
+              messagesViewed: newMessageViewed,
+            },
+            {
+              merge: true,
             }
-          };
+          );
 
-          createRoomAndMes();
-        }
+          addDocument("messages", {
+            category: "single",
+            roomId: room.id,
+            uid: userInfo.uid,
+            text: inputValue,
+          });
+        };
+        createMes();
+      } else {
+        const createRoomAndMes = async () => {
+          try {
+            const roomRef = await addDoc(collection(db, "rooms"), {
+              category: "single",
+              members: [userInfo.uid, selectedUserMessaging.uidSelected],
+              messageLastest: {
+                text: inputValue,
+                displayName: userInfo.displayName,
+                uid: userInfo.uid,
+                createdAt: serverTimestamp(),
+              },
+              createdAt: serverTimestamp(),
+              totalMessages: 1,
+              messagesViewed: [
+                { uid: userInfo.uid, count: 1 },
+                { uid: selectedUserMessaging.uidSelected, count: 0 },
+              ],
+            });
+
+            const response = await getDoc(roomRef);
+
+            if (roomRef && roomRef.id) {
+              setRoom({ id: response.id, ...response.data() });
+              addDocument("messages", {
+                category: "single",
+                roomId: response.id,
+                uid: userInfo.uid,
+                text: inputValue,
+              });
+            } else {
+              console.log("false");
+            }
+          } catch (error) {
+            console.error("Error creating room:", error);
+          }
+        };
+
+        createRoomAndMes();
       }
-      // focus to input again after submit
+    }
+    // focus to input again after submit
 
-      setInputValue("");
+    setInputValue("");
 
-      if (inputRef?.current) {
-        setTimeout(() => {
-          inputRef.current.focus();
-        });
-      }
-
-      const chatWindow = boxChatRef?.current;
+    if (inputRef?.current) {
       setTimeout(() => {
-        chatWindow.scrollTo({
-          top: chatWindow.scrollHeight,
-          behavior: "smooth",
-        });
-      }, 200);
+        inputRef.current.focus();
+      });
+    }
+
+    const chatWindow = boxChatRef?.current;
+    setTimeout(() => {
+      chatWindow.scrollTo({
+        top: chatWindow.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 200);
   };
 
   // const [isOnline, setIsOnline] = useState(false);
@@ -829,7 +829,11 @@ const BoxChat = () => {
                   className="input-message-text"
                   type="text"
                   // style={{ textTransform: "capitalize" }}
-                  placeholder={`Nhắn tin tới ${selectedUserMessaging.displayNameSelected}`}
+                  placeholder={`Nhắn tin tới ${
+                    selectedUserMessaging.displayNameSelected.length < 60
+                      ? selectedUserMessaging.displayNameSelected
+                      : selectedUserMessaging.displayNameSelected.slice(0, 59) + "..."
+                  }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e)}

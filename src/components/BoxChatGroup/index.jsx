@@ -163,8 +163,8 @@ const BoxChatGroup = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    return () => setMessages([])
-  }, [])
+    return () => setMessages([]);
+  }, []);
 
   useEffect(() => {
     let unSubcribe;
@@ -338,15 +338,17 @@ const BoxChatGroup = () => {
           where("uid", "in", room.members)
         );
         const response = await getDocs(partnerRef);
-        const documents = response.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            id: id,
-            displayName: data.displayName,
-            photoURL: data.photoURL,
-          };
-        }).reverse();
+        const documents = response.docs
+          .map((doc) => {
+            const id = doc.id;
+            const data = doc.data();
+            return {
+              id: id,
+              displayName: data.displayName,
+              photoURL: data.photoURL,
+            };
+          })
+          .reverse();
 
         const avatars = documents.map((item) => item.photoURL);
         setAvatars(avatars);
@@ -489,7 +491,13 @@ const BoxChatGroup = () => {
                   type="text"
                   // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhắn tin tới ${
-                    room?.name || selectedGroupMessaging?.name
+                    room?.name && room?.name.length < 60
+                      ? room?.name
+                      : room?.name.slice(0, 59) + "..." ||
+                        (selectedGroupMessaging?.name &&
+                          selectedGroupMessaging?.name.length < 60)
+                      ? selectedGroupMessaging?.name
+                      : selectedGroupMessaging?.name.slice(0, 59) + "..."
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
