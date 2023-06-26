@@ -491,13 +491,14 @@ const BoxChatGroup = () => {
                   type="text"
                   // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhắn tin tới ${
-                    (room?.name && room?.name.length < 60
-                      ? room?.name
-                      : room?.name.slice(0, 59) + "...") ||
+                    (room?.name &&
+                      (room?.name?.length < 40
+                        ? room?.name
+                        : room?.name?.slice(0, 39) + "...")) ||
                     (selectedGroupMessaging?.name &&
-                    selectedGroupMessaging?.name.length < 60
-                      ? selectedGroupMessaging?.name
-                      : selectedGroupMessaging?.name.slice(0, 59) + "...")
+                      (selectedGroupMessaging?.name.length < 40
+                        ? selectedGroupMessaging?.name
+                        : selectedGroupMessaging?.name?.slice(0, 39) + "..."))
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}

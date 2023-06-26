@@ -830,9 +830,9 @@ const BoxChat = () => {
                   type="text"
                   // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhắn tin tới ${
-                    selectedUserMessaging.displayNameSelected.length < 60
+                    selectedUserMessaging.displayNameSelected.length < 40
                       ? selectedUserMessaging.displayNameSelected
-                      : selectedUserMessaging.displayNameSelected.slice(0, 59) + "..."
+                      : selectedUserMessaging.displayNameSelected.slice(0, 39) + "..."
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
