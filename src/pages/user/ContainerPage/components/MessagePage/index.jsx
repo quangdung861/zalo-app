@@ -219,8 +219,6 @@ const MessagePage = () => {
 
   const [keywords, setKeywords] = useState("");
 
-
-
   const renderRooms = useMemo(() => {
     setTotalUnseenMessageRef(0);
 
@@ -375,6 +373,10 @@ const MessagePage = () => {
           if (!isKeywords) {
             return;
           }
+        }
+
+        if (categorySelected) {
+          return;
         }
 
         if (filterOption === "unseen") {
