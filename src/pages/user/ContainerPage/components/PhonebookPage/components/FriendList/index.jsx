@@ -10,11 +10,11 @@ import {
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import empty from "assets/empty.png";
-import ModalAccount from "components/ModalAccount";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import searchEmpty from "assets/searchEmpty.png";
 import Skeleton from "react-loading-skeleton";
+import ModalAccount from "components/ModalAccount";
 
 const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
