@@ -117,6 +117,7 @@ export const Container = styled.div`
       .right {
         display: flex;
         gap: 4px;
+        padding-left: 16px;
         .box-icon {
           width: 32px;
           height: 32px;
@@ -335,7 +336,14 @@ export const Container = styled.div`
           :hover {
             background-color: #f1f1f1;
           }
-          > i {
+          label {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          i {
             font-size: 22px;
             color: rgb(117, 137, 163);
           }

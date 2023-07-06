@@ -24,6 +24,7 @@ import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import { convertImagesToBase64 } from "utils/image";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -78,9 +79,9 @@ const BoxChatGroup = () => {
     );
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (inputValue) {
+  const handleKeyDown = (imageBase64FullInfo, e) => {
+    if (e?.key === "Enter") {
+      if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
           audio.play();
           const createMes = async () => {
@@ -104,7 +105,7 @@ const BoxChatGroup = () => {
               roomRef,
               {
                 messageLastest: {
-                  text: inputValue,
+                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
@@ -124,6 +125,7 @@ const BoxChatGroup = () => {
               displayName: userInfo.displayName,
               photoURL: userInfo.photoURL,
               text: inputValue,
+              images: imageBase64FullInfo,
             });
           };
           createMes();
@@ -146,6 +148,20 @@ const BoxChatGroup = () => {
           behavior: "smooth",
         });
       }, 200);
+    }
+  };
+
+  const handleUploadImage = async (e) => {
+    // Chuyển đổi đối tượng thành mảng đơn giản
+    const files = Object.values(e.target.files);
+
+    if (files) {
+      const imageBase64FullInfo = await convertImagesToBase64(files);
+      const e = {
+        key: "Enter",
+      };
+
+      handleKeyDown(imageBase64FullInfo, e);
     }
   };
 
@@ -243,6 +259,17 @@ const BoxChatGroup = () => {
             <div className="message-item__myself">
               <div className="box-image">
                 <div className="text">
+                  {item.images[0] &&
+                    item.images.map((image, index) => {
+                      return (
+                        <img
+                          key={index}
+                          src={image.url}
+                          alt=""
+                          style={{ width: "100%" }}
+                        />
+                      );
+                    })}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()}</div>
                 </div>
@@ -257,6 +284,17 @@ const BoxChatGroup = () => {
                   <div style={{ fontSize: "13px", color: "#7589A3" }}>
                     {item.displayName}
                   </div>
+                  {item?.images[0] &&
+                    item.images.map((image, index) => {
+                      return (
+                        <img
+                          key={index}
+                          src={image.url}
+                          alt=""
+                          style={{ width: "100%" }}
+                        />
+                      );
+                    })}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
                 </div>
@@ -481,6 +519,21 @@ const BoxChatGroup = () => {
                 }
               >
                 <i className="fa-regular fa-face-laugh-beam"></i>
+              </div>
+              <div className="box-icon upload-image">
+                <label htmlFor="uploadImage" style={{ cursor: "pointer" }}>
+                  {" "}
+                  <i className="fa-regular fa-image"></i>
+                </label>
+                <input
+                  id="uploadImage"
+                  type="file"
+                  accept="image/*"
+                  multiple={true}
+                  style={{ display: "none" }}
+                  onClick={(event) => event.target.value = null}
+                  onChange={handleUploadImage}
+                />
               </div>
             </div>
             <div className="box-chat-input">

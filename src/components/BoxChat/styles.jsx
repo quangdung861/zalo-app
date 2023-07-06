@@ -152,7 +152,7 @@ export const Container = styled.div`
     &__content {
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
+      background-image: url(${(props) =>  props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
@@ -340,6 +340,13 @@ export const Container = styled.div`
           align-items: center;
           :hover {
             background-color: #f1f1f1;
+          }
+          label {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
           i {
             font-size: 22px;

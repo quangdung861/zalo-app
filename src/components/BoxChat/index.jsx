@@ -144,7 +144,6 @@ const BoxChat = () => {
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
       if (inputValue || imageBase64FullInfo[0]) {
-        console.log("first");
         if (room.id) {
           audio.play();
           const createMes = async () => {
@@ -530,6 +529,17 @@ const BoxChat = () => {
               <div className="box-image">
                 <img src={newInfoUser?.photoURL} alt="" className="avatar" />
                 <div className="text">
+                  {item.images[0] &&
+                    item.images.map((image, index) => {
+                      return (
+                        <img
+                          key={index}
+                          src={image.url}
+                          alt=""
+                          style={{ width: "100%" }}
+                        />
+                      );
+                    })}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
                 </div>
