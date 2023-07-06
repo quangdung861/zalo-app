@@ -22,6 +22,8 @@ import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import suggestCloudImage from "assets/suggestCloudImage.png";
+import { convertImagesToBase64 } from "utils/image";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
@@ -139,9 +141,10 @@ const BoxChat = () => {
     };
   }, []);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (inputValue) {
+  const handleKeyDown = (imageBase64FullInfo, e) => {
+    if (e?.key === "Enter") {
+      if (inputValue || imageBase64FullInfo[0]) {
+        console.log("first");
         if (room.id) {
           audio.play();
           const createMes = async () => {
@@ -165,7 +168,7 @@ const BoxChat = () => {
               roomRef,
               {
                 messageLastest: {
-                  text: inputValue,
+                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
@@ -183,6 +186,7 @@ const BoxChat = () => {
               roomId: room.id,
               uid: userInfo.uid,
               text: inputValue,
+              images: imageBase64FullInfo,
             });
           };
           createMes();
@@ -193,7 +197,7 @@ const BoxChat = () => {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
                 messageLastest: {
-                  text: inputValue,
+                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
@@ -215,6 +219,7 @@ const BoxChat = () => {
                   roomId: response.id,
                   uid: userInfo.uid,
                   text: inputValue,
+                  images: imageBase64FullInfo,
                 });
               } else {
                 console.log("false");
@@ -503,6 +508,17 @@ const BoxChat = () => {
             <div className="message-item__myself">
               <div className="box-image">
                 <div className="text">
+                  {item.images[0] &&
+                    item.images.map((image, index) => {
+                      return (
+                        <img
+                          key={index}
+                          src={image.url}
+                          alt=""
+                          style={{ width: "100%" }}
+                        />
+                      );
+                    })}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()}</div>
                 </div>
@@ -650,6 +666,20 @@ const BoxChat = () => {
     setIsShowBoxChat(false);
   };
 
+  const handleUploadImage = async (e) => {
+    // Chuyển đổi đối tượng thành mảng đơn giản
+    const files = Object.values(e.target.files);
+
+    if (files) {
+      const imageBase64FullInfo = await convertImagesToBase64(files);
+      const e = {
+        key: "Enter",
+      };
+
+      handleKeyDown(imageBase64FullInfo, e);
+    }
+  };
+
   return (
     <S.Wrapper>
       <S.Container
@@ -767,14 +797,19 @@ const BoxChat = () => {
           </div>
           <div className="box-chat__content" ref={boxChatRef}>
             <div className="user-info">
-              <img
-                src={selectedUserMessaging.photoURLSelected}
-                alt=""
-                className="user-info__avatar"
-              />
-              <div className="user-info__name">
-                {selectedUserMessaging.displayNameSelected}
-              </div>
+              {selectedUserMessaging.uidSelected !== "my-cloud" && (
+                <>
+                  <img
+                    src={selectedUserMessaging.photoURLSelected}
+                    alt=""
+                    className="user-info__avatar"
+                  />
+                  <div className="user-info__name">
+                    {selectedUserMessaging.displayNameSelected}
+                  </div>
+                </>
+              )}
+
               {userInfo.friends.find(
                 (item) => item.uid === selectedUserMessaging.uidSelected
               ) ? (
@@ -783,8 +818,28 @@ const BoxChat = () => {
                   trên Zalo
                 </div>
               ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
-                <div className="user-info__description">
-                  Nơi lưu trữ thông tin của bạn trên Cloud
+                <div
+                  style={{
+                    backgroundColor: "#F5F9FC",
+                    width: "380px",
+                    height: "275px",
+                    padding: "14px",
+                    borderRadius: "8px",
+                    margin: "20px auto 80px",
+                  }}
+                >
+                  <img
+                    src={suggestCloudImage}
+                    alt=""
+                    style={{ width: "100%", marginBottom: "12px" }}
+                  />
+                  <div
+                    className="user-info__description"
+                    style={{ padding: "0 40px", fontSize: "13px" }}
+                  >
+                    Dữ liệu trong Cloud của tôi được lưu trữ và đồng bộ giữa các
+                    thiết bị của bạn.
+                  </div>
                 </div>
               ) : (
                 <div className="user-info__description">
@@ -813,6 +868,7 @@ const BoxChat = () => {
                   />
                 )}
               </div>
+
               <div
                 onClick={handleToggleEmojiPicker}
                 className={
@@ -820,6 +876,20 @@ const BoxChat = () => {
                 }
               >
                 <i className="fa-regular fa-face-laugh-beam"></i>
+              </div>
+              <div className="box-icon upload-image">
+                <label htmlFor="uploadImage" style={{ cursor: "pointer" }}>
+                  {" "}
+                  <i className="fa-regular fa-image"></i>
+                </label>
+                <input
+                  id="uploadImage"
+                  type="file"
+                  accept="image/*"
+                  multiple={true}
+                  style={{ display: "none" }}
+                  onChange={handleUploadImage}
+                />
               </div>
             </div>
             <div className="box-chat-input">
@@ -832,7 +902,8 @@ const BoxChat = () => {
                   placeholder={`Nhắn tin tới ${
                     selectedUserMessaging.displayNameSelected.length < 40
                       ? selectedUserMessaging.displayNameSelected
-                      : selectedUserMessaging.displayNameSelected.slice(0, 39) + "..."
+                      : selectedUserMessaging.displayNameSelected.slice(0, 39) +
+                        "..."
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}

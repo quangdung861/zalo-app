@@ -341,7 +341,7 @@ export const Container = styled.div`
           :hover {
             background-color: #f1f1f1;
           }
-          > i {
+          i {
             font-size: 22px;
             color: rgb(117, 137, 163);
           }
