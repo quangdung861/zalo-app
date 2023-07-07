@@ -33,6 +33,7 @@ const BoxChat = () => {
   const inputRef = useRef();
   const boxChatRef = useRef();
   const categoryRef = useRef();
+  const imagesRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
 
@@ -185,7 +186,7 @@ const BoxChat = () => {
               roomId: room.id,
               uid: userInfo.uid,
               text: inputValue,
-              images: imageBase64FullInfo,
+              images: imageBase64FullInfo || [],
             });
           };
           createMes();
@@ -218,7 +219,7 @@ const BoxChat = () => {
                   roomId: response.id,
                   uid: userInfo.uid,
                   text: inputValue,
-                  images: imageBase64FullInfo,
+                  images: imageBase64FullInfo || [],
                 });
               } else {
                 console.log("false");
@@ -361,6 +362,8 @@ const BoxChat = () => {
   const [fullInfoUser, setFullInfoUser] = useState({});
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
+    useState(false);
 
   useEffect(() => {
     let unSubcribe;
@@ -476,7 +479,8 @@ const BoxChat = () => {
         (infoUser) => infoUser.uid === item.uid
       );
 
-      const renderCreatedAtMessage = () => {
+      let CREATEDAT_URL;
+      const getCreatedAtMessage = () => {
         if (item.createdAt) {
           let formattedDate = "";
           const now = moment(); // Lấy thời điểm hiện tại
@@ -497,9 +501,10 @@ const BoxChat = () => {
             formattedDate = `${formattedDateTime} `;
           }
 
-          return <div className="format-date-message"> {formattedDate} </div>;
+          return (CREATEDAT_URL = formattedDate);
         }
       };
+      getCreatedAtMessage();
 
       return (
         <div key={item.id} className="message-item">
@@ -511,15 +516,27 @@ const BoxChat = () => {
                     item.images.map((image, index) => {
                       return (
                         <img
+                          className="image-item"
                           key={index}
                           src={image.url}
                           alt=""
                           style={{ width: "100%" }}
+                          onClick={() => {
+                            setMessageSelected({
+                              ...newInfoUser,
+                              URL: image.url,
+                              CREATEDAT_URL,
+                              MESSAGE_ID: item.id,
+                            });
+                            setIsShowOverlayModalDetailImage(true);
+                          }}
                         />
                       );
                     })}
                   {item.text}
-                  <div className="box-date">{renderCreatedAtMessage()}</div>
+                  <div className="box-date">
+                    <div className="format-date-message">{CREATEDAT_URL}</div>
+                  </div>
                 </div>
                 <img src={newInfoUser?.photoURL} alt="" className="avatar" />
               </div>
@@ -541,7 +558,7 @@ const BoxChat = () => {
                       );
                     })}
                   {item.text}
-                  <div className="box-date">{renderCreatedAtMessage()} </div>
+                  <div className="box-date">{CREATEDAT_URL} </div>
                 </div>
               </div>
             </div>
@@ -676,11 +693,24 @@ const BoxChat = () => {
     setIsShowBoxChat(false);
   };
 
+  const [isShowMessageError, setIsShowMessageError] = useState(false);
+
   const handleUploadImage = async (e) => {
     // Chuyển đổi đối tượng thành mảng đơn giản
     const files = Object.values(e.target.files);
 
     if (files) {
+      const sumSize = files.reduce((total, file) => {
+        return total + file.size;
+      }, 0);
+      if (sumSize >= 1048576) {
+        //1048576 bytes (max size)
+        setIsShowMessageError(true);
+        setTimeout(function () {
+          setIsShowMessageError(false);
+        }, 3000);
+        return;
+      }
       const imageBase64FullInfo = await convertImagesToBase64(files);
       const e = {
         key: "Enter",
@@ -688,6 +718,103 @@ const BoxChat = () => {
 
       handleKeyDown(imageBase64FullInfo, e);
     }
+  };
+
+  const [messageSelected, setMessageSelected] = useState();
+
+  const renderContainerImages = () => {
+    return messages.map((item) => {
+      const newInfoUser = infoUsers?.find(
+        (infoUser) => infoUser.uid === item.uid
+      );
+
+      let CREATEDAT_URL;
+      const getCreatedAtMessage = () => {
+        if (item.createdAt) {
+          let formattedDate = "";
+          const now = moment(); // Lấy thời điểm hiện tại
+
+          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+
+          if (date.isSame(now, "day")) {
+            // Nếu timestamp là cùng ngày với hiện tại
+            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
+            formattedDate = `${formattedTime} Hôm nay`;
+          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+            // Nếu timestamp là ngày hôm qua
+            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
+            formattedDate = `${formattedTime} Hôm qua`;
+          } else {
+            // Trường hợp khác
+            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
+            formattedDate = `${formattedDateTime} `;
+          }
+
+          return (CREATEDAT_URL = formattedDate);
+        }
+      };
+      getCreatedAtMessage();
+
+      return item.images.map((image, index) => {
+        return (
+          <img
+            className="image-item"
+            key={index}
+            src={image.url}
+            alt=""
+            onClick={() =>
+              setMessageSelected({
+                ...newInfoUser,
+                URL: image.url,
+                CREATEDAT_URL: CREATEDAT_URL,
+                MESSAGE_ID: item.id,
+              })
+            }
+            style={
+              item.id === messageSelected.MESSAGE_ID
+                ? {
+                    minWidth: "100px",
+                    minHeight: "100px",
+                    filter: "none",
+                    border: "2px solid #fff",
+                  }
+                : {}
+            }
+          />
+        );
+      });
+    });
+  };
+
+  useEffect(() => {
+    if (imagesRef && imagesRef.current) {
+      const handleScroll = () => {
+        const value = imagesRef.current.scrollTop;
+      };
+
+      const element = imagesRef.current;
+      element.addEventListener("scroll", handleScroll);
+
+      return () => {
+        element.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, [messageSelected]);
+
+  const imageRef = useRef(null);
+
+  const handleImageClick = (image) => {
+    // Lấy vị trí của phần tử ảnh
+    const { top } = imageRef.current.getBoundingClientRect();
+
+    // Cuộn tự động đến vị trí của ảnh
+    window.scrollTo({
+      top: window.pageYOffset + top,
+      behavior: 'smooth',
+    });
+
+    // Thực hiện các thao tác khác sau khi cuộn đến vị trí ảnh
+    // ...
   };
 
   return (
@@ -897,6 +1024,7 @@ const BoxChat = () => {
                   type="file"
                   accept="image/*"
                   multiple={true}
+                  onClick={(e) => (e.target.value = null)}
                   style={{ display: "none" }}
                   onChange={handleUploadImage}
                 />
@@ -935,6 +1063,28 @@ const BoxChat = () => {
               </div>
             </div>
           </div>
+          {isShowMessageError && (
+            <div
+              className="message-error"
+              style={{
+                position: "absolute",
+                top: "80px",
+                left: "0px",
+                right: "0px",
+                margin: "0 auto",
+                backgroundColor: "#fff",
+                width: "300px",
+                height: "40px",
+                padding: "12px",
+                borderRadius: "4px",
+                boxShadow: "var(--box-shadow-default)",
+                textAlign: "center",
+                fontWeight: "500",
+              }}
+            >
+              Hình ảnh phải có kích thước nhỏ hơn 1MB
+            </div>
+          )}
         </div>
         {isShowOverlayModal && (
           <ModalAccount
@@ -944,6 +1094,73 @@ const BoxChat = () => {
             }
             isShowOverlayModal={isShowOverlayModal}
           />
+        )}
+        {isShowOverlayModalDetailImage && (
+          <div className="images-container">
+            <div className="image-show__title">
+              <div>Cloud của tôi</div>
+              <i
+                className="fa-solid fa-xmark"
+                onClick={() => setIsShowOverlayModalDetailImage(false)}
+              ></i>
+            </div>
+            <div className="image-show__center">
+              <div className="main-image">
+                <img
+                  src={messageSelected?.URL}
+                  alt=""
+                  style={{ zIndex: 2, position: "relative" }}
+                />
+                <div
+                  className="background-overlay"
+                  style={{ position: "absolute", inset: "0 0 0 0", zIndex: 1 }}
+                  onClick={() => setIsShowOverlayModalDetailImage(false)}
+                ></div>
+              </div>
+
+              <div className="container-image-list">
+                <div className="dividing">
+                  <div className="dividing-line"></div>
+                </div>
+
+                <div className="images" ref={imagesRef}>
+                  <div className="image-list__title"> Hôm nay</div>
+                  {renderContainerImages()}
+                </div>
+              </div>
+            </div>
+            <div className="image-show__bottom">
+              <div className="image-show__bottom__sender">
+                <img
+                  className="image-show__bottom__sender__avatar"
+                  src={messageSelected?.photoURL}
+                  alt=""
+                />
+                <div className="image-show__bottom__sender__info">
+                  <div className="sender-name">
+                    {messageSelected.displayName}
+                  </div>
+                  <div className="createAt">
+                    {messageSelected.CREATEDAT_URL}
+                  </div>
+                </div>
+              </div>
+              <div className="image-show__bottom__ctrl">
+                <i className="fa-solid fa-share"></i>
+                <i className="fa-solid fa-download"></i>
+                <i className="fa-solid fa-rotate-right fa-flip-horizontal"></i>
+                <i className="fa-solid fa-rotate-right"></i>
+                <i className="fa-solid fa-magnifying-glass-plus"></i>
+                <i className="fa-solid fa-magnifying-glass-minus"></i>
+              </div>
+              <div className="image-show__bottom__slider-wrapper">
+                <div>
+                  <i className="fa-regular fa-thumbs-up"></i>
+                </div>
+                <i className="fa-solid fa-expand"></i>
+              </div>
+            </div>
+          </div>
         )}
       </S.Container>
     </S.Wrapper>
