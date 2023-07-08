@@ -527,6 +527,7 @@ const BoxChat = () => {
                               URL: image.url,
                               CREATEDAT_URL,
                               MESSAGE_ID: item.id,
+                              IMAGE_INDEX: index,
                             });
                             setIsShowOverlayModalDetailImage(true);
                           }}
@@ -768,10 +769,12 @@ const BoxChat = () => {
                 URL: image.url,
                 CREATEDAT_URL: CREATEDAT_URL,
                 MESSAGE_ID: item.id,
+                IMAGE_INDEX: index,
               })
             }
             style={
-              item.id === messageSelected.MESSAGE_ID
+              item.id === messageSelected.MESSAGE_ID &&
+              index === messageSelected.IMAGE_INDEX
                 ? {
                     minWidth: "100px",
                     minHeight: "100px",
@@ -784,37 +787,6 @@ const BoxChat = () => {
         );
       });
     });
-  };
-
-  useEffect(() => {
-    if (imagesRef && imagesRef.current) {
-      const handleScroll = () => {
-        const value = imagesRef.current.scrollTop;
-      };
-
-      const element = imagesRef.current;
-      element.addEventListener("scroll", handleScroll);
-
-      return () => {
-        element.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [messageSelected]);
-
-  const imageRef = useRef(null);
-
-  const handleImageClick = (image) => {
-    // Lấy vị trí của phần tử ảnh
-    const { top } = imageRef.current.getBoundingClientRect();
-
-    // Cuộn tự động đến vị trí của ảnh
-    window.scrollTo({
-      top: window.pageYOffset + top,
-      behavior: 'smooth',
-    });
-
-    // Thực hiện các thao tác khác sau khi cuộn đến vị trí ảnh
-    // ...
   };
 
   return (
@@ -1124,7 +1096,7 @@ const BoxChat = () => {
                 </div>
 
                 <div className="images" ref={imagesRef}>
-                  <div className="image-list__title"> Hôm nay</div>
+                  <div className="image-list__title"> </div>
                   {renderContainerImages()}
                 </div>
               </div>
