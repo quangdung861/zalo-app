@@ -32,6 +32,7 @@ const ModalAccount = ({
   const [inputValueDateOfBirth, setInputValueDateOfBirth] = useState();
   // IMAGE
   const [imgPreviewCover, setImgPreviewCover] = useState(null);
+  const [isShowMessageError, setIsShowMessageError] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -141,7 +142,15 @@ const ModalAccount = ({
   };
 
   /// IMAGE
+
   const handleCoverImagePreview = (file) => {
+    if (file.size >= 1048487) {
+      setIsShowMessageError(true);
+      setTimeout(function () {
+        setIsShowMessageError(false);
+      }, 3000);
+      return;
+    }
     const imgPreviewCoverConvert = convertImageToBase64(file);
     imgPreviewCoverConvert.then((res) => {
       setImgPreviewCover({
@@ -168,6 +177,13 @@ const ModalAccount = ({
 
   const handleAvatarImage = (file) => {
     if (file) {
+      if (file.size >= 1048487) {
+        setIsShowMessageError(true);
+        setTimeout(function () {
+          setIsShowMessageError(false);
+        }, 3000);
+        return;
+      }
       let imageAvatar = convertImageToBase64(file);
       imageAvatar.then((res) => {
         const userInfoRef = doc(db, "users", userInfo.id);
@@ -227,6 +243,7 @@ const ModalAccount = ({
                       type="file"
                       id="myFileInput"
                       className="custom-file-input"
+                      onClick={(e) => (e.target.value = null)}
                       onChange={(e) =>
                         handleCoverImagePreview(e.target.files[0])
                       }
@@ -249,6 +266,7 @@ const ModalAccount = ({
                   type="file"
                   id="inputFileAvatar"
                   className="custom-file-input"
+                  onClick={(e) => (e.target.value = null)}
                   onChange={(e) => handleAvatarImage(e.target.files[0])}
                 />
                 {/*  */}
@@ -398,6 +416,29 @@ const ModalAccount = ({
           </div>
         </div>
       </div>
+      {isShowMessageError && (
+        <div
+          className="message-error"
+          style={{
+            position: "absolute",
+            top: "80px",
+            left: "0px",
+            right: "0px",
+            margin: "0 auto",
+            backgroundColor: "#fff",
+            width: "300px",
+            height: "40px",
+            padding: "12px",
+            borderRadius: "4px",
+            boxShadow: "var(--box-shadow-default)",
+            textAlign: "center",
+            fontWeight: "500",
+            zIndex: 99,
+          }}
+        >
+          Hình ảnh phải có kích thước nhỏ hơn 1MB
+        </div>
+      )}
     </div>
   ) : accountSelected.myCloud ? (
     <div className="modal-overlay">
@@ -448,6 +489,29 @@ const ModalAccount = ({
           </div>
         </div>
       </div>
+      {isShowMessageError && (
+        <div
+          className="message-error"
+          style={{
+            position: "absolute",
+            top: "80px",
+            left: "0px",
+            right: "0px",
+            margin: "0 auto",
+            backgroundColor: "#fff",
+            width: "300px",
+            height: "40px",
+            padding: "12px",
+            borderRadius: "4px",
+            boxShadow: "var(--box-shadow-default)",
+            textAlign: "center",
+            fontWeight: "500",
+            zIndex: 99,
+          }}
+        >
+          Hình ảnh phải có kích thước nhỏ hơn 1MB
+        </div>
+      )}
     </div>
   ) : (
     <div className="modal-overlay">
@@ -542,6 +606,29 @@ const ModalAccount = ({
           </div>
         </div>
       </div>
+      {isShowMessageError && (
+        <div
+          className="message-error"
+          style={{
+            position: "absolute",
+            top: "80px",
+            left: "0px",
+            right: "0px",
+            margin: "0 auto",
+            backgroundColor: "#fff",
+            width: "300px",
+            height: "40px",
+            padding: "12px",
+            borderRadius: "4px",
+            boxShadow: "var(--box-shadow-default)",
+            textAlign: "center",
+            fontWeight: "500",
+            zIndex: 99,
+          }}
+        >
+          Hình ảnh phải có kích thước nhỏ hơn 1MB
+        </div>
+      )}
     </div>
   );
 };
