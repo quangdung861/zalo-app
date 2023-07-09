@@ -24,6 +24,7 @@ import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import suggestCloudImage from "assets/suggestCloudImage.png";
 import { convertImagesToBase64 } from "utils/image";
+import { convertBase64ToImage } from "utils/file";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
@@ -40,6 +41,9 @@ const BoxChat = () => {
   const audio = new Audio(messageSend);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
+
+  const [isShowContainerImageList, setIsShowContainerImageList] =
+    useState(true);
 
   useEffect(() => {
     if (inputRef) {
@@ -699,6 +703,7 @@ const BoxChat = () => {
   const handleUploadImage = async (e) => {
     // Chuyển đổi đối tượng thành mảng đơn giản
     const files = Object.values(e.target.files);
+    console.log("🚀 ~ file: index.jsx:706 ~ handleUploadImage ~ files:", files);
 
     if (files) {
       const sumSize = files.reduce((total, file) => {
@@ -780,6 +785,7 @@ const BoxChat = () => {
                     minHeight: "100px",
                     filter: "none",
                     border: "2px solid #fff",
+                    transition: "all .3s ease",
                   }
                 : {}
             }
@@ -787,6 +793,31 @@ const BoxChat = () => {
         );
       });
     });
+  };
+
+  const [imageFormat, setImageFormat] = useState({
+    rotate: 0,
+    scale: 1,
+  });
+
+  useEffect(() => {
+    setImageFormat({
+      rotate: 0,
+      scale: 1,
+    });
+  }, [messageSelected]);
+ 
+  const downloadImage = () => {
+    const randomNumber = Math.floor(Math.random() * 10000000000000);
+    console.log(randomNumber); // In số ngẫu nhiên ra console
+
+    const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
+    const link = document.createElement("a");
+    link.href = `${base64Data}`;
+    link.download = `photo-${randomNumber}`; // Tên file khi được lưu xuống máy
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -1081,25 +1112,35 @@ const BoxChat = () => {
                 <img
                   src={messageSelected?.URL}
                   alt=""
-                  style={{ zIndex: 2, position: "relative" }}
+                  style={{
+                    zIndex: 2,
+                    position: "relative",
+                    scale: `${imageFormat.scale}`,
+                    rotate: `${imageFormat.rotate}deg`,
+                  }}
                 />
                 <div
                   className="background-overlay"
                   style={{ position: "absolute", inset: "0 0 0 0", zIndex: 1 }}
-                  onClick={() => setIsShowOverlayModalDetailImage(false)}
+                  onClick={() => {
+                    setIsShowOverlayModalDetailImage(false);
+                    setIsShowContainerImageList(true);
+                  }}
                 ></div>
               </div>
 
-              <div className="container-image-list">
-                <div className="dividing">
-                  <div className="dividing-line"></div>
-                </div>
+              {isShowContainerImageList && (
+                <div className="container-image-list">
+                  <div className="dividing">
+                    <div className="dividing-line"></div>
+                  </div>
 
-                <div className="images" ref={imagesRef}>
-                  <div className="image-list__title"> </div>
-                  {renderContainerImages()}
+                  <div className="images" ref={imagesRef}>
+                    <div className="image-list__title"> </div>
+                    {renderContainerImages()}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="image-show__bottom">
               <div className="image-show__bottom__sender">
@@ -1119,17 +1160,57 @@ const BoxChat = () => {
               </div>
               <div className="image-show__bottom__ctrl">
                 <i className="fa-solid fa-share"></i>
-                <i className="fa-solid fa-download"></i>
-                <i className="fa-solid fa-rotate-right fa-flip-horizontal"></i>
-                <i className="fa-solid fa-rotate-right"></i>
-                <i className="fa-solid fa-magnifying-glass-plus"></i>
-                <i className="fa-solid fa-magnifying-glass-minus"></i>
+                <i className="fa-solid fa-download" onClick={downloadImage}></i>
+                <i
+                  className="fa-solid fa-rotate-right fa-flip-horizontal"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        rotate: current.rotate - 90,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-rotate-right"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        rotate: current.rotate + 90,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-magnifying-glass-plus"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        scale: current.scale + 0.25,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-magnifying-glass-minus"
+                  onClick={() => {
+                    setImageFormat((current) => ({
+                      ...current,
+                      scale: 1,
+                    }));
+                  }}
+                ></i>
               </div>
               <div className="image-show__bottom__slider-wrapper">
                 <div>
                   <i className="fa-regular fa-thumbs-up"></i>
                 </div>
-                <i className="fa-solid fa-expand"></i>
+                <i
+                  className="fa-solid fa-expand"
+                  onClick={() =>
+                    setIsShowContainerImageList(!isShowContainerImageList)
+                  }
+                ></i>
               </div>
             </div>
           </div>

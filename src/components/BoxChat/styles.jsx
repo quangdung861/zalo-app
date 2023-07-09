@@ -153,7 +153,7 @@ export const Container = styled.div`
     &__content {
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) =>      props.isCloud ? cloudBg : messageBg});
+      background-image: url(${(props) =>    props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
@@ -416,7 +416,6 @@ export const Container = styled.div`
     background-color: #3e4041;
     user-select: none;
 
-
     .image-show__title {
       display: flex;
       justify-content: space-between;
@@ -453,10 +452,12 @@ export const Container = styled.div`
         justify-content: center;
         object-fit: contain;
         position: relative;
+        overflow: hidden;
         > img {
           /* width: 100%; */
           max-width: 100%;
           max-height: 100%;
+          transition: all 0.3s ease;
         }
       }
       .container-image-list {
@@ -521,6 +522,7 @@ export const Container = styled.div`
       .image-show__bottom__sender {
         display: flex;
         z-index: 3;
+        overflow: hidden;
         .image-show__bottom__sender__avatar {
           width: 40px;
           height: 40px;
@@ -530,6 +532,7 @@ export const Container = styled.div`
           margin-right: 10px;
         }
         .image-show__bottom__sender__info {
+          white-space: nowrap;
           .sender-name {
             color: #fff;
             margin-bottom: 3px;
@@ -542,14 +545,12 @@ export const Container = styled.div`
       }
       .image-show__bottom__ctrl {
         margin: 0 auto;
-        padding-top: 14px;
         text-align: center;
         display: flex;
         justify-content: center;
-        position: absolute;
-        z-index: 2;
+        position: relative;
+        z-index: 3;
         top: 0;
-        width: 100%;
         background-clip: content-box;
         i {
           width: 40px;
