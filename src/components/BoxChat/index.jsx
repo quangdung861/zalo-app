@@ -147,14 +147,8 @@ const BoxChat = () => {
   }, []);
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
-    console.log("ahihi");
-    console.log(e);
     if (e?.key === "Enter") {
       if (inputValue || imageBase64FullInfo[0]) {
-        console.log(
-          "🚀 ~ file: index.jsx:153 ~ handleKeyDown ~ inputValue:",
-          inputValue
-        );
         if (room.id) {
           audio.play();
           const createMes = async () => {
@@ -486,10 +480,6 @@ const BoxChat = () => {
 
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
-      console.log(
-        "🚀 ~ file: index.jsx:482 ~ returnmessages?.map ~ item:",
-        item
-      );
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );

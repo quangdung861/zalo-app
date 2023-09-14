@@ -269,9 +269,9 @@ const MessagePage = () => {
         if (keywords) {
           // const isKeywords = keywordsName.includes(keywords.toLowerCase());
 
-          let index = keywordsName.indexOf(keywords.toLowerCase());
+          let ind = keywordsName.indexOf(keywords.toLowerCase());
 
-          if (index < 0) {
+          if (ind < 0) {
             return;
           }
         }
