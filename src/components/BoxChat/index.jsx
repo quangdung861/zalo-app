@@ -37,6 +37,7 @@ const BoxChat = () => {
   const imagesRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
+  console.log("🚀 ~ file: index.jsx:40 ~ BoxChat ~ inputValue:", inputValue);
 
   const audio = new Audio(messageSend);
 
@@ -147,8 +148,14 @@ const BoxChat = () => {
   }, []);
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
+    console.log("ahihi");
+    console.log(e);
     if (e?.key === "Enter") {
       if (inputValue || imageBase64FullInfo[0]) {
+        console.log(
+          "🚀 ~ file: index.jsx:153 ~ handleKeyDown ~ inputValue:",
+          inputValue
+        );
         if (room.id) {
           audio.play();
           const createMes = async () => {
@@ -299,6 +306,7 @@ const BoxChat = () => {
             roomId: room.id,
             uid: userInfo.uid,
             text: inputValue,
+            images: [],
           });
         };
         createMes();
@@ -479,6 +487,10 @@ const BoxChat = () => {
 
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
+      console.log(
+        "🚀 ~ file: index.jsx:482 ~ returnmessages?.map ~ item:",
+        item
+      );
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );
@@ -516,7 +528,7 @@ const BoxChat = () => {
             <div className="message-item__myself">
               <div className="box-image">
                 <div className="text">
-                  {item.images[0] &&
+                  {item?.images[0] &&
                     item.images.map((image, index) => {
                       return (
                         <img
@@ -806,7 +818,7 @@ const BoxChat = () => {
       scale: 1,
     });
   }, [messageSelected]);
- 
+
   const downloadImage = () => {
     const randomNumber = Math.floor(Math.random() * 10000000000000);
     console.log(randomNumber); // In số ngẫu nhiên ra console
@@ -1048,7 +1060,7 @@ const BoxChat = () => {
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e)}
+                  onKeyDown={(e) => handleKeyDown(null, e)}
                   value={inputValue}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}

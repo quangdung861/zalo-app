@@ -20,6 +20,7 @@ import { addDocument } from "services";
 import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
+import { convertImagesToBase64 } from "utils/image";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
@@ -34,6 +35,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const [groupName, setGroupName] = useState("");
   const [imgPreviewAvatar, setImgPreviewAvatar] = useState(null);
   const [friendsSelected, setFriendsSelected] = useState([]);
+  const [isShowMessageError, setIsShowMessageError] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -254,6 +256,15 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   /// IMAGE
   const handleCoverImagePreview = (file) => {
+    if (file.size >= 1048576) {
+      //1048576 bytes (max size)
+      setIsShowMessageError(true);
+      setTimeout(function () {
+        setIsShowMessageError(false);
+      }, 3000);
+      return;
+    }
+
     const imgPreviewCoverConvert = convertImageToBase64(file);
     imgPreviewCoverConvert.then((res) => {
       setImgPreviewAvatar({
@@ -512,6 +523,29 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
           </div>
         </div>
       </S.Container>
+      {isShowMessageError && (
+        <div
+          className="message-error"
+          style={{
+            position: "absolute",
+            top: "80px",
+            left: "0px",
+            right: "0px",
+            margin: "0 auto",
+            backgroundColor: "#fff",
+            width: "300px",
+            height: "40px",
+            padding: "12px",
+            borderRadius: "4px",
+            boxShadow: "var(--box-shadow-default)",
+            textAlign: "center",
+            fontWeight: "500",
+            zIndex: 999,
+          }}
+        >
+          Hình ảnh phải có kích thước nhỏ hơn 1MB
+        </div>
+      )}
     </S.Wrapper>
   );
 };
