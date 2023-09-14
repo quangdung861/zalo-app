@@ -287,6 +287,11 @@
     }
   }
 
+  .message-error {
+    animation-name: fadeIn, zoom;
+    animation-duration: 0.4s;
+  }
+
   @keyframes zoom {
     0% {
       transform: scale3d(0.3, 0.3, 0.3);

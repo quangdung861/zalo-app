@@ -376,6 +376,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                     type="file"
                     id="myFileInput"
                     className="custom-file-input"
+                    onClick={(e) => (e.target.value = null)}
                     onChange={(e) => handleCoverImagePreview(e.target.files[0])}
                   />
                   <input
@@ -520,32 +521,32 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                 </div>
               </div>
             </div>
+            {isShowMessageError && (
+              <div
+                className="message-error"
+                style={{
+                  position: "absolute",
+                  top: "80px",
+                  left: "0px",
+                  right: "0px",
+                  margin: "0 auto",
+                  backgroundColor: "#fff",
+                  width: "300px",
+                  height: "40px",
+                  padding: "12px",
+                  borderRadius: "4px",
+                  boxShadow: "var(--box-shadow-default)",
+                  textAlign: "center",
+                  fontWeight: "500",
+                  zIndex: 999,
+                }}
+              >
+                Hình ảnh phải có kích thước nhỏ hơn 1MB
+              </div>
+            )}
           </div>
         </div>
       </S.Container>
-      {isShowMessageError && (
-        <div
-          className="message-error"
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "0px",
-            right: "0px",
-            margin: "0 auto",
-            backgroundColor: "#fff",
-            width: "300px",
-            height: "40px",
-            padding: "12px",
-            borderRadius: "4px",
-            boxShadow: "var(--box-shadow-default)",
-            textAlign: "center",
-            fontWeight: "500",
-            zIndex: 999,
-          }}
-        >
-          Hình ảnh phải có kích thước nhỏ hơn 1MB
-        </div>
-      )}
     </S.Wrapper>
   );
 };

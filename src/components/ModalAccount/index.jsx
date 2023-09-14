@@ -506,7 +506,7 @@ const ModalAccount = ({
             boxShadow: "var(--box-shadow-default)",
             textAlign: "center",
             fontWeight: "500",
-            zIndex: 99,
+            zIndex: 999,
           }}
         >
           Hình ảnh phải có kích thước nhỏ hơn 1MB
@@ -623,7 +623,7 @@ const ModalAccount = ({
             boxShadow: "var(--box-shadow-default)",
             textAlign: "center",
             fontWeight: "500",
-            zIndex: 99,
+            zIndex: 999,
           }}
         >
           Hình ảnh phải có kích thước nhỏ hơn 1MB

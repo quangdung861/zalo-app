@@ -13,6 +13,10 @@ export const Container = styled.div`
     user-select: none;
     .modal-container {
       padding: 0px 12px;
+      .message-error {
+        animation-name: fadeIn, zoom;
+        animation-duration: 0.4s;
+      }
       .modal-content {
         animation-name: zoom;
         animation-duration: 0.5s;

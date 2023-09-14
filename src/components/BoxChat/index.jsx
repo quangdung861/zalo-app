@@ -715,7 +715,6 @@ const BoxChat = () => {
   const handleUploadImage = async (e) => {
     // Chuyển đổi đối tượng thành mảng đơn giản
     const files = Object.values(e.target.files);
-    console.log("🚀 ~ file: index.jsx:706 ~ handleUploadImage ~ files:", files);
 
     if (files) {
       const sumSize = files.reduce((total, file) => {

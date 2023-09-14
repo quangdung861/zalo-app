@@ -13,6 +13,7 @@ export const Container = styled.div`
   .box-chat {
     --header-height: 68px;
     --footer-height: 105px;
+    position: relative;
     &__header {
       height: var(--header-height);
       padding: 0 16px;
@@ -378,6 +379,10 @@ export const Container = styled.div`
         }
       }
     }
+    .message-error {
+      animation-name: fadeIn, zoom;
+      animation-duration: 0.4s;
+    }
   }
   @media only screen and (max-width: 992px) {
     .box-chat {
@@ -400,6 +405,15 @@ export const Container = styled.div`
           }
         }
       }
+    }
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0.2;
+    }
+    100% {
+      opacity: 1;
     }
   }
 `;

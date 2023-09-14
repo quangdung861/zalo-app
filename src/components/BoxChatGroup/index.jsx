@@ -125,7 +125,7 @@ const BoxChatGroup = () => {
               displayName: userInfo.displayName,
               photoURL: userInfo.photoURL,
               text: inputValue,
-              images: imageBase64FullInfo,
+              images: imageBase64FullInfo || [],
             });
           };
           createMes();
@@ -151,11 +151,24 @@ const BoxChatGroup = () => {
     }
   };
 
+  const [isShowMessageError, setIsShowMessageError] = useState(false);
+
   const handleUploadImage = async (e) => {
     // Chuyển đổi đối tượng thành mảng đơn giản
     const files = Object.values(e.target.files);
 
     if (files) {
+      const sumSize = files.reduce((total, file) => {
+        return total + file.size;
+      }, 0);
+      if (sumSize >= 1048576) {
+        //1048576 bytes (max size)
+        setIsShowMessageError(true);
+        setTimeout(function () {
+          setIsShowMessageError(false);
+        }, 3000);
+        return;
+      }
       const imageBase64FullInfo = await convertImagesToBase64(files);
       const e = {
         key: "Enter",
@@ -531,7 +544,7 @@ const BoxChatGroup = () => {
                   accept="image/*"
                   multiple={true}
                   style={{ display: "none" }}
-                  onClick={(event) => event.target.value = null}
+                  onClick={(event) => (event.target.value = null)}
                   onChange={handleUploadImage}
                 />
               </div>
@@ -555,14 +568,38 @@ const BoxChatGroup = () => {
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e)}
+                  onKeyDown={(e) => handleKeyDown(null, e)}
                   value={inputValue}
                 />
               </div>
               <div className="box-chat-input__right"></div>
             </div>
           </div>
+          {isShowMessageError && (
+            <div
+              className="message-error"
+              style={{
+                position: "absolute",
+                top: "80px",
+                left: "0px",
+                right: "0px",
+                margin: "0 auto",
+                backgroundColor: "#fff",
+                width: "300px",
+                height: "40px",
+                padding: "12px",
+                borderRadius: "4px",
+                boxShadow: "var(--box-shadow-default)",
+                textAlign: "center",
+                fontWeight: "500",
+                zIndex: 999,
+              }}
+            >
+              Hình ảnh phải có kích thước nhỏ hơn 1MB
+            </div>
+          )}
         </div>
+
         {isShowOverlayModal && (
           <ModalAccountGroup
             setIsShowOverlayModal={setIsShowOverlayModal}
