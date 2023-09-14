@@ -79,6 +79,24 @@ const BoxChatGroup = () => {
     );
   };
 
+  const handleFocus = () => {
+    const toolbarChatInputElement = document.querySelector(
+      ".toolbar-chat-input"
+    );
+    Object.assign(toolbarChatInputElement.style, {
+      borderBottom: "1px solid #0068FF",
+    });
+  };
+
+  const handleBlur = () => {
+    const toolbarChatInputElement = document.querySelector(
+      ".toolbar-chat-input"
+    );
+    Object.assign(toolbarChatInputElement.style, {
+      borderBottom: "1px solid var(--boder-dividing-color)",
+    });
+  };
+
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
       if (inputValue || imageBase64FullInfo[0]) {
@@ -126,6 +144,78 @@ const BoxChatGroup = () => {
               photoURL: userInfo.photoURL,
               text: inputValue,
               images: imageBase64FullInfo || [],
+            });
+          };
+          createMes();
+        }
+      }
+      // focus to input again after submit
+
+      setInputValue("");
+
+      if (inputRef?.current) {
+        setTimeout(() => {
+          inputRef.current.focus();
+        });
+      }
+
+      const chatWindow = boxChatRef?.current;
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 200);
+    }
+  };
+
+  const handleClickSentMessage = () => {
+    if (inputValue) {
+      if (inputValue) {
+        if (room.id) {
+          audio.play();
+          const createMes = async () => {
+            const roomRef = doc(db, "rooms", room.id);
+
+            const messagesViewedIndex = room.messagesViewed.findIndex(
+              (item) => item.uid === userInfo.uid
+            );
+            const messagesViewed = room.messagesViewed.find(
+              (item) => item.uid === userInfo.uid
+            );
+
+            const newMessageViewed = [...room.messagesViewed];
+
+            newMessageViewed.splice(messagesViewedIndex, 1, {
+              ...messagesViewed,
+              count: messagesViewed.count + 1,
+            });
+
+            await setDoc(
+              roomRef,
+              {
+                messageLastest: {
+                  text: inputValue,
+                  displayName: userInfo.displayName,
+                  uid: userInfo.uid,
+                  createdAt: serverTimestamp(),
+                },
+                totalMessages: room.totalMessages + 1,
+                messagesViewed: newMessageViewed,
+              },
+              {
+                merge: true,
+              }
+            );
+
+            addDocument("messages", {
+              category: "group",
+              roomId: room.id,
+              uid: userInfo.uid,
+              displayName: userInfo.displayName,
+              photoURL: userInfo.photoURL,
+              text: inputValue,
+              images: [],
             });
           };
           createMes();
@@ -570,9 +660,20 @@ const BoxChatGroup = () => {
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(null, e)}
                   value={inputValue}
+                  onFocus={() => handleFocus()}
+                  onBlur={() => handleBlur()}
                 />
               </div>
-              <div className="box-chat-input__right"></div>
+              <div className="box-chat-input__right">
+                {inputValue.length > 0 && (
+                  <div
+                    className="btn-sent-message"
+                    onClick={() => handleClickSentMessage()}
+                  >
+                    GỬI
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {isShowMessageError && (

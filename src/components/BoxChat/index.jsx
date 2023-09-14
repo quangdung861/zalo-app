@@ -37,7 +37,6 @@ const BoxChat = () => {
   const imagesRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
-  console.log("🚀 ~ file: index.jsx:40 ~ BoxChat ~ inputValue:", inputValue);
 
   const audio = new Audio(messageSend);
 
@@ -820,8 +819,6 @@ const BoxChat = () => {
 
   const downloadImage = () => {
     const randomNumber = Math.floor(Math.random() * 10000000000000);
-    console.log(randomNumber); // In số ngẫu nhiên ra console
-
     const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
     const link = document.createElement("a");
     link.href = `${base64Data}`;
