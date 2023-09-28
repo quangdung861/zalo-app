@@ -256,8 +256,8 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   /// IMAGE
   const handleCoverImagePreview = (file) => {
-    if (file.size >= 1048576) {
-      //1048576 bytes (max size)
+    if (file.size >= 848576) {
+      //848576 bytes (max size)
       setIsShowMessageError(true);
       setTimeout(function () {
         setIsShowMessageError(false);

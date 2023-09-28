@@ -564,7 +564,9 @@ const BoxChat = () => {
                       );
                     })}
                   {item.text}
-                  <div className="box-date">{CREATEDAT_URL} </div>
+                  <div className="box-date">
+                    <div className="format-date-message">{CREATEDAT_URL}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -709,8 +711,8 @@ const BoxChat = () => {
       const sumSize = files.reduce((total, file) => {
         return total + file.size;
       }, 0);
-      if (sumSize >= 1048576) {
-        //1048576 bytes (max size)
+      if (sumSize >= 848576) {
+        //848576 bytes (max size)
         setIsShowMessageError(true);
         setTimeout(function () {
           setIsShowMessageError(false);
@@ -1046,7 +1048,7 @@ const BoxChat = () => {
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(null, e)}
+                  onKeyDown={(e) => handleKeyDown([], e)}
                   value={inputValue}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}

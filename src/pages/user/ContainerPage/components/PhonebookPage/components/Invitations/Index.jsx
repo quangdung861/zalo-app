@@ -136,7 +136,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                       >
                         {item.displayName}
                       </span>
-                      <div className="origin">2 ngày - Từ nhóm trò chuyện</div>
+                      <div className="origin">Từ trò chuyện với người lạ</div>
                     </div>
                   </div>
                   <i
@@ -275,7 +275,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                       >
                         {item.displayName}
                       </span>
-                      <div className="origin">2 ngày - Từ nhóm trò chuyện</div>
+                      <div className="origin">Từ trò chuyện với người lạ</div>
                     </div>
                   </div>
                   <i

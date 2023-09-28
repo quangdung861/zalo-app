@@ -83,7 +83,7 @@ const MessagePage = () => {
 
   const categoryRef = useRef(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [categorySelected, setCategorySelected] = useState("");
 
   const toogleBoxChat = ({
@@ -123,19 +123,6 @@ const MessagePage = () => {
   };
 
   const [infoPartner, setInfoPartner] = useState([]);
-
-  useEffect(() => {
-    if (rooms[0]) {
-      setLoading(true);
-      const fetchDataAsync = async () => {
-        const fetchedData = await fetchData();
-        setInfoPartner(fetchedData);
-        setLoading(false);
-      };
-
-      fetchDataAsync();
-    }
-  }, [rooms]);
 
   const fetchData = async () => {
     let infoPartner = [];
@@ -216,6 +203,19 @@ const MessagePage = () => {
     }
     return infoPartner;
   };
+
+  useEffect(() => {
+    if (rooms[0]) {
+      setLoading(true);
+      const fetchDataAsync = async () => {
+        const fetchedData = await fetchData();
+        setInfoPartner(fetchedData);
+        setLoading(false);
+      };
+
+      fetchDataAsync();
+    }
+  }, [rooms, userInfo, fetchData]);
 
   const [keywords, setKeywords] = useState("");
 
@@ -302,17 +302,17 @@ const MessagePage = () => {
             onClick={() =>
               toogleBoxChat({
                 uidSelected: uidSelected,
-                photoURLSelected: infoPartner[index].photoURL,
-                displayNameSelected: infoPartner[index].displayName,
+                photoURLSelected: infoPartner[index]?.photoURL,
+                displayNameSelected: infoPartner[index]?.displayName,
               })
             }
           >
             <div className="room-item__left">
-              {infoPartner[index]?.photoURL ? (
-                <img src={infoPartner[index]?.photoURL} alt="" />
-              ) : (
-                <div className="image-temporary"> </div>
-              )}
+              <img
+                src={infoPartner[index]?.photoURL}
+                alt=""
+                className="image-with-replacement"
+              />
 
               <div className="info">
                 <div className="room-name">
@@ -385,6 +385,12 @@ const MessagePage = () => {
           }
         }
 
+        const handleImageError = () => {
+          // Xử lý khi hình ảnh không tải được (ví dụ: hiển thị biểu tượng thay thế)
+          const iconImage = document.querySelector(".icon-image");
+          iconImage.style.display = "block";
+        };
+
         return (
           <div
             key={room.id}
@@ -402,7 +408,13 @@ const MessagePage = () => {
             }
           >
             <div className="room-item__left">
-              {room.avatar?.url && <img src={room.avatar?.url} alt="" />}
+              {room.avatar?.url && (
+                <img
+                  src={room.avatar?.url}
+                  alt=""
+                  className="image-with-replacement"
+                />
+              )}
 
               {!room.avatar?.url && infoGroup?.photoURL && (
                 <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
@@ -656,9 +668,10 @@ const MessagePage = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="room-item__right" style={{ width: "100%" }}>
-                 
-                    </div>
+                    <div
+                      className="room-item__right"
+                      style={{ width: "100%" }}
+                    ></div>
                   </div>
                 )} */}
 

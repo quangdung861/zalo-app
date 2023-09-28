@@ -251,8 +251,8 @@ const BoxChatGroup = () => {
       const sumSize = files.reduce((total, file) => {
         return total + file.size;
       }, 0);
-      if (sumSize >= 1048576) {
-        //1048576 bytes (max size)
+      if (sumSize >= 848576) {
+        //848576 bytes (max size)
         setIsShowMessageError(true);
         setTimeout(function () {
           setIsShowMessageError(false);

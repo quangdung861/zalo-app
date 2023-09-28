@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import bgInstead from "assets/avatar-mac-dinh-1.png";
+
 export const Wrapper = styled.div`
   width: 100%;
 `;
@@ -165,12 +167,16 @@ export const Container = styled.div`
                 object-fit: cover;
                 border-radius: 50%;
               }
-              > .image-temporary {
-                width: 48px;
-                flex-shrink: 0;
-                height: 48px;
-                border-radius: 50%;
-                background-color: red;
+              .image-with-replacement {
+                width: 48px; /* Đặt kích thước chiều rộng là 0 */
+                height: 48px; /* Đặt kích thước chiều cao là 0 */
+                background-image: url("${bgInstead}"); /* Đặt hình ảnh thay thế */
+                background-size: cover; /* Tùy chỉnh kích thước ảnh thay thế */
+                color: transparent; /* Ẩn văn bản alt */
+              }
+
+              > img.onError {
+                display: none;
               }
               .info {
                 .room-name {
