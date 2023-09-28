@@ -167,17 +167,7 @@ export const Container = styled.div`
                 object-fit: cover;
                 border-radius: 50%;
               }
-              .image-with-replacement {
-                width: 48px; /* Đặt kích thước chiều rộng là 0 */
-                height: 48px; /* Đặt kích thước chiều cao là 0 */
-                background-image: url("${bgInstead}"); /* Đặt hình ảnh thay thế */
-                background-size: cover; /* Tùy chỉnh kích thước ảnh thay thế */
-                color: transparent; /* Ẩn văn bản alt */
-              }
 
-              > img.onError {
-                display: none;
-              }
               .info {
                 .room-name {
                   font-size: 16px;

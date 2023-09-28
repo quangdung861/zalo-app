@@ -309,9 +309,12 @@ const MessagePage = () => {
           >
             <div className="room-item__left">
               <img
+                // className="image-with-replacement"
                 src={infoPartner[index]?.photoURL}
                 alt=""
-                className="image-with-replacement"
+                onError={(e) => {
+                  e.target.src = avatarDefault;
+                }}
               />
 
               <div className="info">
