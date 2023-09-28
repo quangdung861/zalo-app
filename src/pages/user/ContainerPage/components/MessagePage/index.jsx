@@ -215,7 +215,7 @@ const MessagePage = () => {
 
       fetchDataAsync();
     }
-  }, [rooms, userInfo, fetchData]);
+  }, [rooms, userInfo]);
 
   const [keywords, setKeywords] = useState("");
 

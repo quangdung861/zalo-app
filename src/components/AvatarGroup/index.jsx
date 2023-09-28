@@ -1,6 +1,6 @@
 import React from "react";
-
 import * as S from "./styles";
+import avatarDefault from "assets/avatar-mac-dinh-1.png";
 const AvatarGroup = ({ props, styleBox, styleIcon }) => {
   const { avatars, room } = props;
 
@@ -18,6 +18,9 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                     src={item}
                     alt=""
                     className={`avatar-${index}`}
+                    onError={(e) => {
+                      e.target.src = avatarDefault;
+                    }}
                   />
                 ))}
               </div>
@@ -31,6 +34,9 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                     src={item}
                     alt=""
                     className={`avatar-${index}`}
+                    onError={(e) => {
+                      e.target.src = avatarDefault;
+                    }}
                   />
                 ))}
               </div>
@@ -44,6 +50,9 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                     src={item}
                     alt=""
                     className={`avatar-${index}`}
+                    onError={(e) => {
+                      e.target.src = avatarDefault;
+                    }}
                   />
                 ))}
               </div>
@@ -57,6 +66,9 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                     src={item}
                     alt=""
                     className={`avatar-${index}`}
+                    onError={(e) => {
+                      e.target.src = avatarDefault;
+                    }}
                   />
                 ))}
               </div>
@@ -71,6 +83,9 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                       src={item}
                       alt=""
                       className={`avatar-${index}`}
+                      onError={(e) => {
+                        e.target.src = avatarDefault;
+                      }}
                     />
                   ) : (
                     index === 3 && (
