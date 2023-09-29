@@ -264,11 +264,11 @@ const MessagePage = () => {
         if (room.category === "single") {
           keywordsName = infoPartner.find(
             (item) => item.uid === uidSelected
-          ).keywordsName;
+          )?.keywordsName;
         } else if (room.category === "my cloud") {
           keywordsName = infoPartner.find(
             (item) => item.id === "my-cloud"
-          ).keywordsName;
+          )?.keywordsName;
         }
 
         if (keywords) {
