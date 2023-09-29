@@ -9,7 +9,8 @@ import { auth, googleProvider, githubProvider } from "firebaseConfig";
 import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
-import avatarCloud from "assets/avatarCloudjpg.jpg"
+import avatarCloud from "assets/avatarCloudjpg.jpg";
+import DirectionBoard from "components/DirectionBoard";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -89,8 +90,7 @@ const LoginPage = () => {
             members: [data.user.uid, "my-cloud"],
             info: [
               {
-                avatar:
-                  avatarCloud,
+                avatar: avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },
@@ -179,8 +179,7 @@ const LoginPage = () => {
             members: [data.user.uid, "my-cloud"],
             info: [
               {
-                avatar:
-                  avatarCloud,
+                avatar: avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },
@@ -211,6 +210,7 @@ const LoginPage = () => {
   return (
     <S.Wrapper>
       <S.Container>
+        <DirectionBoard />
         <div className="login">
           <div className="login-container">
             {loginWay ? (
