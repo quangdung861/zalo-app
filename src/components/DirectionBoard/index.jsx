@@ -26,7 +26,7 @@ const DirectionBoard = () => {
               <div className="content__item">
                 <div>
                   <b style={{ color: " rgb(240, 81, 35)" }}>Lưu ý: </b> Bạn vui
-                  lòng gửi tin nhắn với các nội dung có ý nghĩa và lịch để mình
+                  lòng gửi tin nhắn với các nội dung có ý nghĩa và lịch sự để mình
                   không phải đi clean nhé ạ. Chúc bạn có một ngày tốt lành.
                 </div>
               </div>
