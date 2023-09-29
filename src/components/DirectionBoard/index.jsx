@@ -13,7 +13,7 @@ const DirectionBoard = () => {
             <div className="content">
               <div className="content__item">
                 <div style={{ color: " rgb(240, 81, 35)" }}>
-                  Tài khoản Demo đã kết bạn và tạo nhóm sẳn
+                  Tài khoản Demo đã kết bạn và tạo nhóm sẵn
                 </div>
                 <div>
                   <b>Email: </b> phanquangdung@gmail.com
