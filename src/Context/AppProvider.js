@@ -54,7 +54,7 @@ const AppProvider = ({ children }) => {
       );
       const duration = moment.duration(currentTime.diff(previousTime));
       const hoursDifference = duration.asHours();
-      if (hoursDifference > 24) {
+      if (hoursDifference > 1) {
         const docRef = doc(db, "users", userInfo.id);
         setDoc(
           docRef,

@@ -530,6 +530,7 @@ export const Container = styled.div`
           object-fit: cover;
           border-radius: 50%;
           margin-right: 10px;
+          flex-shrink: 0;
         }
         .image-show__bottom__sender__info {
           white-space: nowrap;

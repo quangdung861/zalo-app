@@ -254,21 +254,24 @@ const ModalAccount = ({
 
               {/*  */}
               <div className="box-image">
-                <img
-                  src={accountSelected.photoURL}
-                  alt=""
-                  className="photo-avatar"
-                />
-                <label htmlFor="inputFileAvatar" className="box-avatar__icon">
-                  <i className="fa-solid fa-camera"></i>
-                </label>
-                <input
-                  type="file"
-                  id="inputFileAvatar"
-                  className="custom-file-input"
-                  onClick={(e) => (e.target.value = null)}
-                  onChange={(e) => handleAvatarImage(e.target.files[0])}
-                />
+                <div className="box-image__item">
+                  <img
+                    src={accountSelected.photoURL}
+                    alt=""
+                    className="photo-avatar"
+                  />
+                  <label htmlFor="inputFileAvatar" className="box-avatar__icon">
+                    <i className="fa-solid fa-camera"></i>
+                  </label>
+                  <input
+                    type="file"
+                    id="inputFileAvatar"
+                    className="custom-file-input"
+                    onClick={(e) => (e.target.value = null)}
+                    onChange={(e) => handleAvatarImage(e.target.files[0])}
+                  />
+                </div>
+
                 {/*  */}
                 <div className="display-name">
                   {accountSelected.displayName}

@@ -115,6 +115,9 @@
             align-items: center;
             margin-top: -40px;
             margin-bottom: 16px;
+            .box-image__item {
+              position: relative;
+            }
             .custom-file-input {
               display: none;
             }
@@ -122,8 +125,8 @@
               position: absolute;
               display: flex;
               flex-shrink: 0;
-              // margin-left: 80px;
-              // margin-top: 30px;
+              right: 0;
+              bottom: 0;
               cursor: pointer;
               > i {
                 font-size: 14px;
