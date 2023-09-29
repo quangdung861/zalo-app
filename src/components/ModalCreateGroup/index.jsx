@@ -256,8 +256,8 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   /// IMAGE
   const handleCoverImagePreview = (file) => {
-    if (file.size >= 848576) {
-      //848576 bytes (max size)
+    if (file.size >= 500000) {
+      //500000 bytes (max size)
       setIsShowMessageError(true);
       setTimeout(function () {
         setIsShowMessageError(false);
@@ -531,7 +531,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   right: "0px",
                   margin: "0 auto",
                   backgroundColor: "#fff",
-                  width: "300px",
+                  width: "320px",
                   height: "40px",
                   padding: "12px",
                   borderRadius: "4px",
@@ -541,7 +541,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   zIndex: 999,
                 }}
               >
-                Hình ảnh phải có kích thước nhỏ hơn 1MB
+                Hình ảnh phải có kích thước nhỏ hơn 0.5MB
               </div>
             )}
           </div>

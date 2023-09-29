@@ -711,8 +711,8 @@ const BoxChat = () => {
       const sumSize = files.reduce((total, file) => {
         return total + file.size;
       }, 0);
-      if (sumSize >= 848576) {
-        //848576 bytes (max size)
+      if (sumSize >= 500000) {
+        //500000 bytes (max size)
         setIsShowMessageError(true);
         setTimeout(function () {
           setIsShowMessageError(false);
@@ -1076,7 +1076,7 @@ const BoxChat = () => {
                 right: "0px",
                 margin: "0 auto",
                 backgroundColor: "#fff",
-                width: "300px",
+                width: "320px",
                 height: "40px",
                 padding: "12px",
                 borderRadius: "4px",
@@ -1085,7 +1085,7 @@ const BoxChat = () => {
                 fontWeight: "500",
               }}
             >
-              Hình ảnh phải có kích thước nhỏ hơn 1MB
+              Hình ảnh phải có kích thước nhỏ hơn 0.5MB
             </div>
           )}
         </div>

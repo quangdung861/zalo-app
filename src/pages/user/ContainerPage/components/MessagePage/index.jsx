@@ -197,6 +197,7 @@ const MessagePage = () => {
           photoURL: avatarCloud,
           displayName: "Cloud của tôi",
           id: "my-cloud",
+          uid: "my-cloud",
           keywordsName: "Cloud của tôi".toLowerCase(),
         });
       }
@@ -226,8 +227,12 @@ const MessagePage = () => {
       return;
     }
 
-    return rooms?.map((room, index) => {
+    return rooms?.map((room) => {
       if (room.category === "single" || room.category === "my cloud") {
+        const infoPartnerResult = infoPartner.find((item) => {
+          return room.members.includes(item.uid);
+        });
+
         const formatDate = moment(
           room.messageLastest?.createdAt?.seconds * 1000
         )?.fromNow();
@@ -302,15 +307,15 @@ const MessagePage = () => {
             onClick={() =>
               toogleBoxChat({
                 uidSelected: uidSelected,
-                photoURLSelected: infoPartner[index]?.photoURL,
-                displayNameSelected: infoPartner[index]?.displayName,
+                photoURLSelected: infoPartnerResult?.photoURL,
+                displayNameSelected: infoPartnerResult?.displayName,
               })
             }
           >
             <div className="room-item__left">
               <img
                 // className="image-with-replacement"
-                src={infoPartner[index]?.photoURL}
+                src={infoPartnerResult?.photoURL}
                 alt=""
                 onError={(e) => {
                   e.target.src = avatarDefault;
@@ -319,7 +324,7 @@ const MessagePage = () => {
 
               <div className="info">
                 <div className="room-name">
-                  {infoPartner[index]?.displayName}
+                  {infoPartnerResult?.displayName}
                 </div>
                 <div className="new-message">
                   {categoryData && (

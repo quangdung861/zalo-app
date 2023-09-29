@@ -144,7 +144,7 @@ const ModalAccount = ({
   /// IMAGE
 
   const handleCoverImagePreview = (file) => {
-    if (file.size >= 1048487) {
+    if (file.size >= 500000) {
       setIsShowMessageError(true);
       setTimeout(function () {
         setIsShowMessageError(false);
@@ -177,7 +177,7 @@ const ModalAccount = ({
 
   const handleAvatarImage = (file) => {
     if (file) {
-      if (file.size >= 1048487) {
+      if (file.size >= 500000) {
         setIsShowMessageError(true);
         setTimeout(function () {
           setIsShowMessageError(false);
@@ -426,7 +426,7 @@ const ModalAccount = ({
             right: "0px",
             margin: "0 auto",
             backgroundColor: "#fff",
-            width: "300px",
+            width: "320px",
             height: "40px",
             padding: "12px",
             borderRadius: "4px",
@@ -436,7 +436,7 @@ const ModalAccount = ({
             zIndex: 99,
           }}
         >
-          Hình ảnh phải có kích thước nhỏ hơn 1MB
+          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
         </div>
       )}
     </div>
@@ -499,7 +499,7 @@ const ModalAccount = ({
             right: "0px",
             margin: "0 auto",
             backgroundColor: "#fff",
-            width: "300px",
+            width: "320px",
             height: "40px",
             padding: "12px",
             borderRadius: "4px",
@@ -509,7 +509,7 @@ const ModalAccount = ({
             zIndex: 999,
           }}
         >
-          Hình ảnh phải có kích thước nhỏ hơn 1MB
+          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
         </div>
       )}
     </div>
@@ -616,7 +616,7 @@ const ModalAccount = ({
             right: "0px",
             margin: "0 auto",
             backgroundColor: "#fff",
-            width: "300px",
+            width: "320px",
             height: "40px",
             padding: "12px",
             borderRadius: "4px",
@@ -626,7 +626,7 @@ const ModalAccount = ({
             zIndex: 999,
           }}
         >
-          Hình ảnh phải có kích thước nhỏ hơn 1MB
+          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
         </div>
       )}
     </div>
