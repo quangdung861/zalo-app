@@ -29,15 +29,22 @@ import { convertImagesToBase64 } from "utils/image";
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
-
-  const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
-
-  const inputRef = useRef();
-  const boxChatRef = useRef();
-
   const [inputValue, setInputValue] = useState("");
 
+  const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
+  const [infoUsers, setInfoUsers] = useState();
+  const [messageSelected, setMessageSelected] = useState();
+  const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
+    useState(false);
+
+  const inputRef = useRef();
+  const imagesRef = useRef();
+  const boxChatRef = useRef();
+
   const audio = new Audio(messageSend);
+
+  const [isShowContainerImageList, setIsShowContainerImageList] =
+    useState(true);
 
   useEffect(() => {
     if (inputRef) {
@@ -329,8 +336,36 @@ const BoxChatGroup = () => {
     }, 100);
   }, [messages]);
 
+  useEffect(() => {
+    if (messages[0]) {
+      const allUser = messages.map((item) => item.uid);
+      var uniqueArr = [...new Set(allUser)];
+
+      const fetchData = async () => {
+        const docRef = query(
+          collection(db, "users"),
+          where("uid", "in", uniqueArr)
+        );
+        const reponse = await getDocs(docRef);
+        const documents = reponse.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setInfoUsers(documents);
+      };
+      fetchData();
+    }
+  }, [messages, userInfo]);
+
   const renderMessages = () => {
     return messages?.map((item) => {
+      const newInfoUser = infoUsers?.find(
+        (infoUser) => infoUser.uid === item.uid
+      );
+      let CREATEDAT_URL;
+
       const renderCreatedAtMessage = () => {
         if (item.createdAt) {
           let formattedDate = "";
@@ -352,6 +387,8 @@ const BoxChatGroup = () => {
             formattedDate = `${formattedDateTime} `;
           }
 
+          CREATEDAT_URL = formattedDate;
+
           return <div className="format-date-message"> {formattedDate} </div>;
         }
       };
@@ -369,7 +406,17 @@ const BoxChatGroup = () => {
                           key={index}
                           src={image.url}
                           alt=""
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", cursor: "pointer" }}
+                          onClick={() => {
+                            setMessageSelected({
+                              ...newInfoUser,
+                              URL: image.url,
+                              CREATEDAT_URL,
+                              MESSAGE_ID: item.id,
+                              IMAGE_INDEX: index,
+                            });
+                            setIsShowOverlayModalDetailImage(true);
+                          }}
                         />
                       );
                     })}
@@ -394,7 +441,17 @@ const BoxChatGroup = () => {
                           key={index}
                           src={image.url}
                           alt=""
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", cursor: "pointer" }}
+                          onClick={() => {
+                            setMessageSelected({
+                              ...newInfoUser,
+                              URL: image.url,
+                              CREATEDAT_URL,
+                              MESSAGE_ID: item.id,
+                              IMAGE_INDEX: index,
+                            });
+                            setIsShowOverlayModalDetailImage(true);
+                          }}
                         />
                       );
                     })}
@@ -504,6 +561,96 @@ const BoxChatGroup = () => {
   const handleComeBack = () => {
     setIsShowBoxChatGroup(false);
     setSelectedGroupMessaging({});
+  };
+
+  const renderContainerImages = () => {
+    return messages.map((item) => {
+      const newInfoUser = infoUsers?.find(
+        (infoUser) => infoUser.uid === item.uid
+      );
+
+      let CREATEDAT_URL;
+      const getCreatedAtMessage = () => {
+        if (item.createdAt) {
+          let formattedDate = "";
+          const now = moment(); // Lấy thời điểm hiện tại
+
+          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+
+          if (date.isSame(now, "day")) {
+            // Nếu timestamp là cùng ngày với hiện tại
+            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
+            formattedDate = `${formattedTime} Hôm nay`;
+          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+            // Nếu timestamp là ngày hôm qua
+            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
+            formattedDate = `${formattedTime} Hôm qua`;
+          } else {
+            // Trường hợp khác
+            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
+            formattedDate = `${formattedDateTime} `;
+          }
+
+          return (CREATEDAT_URL = formattedDate);
+        }
+      };
+      getCreatedAtMessage();
+
+      return item.images.map((image, index) => {
+        return (
+          <img
+            className="image-item"
+            key={index}
+            src={image.url}
+            alt=""
+            onClick={() =>
+              setMessageSelected({
+                ...newInfoUser,
+                URL: image.url,
+                CREATEDAT_URL: CREATEDAT_URL,
+                MESSAGE_ID: item.id,
+                IMAGE_INDEX: index,
+              })
+            }
+            style={
+              item.id === messageSelected.MESSAGE_ID &&
+              index === messageSelected.IMAGE_INDEX
+                ? {
+                    minWidth: "100px",
+                    minHeight: "100px",
+                    filter: "none",
+                    border: "2px solid #fff",
+                    transition: "all .3s ease",
+                  }
+                : {}
+            }
+          />
+        );
+      });
+    });
+  };
+
+  const [imageFormat, setImageFormat] = useState({
+    rotate: 0,
+    scale: 1,
+  });
+
+  useEffect(() => {
+    setImageFormat({
+      rotate: 0,
+      scale: 1,
+    });
+  }, [messageSelected]);
+
+  const downloadImage = () => {
+    const randomNumber = Math.floor(Math.random() * 10000000000000);
+    const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
+    const link = document.createElement("a");
+    link.href = `${base64Data}`;
+    link.download = `photo-${randomNumber}`; // Tên file khi được lưu xuống máy
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -707,6 +854,124 @@ const BoxChatGroup = () => {
             accountSelected={{ ...selectedGroupMessaging, avatars, name }}
             isShowOverlayModal={isShowOverlayModal}
           />
+        )}
+
+        {isShowOverlayModalDetailImage && (
+          <div className="images-container">
+            <div className="image-show__title">
+              <div>Cloud của tôi</div>
+              <i
+                className="fa-solid fa-xmark"
+                onClick={() => setIsShowOverlayModalDetailImage(false)}
+              ></i>
+            </div>
+            <div className="image-show__center">
+              <div className="main-image">
+                <img
+                  src={messageSelected?.URL}
+                  alt=""
+                  style={{
+                    zIndex: 2,
+                    position: "relative",
+                    scale: `${imageFormat.scale}`,
+                    rotate: `${imageFormat.rotate}deg`,
+                  }}
+                />
+                <div
+                  className="background-overlay"
+                  style={{ position: "absolute", inset: "0 0 0 0", zIndex: 1 }}
+                  onClick={() => {
+                    setIsShowOverlayModalDetailImage(false);
+                    setIsShowContainerImageList(true);
+                  }}
+                ></div>
+              </div>
+
+              {isShowContainerImageList && (
+                <div className="container-image-list">
+                  <div className="dividing">
+                    <div className="dividing-line"></div>
+                  </div>
+
+                  <div className="images" ref={imagesRef}>
+                    <div className="image-list__title"> </div>
+                    {renderContainerImages()}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="image-show__bottom">
+              <div className="image-show__bottom__sender">
+                <img
+                  className="image-show__bottom__sender__avatar"
+                  src={messageSelected?.photoURL}
+                  alt=""
+                />
+                <div className="image-show__bottom__sender__info">
+                  <div className="sender-name">
+                    {messageSelected.displayName}
+                  </div>
+                  <div className="createAt">
+                    {messageSelected.CREATEDAT_URL}
+                  </div>
+                </div>
+              </div>
+              <div className="image-show__bottom__ctrl">
+                <i className="fa-solid fa-share"></i>
+                <i className="fa-solid fa-download" onClick={downloadImage}></i>
+                <i
+                  className="fa-solid fa-rotate-right fa-flip-horizontal"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        rotate: current.rotate - 90,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-rotate-right"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        rotate: current.rotate + 90,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-magnifying-glass-plus"
+                  onClick={() => {
+                    imageFormat.scale <= 7 &&
+                      setImageFormat((current) => ({
+                        ...current,
+                        scale: current.scale + 0.25,
+                      }));
+                  }}
+                ></i>
+                <i
+                  className="fa-solid fa-magnifying-glass-minus"
+                  onClick={() => {
+                    setImageFormat((current) => ({
+                      ...current,
+                      scale: 1,
+                    }));
+                  }}
+                ></i>
+              </div>
+              <div className="image-show__bottom__slider-wrapper">
+                <div>
+                  <i className="fa-regular fa-thumbs-up"></i>
+                </div>
+                <i
+                  className="fa-solid fa-expand"
+                  onClick={() =>
+                    setIsShowContainerImageList(!isShowContainerImageList)
+                  }
+                ></i>
+              </div>
+            </div>
+          </div>
         )}
       </S.Container>
     </S.Wrapper>
