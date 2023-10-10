@@ -6,19 +6,16 @@
   animation-name: fadeIn;
   animation-duration: 0.2s;
   user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .container-account-info {
     padding: 0px 12px;
     .account-info {
       animation-name: zoom;
       animation-duration: 0.5s;
-      position: absolute;
-      height: 97vh;
       width: 352px;
       max-width: 100%;
-      top: 10px;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
       z-index: 2;
       border-radius: 6px;
       background-color: #fff;
