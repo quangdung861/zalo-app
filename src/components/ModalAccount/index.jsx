@@ -13,11 +13,13 @@ const ModalAccount = ({
   isShowOverlayModal,
   accountSelected,
 }) => {
+  console.log("🚀 ~ file: index.jsx:16 ~ accountSelected:", accountSelected);
   const phoneNumberRef = useRef(null);
 
   const accountInfoRef = useRef(null);
 
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:21 ~ userInfo:", userInfo);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
@@ -392,30 +394,6 @@ const ModalAccount = ({
                 </div>
               </div>
             </div>
-            <div className="footer">
-              <div className="action-list">
-                <div className="action-item">
-                  <i className="fa-solid fa-users"></i>
-                  <span>Nhóm chung (0)</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-address-card"></i>
-                  <span>Chia sẻ danh thiếp</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-ban"></i>
-                  <span>Chặn tin nhắn</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span>Báo xấu</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-trash-can"></i>
-                  <span>Xóa khỏi danh sách bạn bè</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -582,30 +560,30 @@ const ModalAccount = ({
                 </div>
               </div>
             </div>
-            <div className="footer">
-              <div className="action-list">
-                <div className="action-item">
-                  <i className="fa-solid fa-users"></i>
-                  <span>Nhóm chung (0)</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-address-card"></i>
-                  <span>Chia sẻ danh thiếp</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-ban"></i>
-                  <span>Chặn tin nhắn</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span>Báo xấu</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-trash-can"></i>
-                  <span>Xóa khỏi danh sách bạn bè</span>
+              <div className="footer">
+                <div className="action-list">
+                  <div className="action-item">
+                    <i className="fa-solid fa-users"></i>
+                    <span>Nhóm chung (0)</span>
+                  </div>
+                  <div className="action-item">
+                    <i className="fa-regular fa-address-card"></i>
+                    <span>Chia sẻ danh thiếp</span>
+                  </div>
+                  <div className="action-item">
+                    <i className="fa-solid fa-ban"></i>
+                    <span>Chặn tin nhắn</span>
+                  </div>
+                  <div className="action-item">
+                    <i className="fa-solid fa-triangle-exclamation"></i>
+                    <span>Báo xấu</span>
+                  </div>
+                  <div className="action-item">
+                    <i className="fa-regular fa-trash-can"></i>
+                    <span>Xóa khỏi danh sách bạn bè</span>
+                  </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>
