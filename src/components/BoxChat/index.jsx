@@ -559,7 +559,17 @@ const BoxChat = () => {
                           key={index}
                           src={image.url}
                           alt=""
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", cursor: "pointer" }}
+                          onClick={() => {
+                            setMessageSelected({
+                              ...newInfoUser,
+                              URL: image.url,
+                              CREATEDAT_URL,
+                              MESSAGE_ID: item.id,
+                              IMAGE_INDEX: index,
+                            });
+                            setIsShowOverlayModalDetailImage(true);
+                          }}
                         />
                       );
                     })}
