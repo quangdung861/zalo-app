@@ -36,6 +36,8 @@ const BoxChatGroup = () => {
   const [messageSelected, setMessageSelected] = useState();
   const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
     useState(false);
+  const [isReplyMessage, setIsReplyMessage] = useState(false);
+  const [infoReply, setInfoReply] = useState({});
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -151,13 +153,15 @@ const BoxChatGroup = () => {
               photoURL: userInfo.photoURL,
               text: inputValue,
               images: imageBase64FullInfo || [],
+              infoReply: infoReply,
             });
           };
           createMes();
         }
       }
       // focus to input again after submit
-
+      setIsReplyMessage(false);
+      setInfoReply({});
       setInputValue("");
 
       if (inputRef?.current) {
@@ -223,13 +227,15 @@ const BoxChatGroup = () => {
               photoURL: userInfo.photoURL,
               text: inputValue,
               images: [],
+              infoReply: infoReply,
             });
           };
           createMes();
         }
       }
       // focus to input again after submit
-
+      setIsReplyMessage(false);
+      setInfoReply({});
       setInputValue("");
 
       if (inputRef?.current) {
@@ -359,6 +365,16 @@ const BoxChatGroup = () => {
     }
   }, [messages, userInfo]);
 
+  const handleReplyMessage = ({ name, id, text, image }) => {
+    setInfoReply({ name, id, text, image });
+    setIsReplyMessage(true);
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      });
+    }
+  };
+
   const renderMessages = () => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -397,6 +413,22 @@ const BoxChatGroup = () => {
         <div key={item.id} className="message-item">
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
+              <div className="myself-options">
+                <i
+                  className="fa-solid fa-quote-right"
+                  title="Trả lời"
+                  onClick={() =>
+                    handleReplyMessage({
+                      name: "",
+                      id: item.id,
+                      text: item.text || "",
+                      image: item?.images[0] || null,
+                    })
+                  }
+                ></i>
+                <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
+              </div>
               <div className="box-image">
                 <div className="text">
                   {item.images[0] &&
@@ -420,6 +452,28 @@ const BoxChatGroup = () => {
                         />
                       );
                     })}
+                  {item.infoReply?.id && (
+                    <div className="reply-content">
+                      <div className="reply-content__left"></div>
+                      {item.infoReply?.image && (
+                        <img
+                          src={item.infoReply?.image?.url}
+                          alt=""
+                          className="image-reply"
+                        />
+                      )}
+                      <div className="reply-content__right">
+                        <div className="subcription">
+                          <span className="name">
+                            {item.infoReply?.name || userInfo.displayName}
+                          </span>
+                        </div>
+                        <div className="content">
+                          {item.infoReply.text || "[Hình ảnh]"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()}</div>
                 </div>
@@ -430,6 +484,7 @@ const BoxChatGroup = () => {
             <div className="message-item__other">
               <div className="box-image">
                 <img src={item.photoURL} alt="" className="avatar" />
+
                 <div className="text">
                   <div style={{ fontSize: "13px", color: "#7589A3" }}>
                     {item.displayName}
@@ -455,9 +510,47 @@ const BoxChatGroup = () => {
                         />
                       );
                     })}
+                  {item.infoReply?.id && (
+                    <div className="reply-content">
+                      <div className="reply-content__left"></div>
+                      {item.infoReply?.image && (
+                        <img
+                          src={item.infoReply?.image?.url}
+                          alt=""
+                          className="image-reply"
+                        />
+                      )}
+                      <div className="reply-content__right">
+                        <div className="subcription">
+                          <span className="name">
+                            {item.infoReply?.name || userInfo.displayName}
+                          </span>
+                        </div>
+                        <div className="content">
+                          {item.infoReply.text || "[Hình ảnh]"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
                 </div>
+              </div>
+              <div className="other-options">
+                <i
+                  className="fa-solid fa-quote-right"
+                  title="Trả lời"
+                  onClick={() =>
+                    handleReplyMessage({
+                      name: newInfoUser.displayName,
+                      id: item.id,
+                      text: item.text,
+                      image: item?.images[0] || null,
+                    })
+                  }
+                ></i>
+                <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
               </div>
             </div>
           )}
@@ -655,7 +748,7 @@ const BoxChatGroup = () => {
 
   return (
     <S.Wrapper>
-      <S.Container>
+      <S.Container isReplyMessage={isReplyMessage}>
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
@@ -786,6 +879,32 @@ const BoxChatGroup = () => {
                 />
               </div>
             </div>
+            {isReplyMessage && (
+              <div className="reply-content">
+                <div className="reply-content__left"></div>
+                {infoReply?.image && (
+                  <img
+                    src={infoReply?.image?.url}
+                    alt=""
+                    className="image-reply"
+                  />
+                )}
+                <div className="reply-content__right">
+                  <div className="subcription">
+                    <i className="fa-solid fa-quote-right"></i>
+                    <span>Trả lời</span>
+                    <span className="name">{infoReply?.name}</span>
+                  </div>
+                  <div className="content">
+                    {infoReply.text || "[Hình ảnh]"}
+                  </div>
+                </div>
+                <i
+                  className="fa-solid fa-circle-xmark btn-close"
+                  onClick={() => setIsReplyMessage(false)}
+                ></i>
+              </div>
+            )}
             <div className="box-chat-input">
               <div className="box-chat-input__left">
                 {/* Nhận content từ người dùng */}
@@ -805,7 +924,7 @@ const BoxChatGroup = () => {
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(null, e)}
+                  onKeyDown={(e) => handleKeyDown([], e)}
                   value={inputValue}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}

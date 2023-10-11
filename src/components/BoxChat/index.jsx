@@ -41,7 +41,8 @@ const BoxChat = () => {
   const audio = new Audio(messageSend);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
-
+  const [isReplyMessage, setIsReplyMessage] = useState(false);
+  const [infoReply, setInfoReply] = useState({});
   const [isShowContainerImageList, setIsShowContainerImageList] =
     useState(true);
 
@@ -191,6 +192,7 @@ const BoxChat = () => {
               uid: userInfo.uid,
               text: inputValue,
               images: imageBase64FullInfo || [],
+              infoReply: infoReply,
             });
           };
           createMes();
@@ -224,6 +226,7 @@ const BoxChat = () => {
                   uid: userInfo.uid,
                   text: inputValue,
                   images: imageBase64FullInfo || [],
+                  infoReply: infoReply,
                 });
               } else {
                 console.log("false");
@@ -237,7 +240,8 @@ const BoxChat = () => {
         }
       }
       // focus to input again after submit
-
+      setIsReplyMessage(false);
+      setInfoReply({});
       setInputValue("");
 
       if (inputRef?.current) {
@@ -300,6 +304,7 @@ const BoxChat = () => {
             uid: userInfo.uid,
             text: inputValue,
             images: [],
+            infoReply: infoReply,
           });
         };
         createMes();
@@ -332,6 +337,7 @@ const BoxChat = () => {
                 roomId: response.id,
                 uid: userInfo.uid,
                 text: inputValue,
+                infoReply: infoReply,
               });
             } else {
               console.log("false");
@@ -345,7 +351,8 @@ const BoxChat = () => {
       }
     }
     // focus to input again after submit
-
+    setIsReplyMessage(false);
+    setInfoReply({});
     setInputValue("");
 
     if (inputRef?.current) {
@@ -478,6 +485,16 @@ const BoxChat = () => {
     }
   }, [messages, userInfo]);
 
+  const handleReplyMessage = ({ name, id, text, image }) => {
+    setInfoReply({ name, id, text, image });
+    setIsReplyMessage(true);
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      });
+    }
+  };
+
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -515,6 +532,25 @@ const BoxChat = () => {
         <div key={item.id} className="message-item">
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
+              <div
+                className="myself-options"
+                // style={{ display: isShowOptionMessage ? "flex" : "none" }}
+              >
+                <i
+                  className="fa-solid fa-quote-right"
+                  title="Trả lời"
+                  onClick={() =>
+                    handleReplyMessage({
+                      name: "",
+                      id: item.id,
+                      text: item.text || "",
+                      image: item?.images[0] || null,
+                    })
+                  }
+                ></i>
+                <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
+              </div>
               <div className="box-image">
                 <div className="text">
                   {item?.images[0] &&
@@ -539,6 +575,29 @@ const BoxChat = () => {
                         />
                       );
                     })}
+                  {item.infoReply?.id && (
+                    <div className="reply-content">
+                      <div className="reply-content__left"></div>
+                      {item.infoReply?.image && (
+                        <img
+                          src={item.infoReply?.image?.url}
+                          alt=""
+                          className="image-reply"
+                        />
+                      )}
+                      <div className="reply-content__right">
+                        <div className="subcription">
+                          <span className="name">
+                            {item.infoReply?.name || userInfo.displayName}
+                          </span>
+                        </div>
+                        <div className="content">
+                          {item.infoReply.text || "[Hình ảnh]"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {item.text}
                   <div className="box-date">
                     <div className="format-date-message">{CREATEDAT_URL}</div>
@@ -573,11 +632,49 @@ const BoxChat = () => {
                         />
                       );
                     })}
+                  {item.infoReply?.id && (
+                    <div className="reply-content">
+                      <div className="reply-content__left"></div>
+                      {item.infoReply?.image && (
+                        <img
+                          src={item.infoReply?.image?.url}
+                          alt=""
+                          className="image-reply"
+                        />
+                      )}
+                      <div className="reply-content__right">
+                        <div className="subcription">
+                          <span className="name">
+                            {item.infoReply?.name || userInfo.displayName}
+                          </span>
+                        </div>
+                        <div className="content">
+                          {item.infoReply.text || "[Hình ảnh]"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {item.text}
                   <div className="box-date">
                     <div className="format-date-message">{CREATEDAT_URL}</div>
                   </div>
                 </div>
+              </div>
+              <div className="other-options">
+                <i
+                  className="fa-solid fa-quote-right"
+                  title="Trả lời"
+                  onClick={() =>
+                    handleReplyMessage({
+                      name: newInfoUser.displayName,
+                      id: item.id,
+                      text: item.text,
+                      image: item?.images[0] || null,
+                    })
+                  }
+                ></i>
+                <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
               </div>
             </div>
           )}
@@ -836,6 +933,7 @@ const BoxChat = () => {
         isCloud={
           selectedUserMessaging.uidSelected === "my-cloud" ? true : false
         }
+        isReplyMessage={isReplyMessage}
       >
         <div className="box-chat">
           <div className="box-chat__header">
@@ -1043,6 +1141,32 @@ const BoxChat = () => {
                 />
               </div>
             </div>
+            {isReplyMessage && (
+              <div className="reply-content">
+                <div className="reply-content__left"></div>
+                {infoReply?.image && (
+                  <img
+                    src={infoReply?.image?.url}
+                    alt=""
+                    className="image-reply"
+                  />
+                )}
+                <div className="reply-content__right">
+                  <div className="subcription">
+                    <i className="fa-solid fa-quote-right"></i>
+                    <span>Trả lời</span>
+                    <span className="name">{infoReply?.name}</span>
+                  </div>
+                  <div className="content">
+                    {infoReply.text || "[Hình ảnh]"}
+                  </div>
+                </div>
+                <i
+                  className="fa-solid fa-circle-xmark btn-close"
+                  onClick={() => setIsReplyMessage(false)}
+                ></i>
+              </div>
+            )}
             <div className="box-chat-input">
               <div className="box-chat-input__left">
                 {/* Nhận content từ người dùng */}

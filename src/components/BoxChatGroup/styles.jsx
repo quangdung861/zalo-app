@@ -12,7 +12,7 @@ export const Wrapper = styled.div`
 export const Container = styled.div`
   .box-chat {
     --header-height: 68px;
-    --footer-height: 105px;
+    --footer-height: ${(props) => (props.isReplyMessage ? "187px" : "105px")};
     position: relative;
     &__header {
       height: var(--header-height);
@@ -247,9 +247,83 @@ export const Container = styled.div`
               text-align: left;
               min-width: 115px;
               min-height: 83px;
+              .reply-content {
+                padding: 10px 9px 10px 12px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+                background-color: #c7e0ff;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                &__left {
+                  width: 3px;
+                  height: 40px;
+                  margin-right: 8px;
+                  background-color: #3989ff;
+                }
+                .image-reply {
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  margin-right: 8px;
+                  border-radius: 2px;
+                }
+                &__right {
+                  .subcription {
+                    margin-bottom: 2px;
+                    > * {
+                      margin: 2px;
+                    }
+                    > i {
+                      color: #7589a3;
+                      font-size: 16px;
+                    }
+                    .name {
+                      font-weight: 600;
+                    }
+                  }
+                  .content {
+                    color: #476285;
+                    font-weight: 500;
+                  }
+                }
+              }
               .box-date {
                 text-align: left;
               }
+              .message-reply {
+                background-color: #c7e0ff;
+                border-radius: 6px;
+                padding: 10px 9px 10px 12px;
+                -webkit-line-clamp: 3;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-bottom: 10px;
+              }
+            }
+          }
+          .myself-options {
+            margin: 0 12px 10px 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            height: 22px;
+            padding: 2px 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            > i {
+              font-size: 16px;
+              padding: 6px;
+              color: rgb(117, 137, 163);
+              cursor: pointer;
+              &:hover {
+                color: rgb(3, 92, 224);
+              }
+            }
+          }
+          &:hover {
+            .myself-options {
+              display: flex;
             }
           }
         }
@@ -281,9 +355,83 @@ export const Container = styled.div`
               max-width: 300px;
               min-width: 115px;
               min-height: 83px;
+              .reply-content {
+                padding: 10px 9px 10px 12px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+                background-color: #eaedf0;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                &__left {
+                  width: 3px;
+                  height: 40px;
+                  margin-right: 8px;
+                  background-color: #3989ff;
+                }
+                .image-reply {
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  margin-right: 8px;
+                  border-radius: 2px;
+                }
+                &__right {
+                  .subcription {
+                    margin-bottom: 2px;
+                    > * {
+                      margin: 2px;
+                    }
+                    > i {
+                      color: #7589a3;
+                      font-size: 16px;
+                    }
+                    .name {
+                      font-weight: 600;
+                    }
+                  }
+                  .content {
+                    color: #476285;
+                    font-weight: 500;
+                  }
+                }
+              }
               .box-date {
                 text-align: left;
               }
+              .message-reply {
+                background-color: #c7e0ff;
+                border-radius: 6px;
+                padding: 10px 9px 10px 12px;
+                -webkit-line-clamp: 3;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-bottom: 10px;
+              }
+            }
+          }
+          .other-options {
+            margin: 0 0 10px 12px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            height: 22px;
+            padding: 2px 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            > i {
+              font-size: 16px;
+              padding: 6px;
+              color: rgb(117, 137, 163);
+              cursor: pointer;
+              &:hover {
+                color: rgb(3, 92, 224);
+              }
+            }
+          }
+          &:hover {
+            .other-options {
+              display: flex;
             }
           }
         }
@@ -390,6 +538,59 @@ export const Container = styled.div`
             &:hover {
               background-color: #e5efff;
             }
+          }
+        }
+      }
+      .reply-content {
+        height: 70px;
+        padding: 12px;
+        margin: 12px 15px 0px;
+        border-radius: 6px;
+        background-color: #eaedf0;
+        display: flex;
+        align-items: center;
+        position: relative;
+        &__left {
+          width: 3px;
+          height: 100%;
+          margin-right: 8px;
+          background-color: #3989ff;
+        }
+        .image-reply {
+          width: 40px;
+          height: 40px;
+          object-fit: cover;
+          margin-right: 8px;
+          border-radius: 2px;
+        }
+        &__right {
+          .subcription {
+            margin-bottom: 4px;
+            > * {
+              margin: 2px;
+            }
+            > i {
+              color: #7589a3;
+              font-size: 16px;
+            }
+            .name {
+              font-weight: 600;
+            }
+          }
+          .content {
+            color: #476285;
+            font-weight: 500;
+          }
+        }
+        .btn-close {
+          position: absolute;
+          right: 8px;
+          top: 8px;
+          color: #7589a3;
+          font-size: 18px;
+          cursor: pointer;
+          &:hover {
+            color: #3989ff;
           }
         }
       }
