@@ -127,7 +127,6 @@ const AppProvider = ({ children }) => {
           );
         }
          */
-
         //
 
         let strangerListRef;
