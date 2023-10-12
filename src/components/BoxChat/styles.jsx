@@ -351,9 +351,10 @@ export const Container = styled.div`
               width: 220px;
               position: absolute;
               z-index: 2;
-              left: 60px;
+              left: -124px;
               bottom: 120%;
-              border-radius: 6px;
+              border-radius: 4px;
+              box-shadow: var(--box-shadow-default);
               padding: 8px 0px;
               .menu-item {
                 padding: 0 8px;
@@ -508,7 +509,8 @@ export const Container = styled.div`
               z-index: 2;
               left: 80px;
               bottom: 120%;
-              border-radius: 6px;
+              border-radius: 4px;
+              box-shadow: var(--box-shadow-default);
               padding: 8px 0px;
               .menu-item {
                 padding: 0 8px;

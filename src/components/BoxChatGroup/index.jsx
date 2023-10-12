@@ -435,9 +435,11 @@ const BoxChatGroup = () => {
           merge: true,
         }
       );
+      setIsShowDropdownOption(false);
       return;
     }
-
+    
+    setIsShowDropdownOption(false);
     setIsShowAlertRecallRejectMessage(true);
     setTimeout(function () {
       setIsShowAlertRecallRejectMessage(false);

@@ -541,7 +541,6 @@ const BoxChat = () => {
   };
 
   const handleRecallMessage = async ({ id, createdAt }) => {
-    console.log(createdAt);
     const now = moment();
     const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
 
@@ -559,9 +558,11 @@ const BoxChat = () => {
           merge: true,
         }
       );
+      setIsShowDropdownOption(false);
       return;
     }
 
+    setIsShowDropdownOption(false);
     setIsShowAlertRecallRejectMessage(true);
     setTimeout(function () {
       setIsShowAlertRecallRejectMessage(false);
@@ -718,7 +719,9 @@ const BoxChat = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
+                    <span
+                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                    >
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
@@ -783,7 +786,9 @@ const BoxChat = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
+                    <span
+                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                    >
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
