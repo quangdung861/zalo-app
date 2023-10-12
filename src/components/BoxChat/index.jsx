@@ -718,7 +718,7 @@ const BoxChat = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)" }}>
+                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
@@ -783,7 +783,7 @@ const BoxChat = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)" }}>
+                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
