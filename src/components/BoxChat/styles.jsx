@@ -153,7 +153,8 @@ export const Container = styled.div`
     &__content {
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
+      background-image: url(${(props) =>
+        props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
@@ -244,6 +245,7 @@ export const Container = styled.div`
               user-select: none;
             }
             > .text {
+              font-size: 15px;
               line-height: 1.5rem;
               background-color: #e5efff;
               border-radius: 8px;
@@ -252,6 +254,7 @@ export const Container = styled.div`
               text-align: left;
               min-width: 115px;
               min-height: 83px;
+              word-break: break-word;
               > img.image-item {
                 cursor: pointer;
               }
@@ -263,8 +266,10 @@ export const Container = styled.div`
                 display: flex;
                 align-items: center;
                 cursor: pointer;
+                user-select: none;
                 &__left {
                   width: 3px;
+                  min-width: 3px;
                   height: 40px;
                   margin-right: 8px;
                   background-color: #3989ff;
@@ -278,21 +283,25 @@ export const Container = styled.div`
                 }
                 &__right {
                   .subcription {
-                    margin-bottom: 2px;
                     > * {
-                      margin: 2px;
-                    }
-                    > i {
-                      color: #7589a3;
-                      font-size: 16px;
+                      margin-right: 2px;
                     }
                     .name {
+                      font-size: 13px;
                       font-weight: 600;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
                     }
                   }
                   .content {
+                    font-size: 14px;
+                    margin-top: -2px;
                     color: #476285;
-                    font-weight: 500;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 1;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
                   }
                 }
               }
@@ -303,7 +312,7 @@ export const Container = styled.div`
                 background-color: #c7e0ff;
                 border-radius: 6px;
                 padding: 10px 9px 10px 12px;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 1;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 margin-bottom: 10px;
@@ -330,6 +339,11 @@ export const Container = styled.div`
                 &:hover {
                   color: rgb(3, 92, 224);
                 }
+              }
+            }
+            .recall {
+              > i:hover {
+                color: #d91b1b;
               }
             }
             .dropdown-menu {
@@ -388,6 +402,7 @@ export const Container = styled.div`
               user-select: none;
             }
             > .text {
+              font-size: 15px;
               background-color: #fff;
               border-radius: 8px;
               padding: 14px;
@@ -395,6 +410,7 @@ export const Container = styled.div`
               max-width: 300px;
               min-width: 115px;
               min-height: 83px;
+              word-break: break-word;
               .reply-content {
                 padding: 10px 9px 10px 12px;
                 margin-bottom: 8px;
@@ -403,8 +419,10 @@ export const Container = styled.div`
                 display: flex;
                 align-items: center;
                 cursor: pointer;
+                user-select: none;
                 &__left {
                   width: 3px;
+                  min-width: 3px;
                   height: 40px;
                   margin-right: 8px;
                   background-color: #3989ff;
@@ -418,21 +436,27 @@ export const Container = styled.div`
                 }
                 &__right {
                   .subcription {
-                    margin-bottom: 2px;
                     > * {
-                      margin: 2px;
+                      margin-right: 2px;
                     }
                     > i {
                       color: #7589a3;
                       font-size: 16px;
                     }
                     .name {
+                      font-size: 13px;
                       font-weight: 600;
                     }
                   }
                   .content {
+                    font-size: 14px;
+                    margin-top: -2px;
                     color: #476285;
-                    font-weight: 500;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 1;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
                   }
                 }
               }
@@ -470,6 +494,11 @@ export const Container = styled.div`
                 &:hover {
                   color: rgb(3, 92, 224);
                 }
+              }
+            }
+            .recall {
+              > i:hover {
+                color: #d91b1b;
               }
             }
             .dropdown-menu {
@@ -621,6 +650,7 @@ export const Container = styled.div`
         display: flex;
         align-items: center;
         position: relative;
+        user-select: none;
         &__left {
           width: 3px;
           height: 100%;
@@ -651,6 +681,11 @@ export const Container = styled.div`
           .content {
             color: #476285;
             font-weight: 500;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
         }
         .btn-close {

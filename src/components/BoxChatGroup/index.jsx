@@ -38,6 +38,9 @@ const BoxChatGroup = () => {
     useState(false);
   const [isReplyMessage, setIsReplyMessage] = useState(false);
   const [infoReply, setInfoReply] = useState({});
+  const [isShowMessageError, setIsShowMessageError] = useState(false);
+  const [isShowAlertRecallRejectMessage, setIsShowAlertRecallRejectMessage] =
+    useState(false);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -268,8 +271,6 @@ const BoxChatGroup = () => {
     }
   };
 
-  const [isShowMessageError, setIsShowMessageError] = useState(false);
-
   const handleUploadImage = async (e) => {
     // Chuyển đổi đối tượng thành mảng đơn giản
     const files = Object.values(e.target.files);
@@ -346,15 +347,20 @@ const BoxChatGroup = () => {
     return () => unSubcribe && unSubcribe();
   }, [room.id]);
 
+  const [messageLength, setMessageLength] = useState(messages.length);
+
   useEffect(() => {
-    const chatWindow = boxChatRef?.current;
-    setTimeout(() => {
-      chatWindow.scrollTo({
-        top: chatWindow.scrollHeight,
-        behavior: "auto",
-      });
-    }, 100);
-  }, [messages]);
+    if (messages.length !== messageLength) {
+      const chatWindow = boxChatRef?.current;
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "auto",
+        });
+      }, 100);
+      setMessageLength(messages.length);
+    }
+  }, [messages, messageLength]);
 
   useEffect(() => {
     if (messages[0]) {
@@ -411,6 +417,34 @@ const BoxChatGroup = () => {
     setIsShowDropdownOption(false);
   };
 
+  const handleRecallMessage = async ({ id, createdAt }) => {
+    const now = moment();
+    const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+
+    const diffSeconds = now.diff(date, "seconds");
+    if (diffSeconds < 30) {
+      const messageRef = doc(db, "messages", id);
+      setIsShowDropdownOption(false);
+
+      await setDoc(
+        messageRef,
+        {
+          isRecall: true,
+        },
+        {
+          merge: true,
+        }
+      );
+      return;
+    }
+
+    setIsShowAlertRecallRejectMessage(true);
+    setTimeout(function () {
+      setIsShowAlertRecallRejectMessage(false);
+    }, 3000);
+    return;
+  };
+
   const renderMessages = () => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -450,88 +484,122 @@ const BoxChatGroup = () => {
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
               <div className="container-options">
-                <div className="myself-options">
-                  <i
-                    className="fa-solid fa-quote-right"
-                    title="Trả lời"
-                    onClick={() =>
-                      handleReplyMessage({
-                        name: newInfoUser.displayName,
-                        id: item.id,
-                        text: item.text,
-                        image: item?.images[0] || null,
-                      })
-                    }
-                  ></i>
-                  <i className="fa-solid fa-share" title="Chia sẻ"></i>
-                  <i
-                    className="fa-solid fa-ellipsis"
-                    title="Thêm"
-                    onClick={() =>
-                      setIsShowDropdownOption({
-                        id: item.id,
-                      })
-                    }
-                  ></i>
-                </div>
-                {isShowDropdownOption?.id === item.id && (
-                  <div className="dropdown-menu" ref={dropdownRef}>
-                    <div
-                      className="menu-item"
-                      onClick={() => handleCopyText(item.text)}
-                    >
-                      <i className="fa-regular fa-copy"></i>
-                      Copy tin nhắn
+                {!item.isRecall ? (
+                  <>
+                    <div className="myself-options">
+                      <i
+                        className="fa-solid fa-quote-right"
+                        title="Trả lời"
+                        onClick={() =>
+                          handleReplyMessage({
+                            name: newInfoUser.displayName,
+                            id: item.id,
+                            text: item.text,
+                            image: item?.images[0] || null,
+                          })
+                        }
+                      ></i>
+                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-ellipsis"
+                        title="Thêm"
+                        onClick={() =>
+                          setIsShowDropdownOption({
+                            id: item.id,
+                          })
+                        }
+                      ></i>
                     </div>
+                    {isShowDropdownOption?.id === item.id && (
+                      <div className="dropdown-menu" ref={dropdownRef}>
+                        <div
+                          className="menu-item"
+                          onClick={() => handleCopyText(item.text)}
+                        >
+                          <i className="fa-regular fa-copy"></i>
+                          Copy tin nhắn
+                        </div>
+                        <div
+                          className="menu-item"
+                          style={{ color: "#d91b1b" }}
+                          onClick={() =>
+                            handleRecallMessage({
+                              id: item.id,
+                              createdAt: item.createdAt,
+                            })
+                          }
+                        >
+                          <i
+                            className="fa-solid fa-rotate-left"
+                            style={{ color: "#d91b1b" }}
+                          ></i>
+                          Thu hồi
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="myself-options recall">
+                    <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
               </div>
               <div className="box-image">
                 <div className="text">
-                  {item.images[0] &&
-                    item.images.map((image, index) => {
-                      return (
-                        <img
-                          key={index}
-                          src={image.url}
-                          alt=""
-                          style={{ width: "100%", cursor: "pointer" }}
-                          onClick={() => {
-                            setMessageSelected({
-                              ...newInfoUser,
-                              URL: image.url,
-                              CREATEDAT_URL,
-                              MESSAGE_ID: item.id,
-                              IMAGE_INDEX: index,
-                            });
-                            setIsShowOverlayModalDetailImage(true);
-                          }}
-                        />
-                      );
-                    })}
-                  {item.infoReply?.id && (
-                    <div className="reply-content">
-                      <div className="reply-content__left"></div>
-                      {item.infoReply?.image && (
-                        <img
-                          src={item.infoReply?.image?.url}
-                          alt=""
-                          className="image-reply"
-                        />
+                  {!item.isRecall ? (
+                    <>
+                      {item.infoReply?.id && (
+                        <div className="reply-content">
+                          <div className="reply-content__left"></div>
+                          {item.infoReply?.image && (
+                            <img
+                              src={item.infoReply?.image?.url}
+                              alt=""
+                              className="image-reply"
+                            />
+                          )}
+                          <div className="reply-content__right">
+                            <div className="subcription">
+                              <span className="name">
+                                {item.infoReply?.name || userInfo.displayName}
+                              </span>
+                            </div>
+                            <div className="content">
+                              {item.infoReply.text || "[Hình ảnh]"}
+                            </div>
+                          </div>
+                        </div>
                       )}
-                      <div className="reply-content__right">
-                        <div className="subcription">
-                          <span className="name">
-                            {item.infoReply?.name || userInfo.displayName}
-                          </span>
-                        </div>
-                        <div className="content">
-                          {item.infoReply.text || "[Hình ảnh]"}
-                        </div>
-                      </div>
-                    </div>
+                      {item.images[0] &&
+                        item.images.map((image, index) => {
+                          return (
+                            <img
+                              key={index}
+                              src={image.url}
+                              alt=""
+                              style={{ width: "100%", cursor: "pointer" }}
+                              onClick={() => {
+                                setMessageSelected({
+                                  ...newInfoUser,
+                                  URL: image.url,
+                                  CREATEDAT_URL,
+                                  MESSAGE_ID: item.id,
+                                  IMAGE_INDEX: index,
+                                });
+                                setIsShowOverlayModalDetailImage(true);
+                              }}
+                            />
+                          );
+                        })}
+
+                      {item.text}
+                    </>
+                  ) : (
+                    <span style={{ color: "rgba(0,0,0,0.3)" }}>
+                      Tin nhắn đã được thu hồi
+                    </span>
                   )}
-                  {item.text}
+
                   <div className="box-date">{renderCreatedAtMessage()}</div>
                 </div>
                 <img src={item.photoURL} alt="" className="avatar" />
@@ -543,90 +611,113 @@ const BoxChatGroup = () => {
                 <img src={item.photoURL} alt="" className="avatar" />
 
                 <div className="text">
-                  <div style={{ fontSize: "13px", color: "#7589A3" }}>
-                    {item.displayName}
-                  </div>
-                  {item?.images[0] &&
-                    item.images.map((image, index) => {
-                      return (
-                        <img
-                          key={index}
-                          src={image.url}
-                          alt=""
-                          style={{ width: "100%", cursor: "pointer" }}
-                          onClick={() => {
-                            setMessageSelected({
-                              ...newInfoUser,
-                              URL: image.url,
-                              CREATEDAT_URL,
-                              MESSAGE_ID: item.id,
-                              IMAGE_INDEX: index,
-                            });
-                            setIsShowOverlayModalDetailImage(true);
-                          }}
-                        />
-                      );
-                    })}
-                  {item.infoReply?.id && (
-                    <div className="reply-content">
-                      <div className="reply-content__left"></div>
-                      {item.infoReply?.image && (
-                        <img
-                          src={item.infoReply?.image?.url}
-                          alt=""
-                          className="image-reply"
-                        />
-                      )}
-                      <div className="reply-content__right">
-                        <div className="subcription">
-                          <span className="name">
-                            {item.infoReply?.name || userInfo.displayName}
-                          </span>
-                        </div>
-                        <div className="content">
-                          {item.infoReply.text || "[Hình ảnh]"}
-                        </div>
+                  {!item.isRecall ? (
+                    <>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: "#7589A3",
+                          userSelect: "none",
+                        }}
+                      >
+                        {item.displayName}
                       </div>
-                    </div>
+                      {item.infoReply?.id && (
+                        <div className="reply-content">
+                          <div className="reply-content__left"></div>
+                          {item.infoReply?.image && (
+                            <img
+                              src={item.infoReply?.image?.url}
+                              alt=""
+                              className="image-reply"
+                            />
+                          )}
+                          <div className="reply-content__right">
+                            <div className="subcription">
+                              <span className="name">
+                                {item.infoReply?.name || userInfo.displayName}
+                              </span>
+                            </div>
+                            <div className="content">
+                              {item.infoReply.text || "[Hình ảnh]"}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {item?.images[0] &&
+                        item.images.map((image, index) => {
+                          return (
+                            <img
+                              key={index}
+                              src={image.url}
+                              alt=""
+                              style={{ width: "100%", cursor: "pointer" }}
+                              onClick={() => {
+                                setMessageSelected({
+                                  ...newInfoUser,
+                                  URL: image.url,
+                                  CREATEDAT_URL,
+                                  MESSAGE_ID: item.id,
+                                  IMAGE_INDEX: index,
+                                });
+                                setIsShowOverlayModalDetailImage(true);
+                              }}
+                            />
+                          );
+                        })}
+
+                      {item.text}
+                    </>
+                  ) : (
+                    <span style={{ color: "rgba(0,0,0,0.3)" }}>
+                      Tin nhắn đã được thu hồi
+                    </span>
                   )}
-                  {item.text}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
                 </div>
               </div>
               <div className="container-options">
-                <div className="other-options">
-                  <i
-                    className="fa-solid fa-quote-right"
-                    title="Trả lời"
-                    onClick={() =>
-                      handleReplyMessage({
-                        name: newInfoUser.displayName,
-                        id: item.id,
-                        text: item.text,
-                        image: item?.images[0] || null,
-                      })
-                    }
-                  ></i>
-                  <i className="fa-solid fa-share" title="Chia sẻ"></i>
-                  <i
-                    className="fa-solid fa-ellipsis"
-                    title="Thêm"
-                    onClick={() =>
-                      setIsShowDropdownOption({
-                        id: item.id,
-                      })
-                    }
-                  ></i>
-                </div>
-                {isShowDropdownOption?.id === item.id && (
-                  <div className="dropdown-menu" ref={dropdownRef}>
-                    <div
-                      className="menu-item"
-                      onClick={() => handleCopyText(item.text)}
-                    >
-                      <i className="fa-regular fa-copy"></i>
-                      Copy tin nhắn
+                {!item.isRecall ? (
+                  <>
+                    <div className="other-options">
+                      <i
+                        className="fa-solid fa-quote-right"
+                        title="Trả lời"
+                        onClick={() =>
+                          handleReplyMessage({
+                            name: newInfoUser.displayName,
+                            id: item.id,
+                            text: item.text,
+                            image: item?.images[0] || null,
+                          })
+                        }
+                      ></i>
+                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-ellipsis"
+                        title="Thêm"
+                        onClick={() =>
+                          setIsShowDropdownOption({
+                            id: item.id,
+                          })
+                        }
+                      ></i>
                     </div>
+                    {isShowDropdownOption?.id === item.id && (
+                      <div className="dropdown-menu" ref={dropdownRef}>
+                        <div
+                          className="menu-item"
+                          onClick={() => handleCopyText(item.text)}
+                        >
+                          <i className="fa-regular fa-copy"></i>
+                          Copy tin nhắn
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="other-options recall">
+                    <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
               </div>
@@ -1041,6 +1132,30 @@ const BoxChatGroup = () => {
               }}
             >
               Hình ảnh phải có kích thước nhỏ hơn 0.5MB
+            </div>
+          )}
+          {isShowAlertRecallRejectMessage && (
+            <div
+              className="message-error"
+              style={{
+                position: "absolute",
+                top: "160px",
+                left: "0px",
+                right: "0px",
+                margin: "0 auto",
+                color: "white",
+                backgroundColor: "rgba(0,0,0,0.7)",
+                width: "320px",
+                height: "auto",
+                padding: "12px",
+                borderRadius: "4px",
+                boxShadow: "var(--box-shadow-default)",
+                textAlign: "center",
+                fontWeight: "500",
+                zIndex: 999,
+              }}
+            >
+              Bạn chỉ có thể thu hồi tin nhắn trong 1 phút sau khi gửi
             </div>
           )}
         </div>
