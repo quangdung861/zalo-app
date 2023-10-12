@@ -102,8 +102,7 @@ const AppProvider = ({ children }) => {
       const getStrangerList = async () => {
         // Nơi add thêm trường dữ liệu mới - sau khi add xong thì comment lại!
 
-        /**
-         * const allUsesrRef = query(collection(db, "messages"));
+        const allUsesrRef = query(collection(db, "messages"));
         const response2 = await getDocs(allUsesrRef);
         const documents2 = response2.docs.map((doc) => {
           const id = doc.id;
@@ -113,20 +112,20 @@ const AppProvider = ({ children }) => {
             id: id,
           };
         });
-        
-        for ( let i = 0; i < documents2.length; i++) {
+
+        for (let i = 0; i < documents2.length; i++) {
           const messageRef = doc(db, "messages", documents2[i].id);
           await setDoc(
             messageRef,
             {
-              infoReply: {},
+              isRecall: false,
             },
             {
               merge: true,
             }
           );
         }
-         */
+
         //
 
         let strangerListRef;
