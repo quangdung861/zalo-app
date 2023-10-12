@@ -387,6 +387,18 @@ const BoxChatGroup = () => {
         inputRef.current.focus();
       });
     }
+
+    if (messages) {
+      if (messages[messages.length - 1]?.id === id) {
+        const chatWindow = boxChatRef?.current;
+        setTimeout(() => {
+          chatWindow.scrollTo({
+            top: chatWindow.scrollHeight,
+            behavior: "smooth",
+          });
+        }, 200);
+      }
+    }
   };
 
   const handleCopyText = (text) => {
