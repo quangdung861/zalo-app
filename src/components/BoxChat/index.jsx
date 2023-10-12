@@ -29,6 +29,7 @@ import { convertBase64ToImage } from "utils/file";
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
     useContext(AppContext);
+  console.log("🚀 ~ file: index.jsx:31 ~ BoxChat ~ room:", room);
 
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
   const inputRef = useRef();
@@ -424,6 +425,7 @@ const BoxChat = () => {
   }, []);
 
   const [messages, setMessages] = useState([]);
+  console.log("🚀 ~ file: index.jsx:428 ~ BoxChat ~ messages:", messages);
 
   useEffect(() => {
     return () => setMessages([]);
@@ -506,6 +508,18 @@ const BoxChat = () => {
       setTimeout(() => {
         inputRef.current.focus();
       });
+    }
+
+    if (messages) {
+      if (messages[messages.length - 1]?.id === id) {
+        const chatWindow = boxChatRef?.current;
+        setTimeout(() => {
+          chatWindow.scrollTo({
+            top: chatWindow.scrollHeight,
+            behavior: "smooth",
+          });
+        }, 200);
+      }
     }
   };
 
