@@ -35,6 +35,7 @@ const BoxChat = () => {
   const boxChatRef = useRef();
   const categoryRef = useRef();
   const imagesRef = useRef();
+  const dropdownRef = useRef();
 
   const [inputValue, setInputValue] = useState("");
 
@@ -45,6 +46,19 @@ const BoxChat = () => {
   const [infoReply, setInfoReply] = useState({});
   const [isShowContainerImageList, setIsShowContainerImageList] =
     useState(true);
+  const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsShowDropdownOption(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (inputRef) {
@@ -495,6 +509,16 @@ const BoxChat = () => {
     }
   };
 
+  const handleCopyText = (text) => {
+    if (text) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => true)
+        .catch((err) => console.log("ERROR>>>", err));
+    }
+    setIsShowDropdownOption(false);
+  };
+
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -532,24 +556,42 @@ const BoxChat = () => {
         <div key={item.id} className="message-item">
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
-              <div
-                className="myself-options"
-                // style={{ display: isShowOptionMessage ? "flex" : "none" }}
-              >
-                <i
-                  className="fa-solid fa-quote-right"
-                  title="Trả lời"
-                  onClick={() =>
-                    handleReplyMessage({
-                      name: "",
-                      id: item.id,
-                      text: item.text || "",
-                      image: item?.images[0] || null,
-                    })
-                  }
-                ></i>
-                <i className="fa-solid fa-share" title="Chia sẻ"></i>
-                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
+              <div className="container-options">
+                <div className="myself-options">
+                  <i
+                    className="fa-solid fa-quote-right"
+                    title="Trả lời"
+                    onClick={() =>
+                      handleReplyMessage({
+                        name: newInfoUser.displayName,
+                        id: item.id,
+                        text: item.text,
+                        image: item?.images[0] || null,
+                      })
+                    }
+                  ></i>
+                  <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                  <i
+                    className="fa-solid fa-ellipsis"
+                    title="Thêm"
+                    onClick={() =>
+                      setIsShowDropdownOption({
+                        id: item.id,
+                      })
+                    }
+                  ></i>
+                </div>
+                {isShowDropdownOption?.id === item.id && (
+                  <div className="dropdown-menu" ref={dropdownRef}>
+                    <div
+                      className="menu-item"
+                      onClick={() => handleCopyText(item.text)}
+                    >
+                      <i className="fa-regular fa-copy"></i>
+                      Copy tin nhắn
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="box-image">
                 <div className="text">
@@ -660,28 +702,49 @@ const BoxChat = () => {
                   </div>
                 </div>
               </div>
-              <div className="other-options">
-                <i
-                  className="fa-solid fa-quote-right"
-                  title="Trả lời"
-                  onClick={() =>
-                    handleReplyMessage({
-                      name: newInfoUser.displayName,
-                      id: item.id,
-                      text: item.text,
-                      image: item?.images[0] || null,
-                    })
-                  }
-                ></i>
-                <i className="fa-solid fa-share" title="Chia sẻ"></i>
-                <i className="fa-solid fa-ellipsis" title="Thêm"></i>
+              <div className="container-options">
+                <div className="other-options">
+                  <i
+                    className="fa-solid fa-quote-right"
+                    title="Trả lời"
+                    onClick={() =>
+                      handleReplyMessage({
+                        name: newInfoUser.displayName,
+                        id: item.id,
+                        text: item.text,
+                        image: item?.images[0] || null,
+                      })
+                    }
+                  ></i>
+                  <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                  <i
+                    className="fa-solid fa-ellipsis"
+                    title="Thêm"
+                    onClick={() =>
+                      setIsShowDropdownOption({
+                        id: item.id,
+                      })
+                    }
+                  ></i>
+                </div>
+                {isShowDropdownOption?.id === item.id && (
+                  <div className="dropdown-menu" ref={dropdownRef}>
+                    <div
+                      className="menu-item"
+                      onClick={() => handleCopyText(item.text)}
+                    >
+                      <i className="fa-regular fa-copy"></i>
+                      Copy tin nhắn
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
       );
     });
-  }, [messages, infoUsers]);
+  }, [messages, infoUsers, isShowDropdownOption]);
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
