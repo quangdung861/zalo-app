@@ -19,7 +19,6 @@ const ModalAccount = ({
   const accountInfoRef = useRef(null);
 
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  console.log("🚀 ~ file: index.jsx:21 ~ userInfo:", userInfo);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
