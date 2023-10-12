@@ -153,7 +153,7 @@ export const Container = styled.div`
     &__content {
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) =>   props.isCloud ? cloudBg : messageBg});
+      background-image: url(${(props) => props.isCloud ? cloudBg : messageBg});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
@@ -228,6 +228,7 @@ export const Container = styled.div`
           align-items: flex-end;
           margin-bottom: 6px;
           margin-right: 8px;
+          position: relative;
           .box-image {
             height: 100%;
             display: flex;
@@ -309,28 +310,58 @@ export const Container = styled.div`
               }
             }
           }
-          .myself-options {
-            margin: 0 12px 10px 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            height: 22px;
-            padding: 2px 8px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            > i {
-              font-size: 16px;
-              padding: 6px;
-              color: rgb(117, 137, 163);
-              cursor: pointer;
-              &:hover {
-                color: rgb(3, 92, 224);
+          .container-options {
+            position: relative;
+            .myself-options {
+              margin: 0 12px 10px 0px;
+              background-color: rgba(255, 255, 255, 0.3);
+              border-radius: 6px;
+              height: 22px;
+              padding: 2px 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              visibility: hidden;
+              > i {
+                font-size: 16px;
+                padding: 6px;
+                color: rgb(117, 137, 163);
+                cursor: pointer;
+                &:hover {
+                  color: rgb(3, 92, 224);
+                }
+              }
+            }
+            .dropdown-menu {
+              background-color: #fff;
+              width: 220px;
+              position: absolute;
+              z-index: 2;
+              left: 60px;
+              bottom: 120%;
+              border-radius: 6px;
+              padding: 8px 0px;
+              .menu-item {
+                padding: 0 8px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                > i {
+                  margin-right: 16px;
+                  font-size: 16px;
+                  color: rgb(117, 137, 163);
+                }
+                :hover {
+                  cursor: pointer;
+                  background-color: #f1f1f1;
+                }
               }
             }
           }
           &:hover {
             .myself-options {
-              display: flex;
+              visibility: visible;
             }
           }
         }
@@ -340,6 +371,7 @@ export const Container = styled.div`
           justify-content: flex-start;
           align-items: flex-end;
           margin-bottom: 6px;
+          position: relative;
           .box-image {
             min-width: 83px;
             height: 100%;
@@ -418,28 +450,59 @@ export const Container = styled.div`
               }
             }
           }
-          .other-options {
-            margin: 0 0 10px 12px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            height: 22px;
-            padding: 2px 8px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            > i {
-              font-size: 16px;
-              padding: 6px;
-              color: rgb(117, 137, 163);
-              cursor: pointer;
-              &:hover {
-                color: rgb(3, 92, 224);
+          .container-options {
+            position: relative;
+            .other-options {
+              margin: 0 0 10px 12px;
+              background-color: rgba(255, 255, 255, 0.3);
+              border-radius: 6px;
+              height: 22px;
+              padding: 2px 8px;
+              visibility: hidden;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              > i {
+                font-size: 16px;
+                padding: 6px;
+                color: rgb(117, 137, 163);
+                cursor: pointer;
+                &:hover {
+                  color: rgb(3, 92, 224);
+                }
+              }
+            }
+            .dropdown-menu {
+              background-color: #fff;
+              width: 220px;
+              position: absolute;
+              z-index: 2;
+              left: 80px;
+              bottom: 120%;
+              border-radius: 6px;
+              padding: 8px 0px;
+              .menu-item {
+                padding: 0 8px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                > i {
+                  margin-right: 16px;
+                  font-size: 16px;
+                  color: rgb(117, 137, 163);
+                }
+                :hover {
+                  cursor: pointer;
+                  background-color: #f1f1f1;
+                }
               }
             }
           }
+
           &:hover {
             .other-options {
-              display: flex;
+              visibility: visible;
             }
           }
         }
