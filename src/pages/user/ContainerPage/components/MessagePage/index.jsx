@@ -21,12 +21,9 @@ import ModalCreateGroup from "components/ModalCreateGroup";
 import AvatarGroup from "components/AvatarGroup";
 import emptyMessageUnssenImage from "assets/emptyMessageUnseen.png";
 import slideList from "./slideList";
-import { generateKeywords } from "services";
-import Skeleton from "react-loading-skeleton";
 import searchEmpty2 from "assets/searchEmpty2.png";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
-import { convertBase64ToImage } from "utils/file";
 
 const MessagePage = () => {
   const {

@@ -1131,6 +1131,7 @@ const BoxChatGroup = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
+                userSelect: "none"
               }}
             >
               Hình ảnh phải có kích thước nhỏ hơn 0.5MB
@@ -1155,6 +1156,7 @@ const BoxChatGroup = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
+                userSelect: "none"
               }}
             >
               Bạn chỉ có thể thu hồi tin nhắn trong 1 phút sau khi gửi

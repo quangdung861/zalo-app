@@ -2,29 +2,20 @@ import React, { useState, useRef, useEffect, useContext, useMemo } from "react";
 import * as S from "./styles";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
-import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import AvatarGroup from "components/AvatarGroup";
-import { generateKeywords } from "services";
 import empty from "assets/empty.png";
 
 const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const {
-    isShowBoxChat,
     setIsShowBoxChat,
-    setTotalUnseenMessage,
-    isShowBoxChatGroup,
     setIsShowBoxChatGroup,
-    setSidebarSelected,
-    setSectionSelected,
   } = useContext(UserLayoutContext);
   const {
     rooms,
-    userInfo,
-    selectedUserMessaging,
     setSelectedUserMessaging,
     setSelectedGroupMessaging,
-    selectedGroupMessaging,
   } = useContext(AppContext);
 
   const [keywords, setKeywords] = useState("");

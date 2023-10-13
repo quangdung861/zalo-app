@@ -25,6 +25,7 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import suggestCloudImage from "assets/suggestCloudImage.png";
 import { convertImagesToBase64 } from "utils/image";
 import { convertBase64ToImage } from "utils/file";
+import ModalSharingMessage from "components/ModalSharingMessage";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
@@ -40,6 +41,12 @@ const BoxChat = () => {
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isShowAlertRecallRejectMessage, setIsShowAlertRecallRejectMessage] =
+    useState(false);
+  const [fullInfoUser, setFullInfoUser] = useState({});
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
+    useState(false);
+  const [isShowOverlayModalSharingMessage, setIsShowOverlayModalSharingMessage] =
     useState(false);
 
   const inputRef = useRef();
@@ -389,11 +396,6 @@ const BoxChat = () => {
   };
 
   // const [isOnline, setIsOnline] = useState(false);
-  const [fullInfoUser, setFullInfoUser] = useState({});
-
-  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
-  const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
-    useState(false);
 
   useEffect(() => {
     let unSubcribe;
@@ -570,6 +572,11 @@ const BoxChat = () => {
     return;
   };
 
+  const handleSharingMessage = () => {
+    setIsShowOverlayModalSharingMessage(true);
+    console.log("ahihi");
+  };
+
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -623,7 +630,11 @@ const BoxChat = () => {
                           })
                         }
                       ></i>
-                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-share"
+                        title="Chia sẻ"
+                        onClick={() => handleSharingMessage()}
+                      ></i>
                       <i
                         className="fa-solid fa-ellipsis"
                         title="Thêm"
@@ -1383,6 +1394,7 @@ const BoxChat = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
+                userSelect: "none",
               }}
             >
               Hình ảnh phải có kích thước nhỏ hơn 0.5MB
@@ -1407,6 +1419,7 @@ const BoxChat = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
+                userSelect: "none",
               }}
             >
               Bạn chỉ có thể thu hồi tin nhắn trong 1 phút sau khi gửi
@@ -1538,6 +1551,9 @@ const BoxChat = () => {
               </div>
             </div>
           </div>
+        )}
+        {isShowOverlayModalSharingMessage && (
+          <ModalSharingMessage setIsShowOverlayModalSharingMessage={setIsShowOverlayModalSharingMessage} />
         )}
       </S.Container>
     </S.Wrapper>
