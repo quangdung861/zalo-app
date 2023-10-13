@@ -229,11 +229,12 @@ export const Container = styled.div`
             user-select: none;
             width: 93%;
             max-width: 324px;
-            position: absolute;
+            position: sticky;
             z-index: 98;
             margin: 0 auto;
             left: 0;
             right: 0;
+            top: 452px;
             bottom: 14px;
             background-color: #fff;
             border-radius: 6px;

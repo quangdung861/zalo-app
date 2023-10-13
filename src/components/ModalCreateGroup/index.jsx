@@ -539,6 +539,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   textAlign: "center",
                   fontWeight: "500",
                   zIndex: 999,
+                  userSelect: "none"
                 }}
               >
                 Hình ảnh phải có kích thước nhỏ hơn 0.5MB

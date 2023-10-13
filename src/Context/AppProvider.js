@@ -131,32 +131,54 @@ const AppProvider = ({ children }) => {
 
         //
 
-        let strangerListRef;
-        const uidFriends = userInfo.friends.map((friend) => friend.uid);
+        const uidFriends = [
+          uid,
+          ...userInfo.friends.map((friend) => friend.uid),
+        ];
 
-        if (keywords) {
-          strangerListRef = query(
-            collection(db, "users"),
-            where("uid", "not-in", [uid, ...uidFriends]),
-            where("keywords", "array-contains", keywords.toLowerCase())
-          );
-        } else {
-          strangerListRef = query(
-            collection(db, "users"),
-            where("uid", "not-in", [uid, ...uidFriends])
+        const batches = [];
+
+        while (uidFriends.length) {
+          // firestore limits batches to 10
+          const batch = uidFriends.splice(0, 10);
+
+          // add the batch request to to a queue
+
+          let strangerListRef;
+
+          if (keywords) {
+            strangerListRef = query(
+              collection(db, "users"),
+              where("uid", "not-in", [...batch]),
+              where("keywords", "array-contains", keywords.toLowerCase())
+            );
+          } else {
+            strangerListRef = query(
+              collection(db, "users"),
+              where("uid", "not-in", [...batch])
+            );
+          }
+
+          batches.push(
+            getDocs(strangerListRef).then((response) =>
+              response.docs.map((doc) => {
+                const id = doc.id;
+                const data = doc.data();
+                return {
+                  ...data,
+                  id: id,
+                };
+              })
+            )
           );
         }
 
-        const response = await getDocs(strangerListRef);
-        const documents = response.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setStrangerList(documents);
+        // after all of the data is fetched, return it
+        const documents = await Promise.all(batches).then((content) =>
+          content.flat()
+        );
+
+        return setStrangerList(documents);
       };
       getStrangerList();
     } else {
