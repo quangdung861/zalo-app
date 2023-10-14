@@ -312,6 +312,77 @@ export const Container = styled.div`
             }
           }
         }
+        .container-message-preview {
+          padding: 12px 16px;
+          .label-message-preview {
+            margin-bottom: 8px;
+          }
+          .box-message-preview {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            background-color: #f9fafb;
+            border-radius: 3px;
+            .preview-content {
+              max-height: 60px;
+              margin-right: 8px;
+              font-size: 15px;
+              user-select: text;
+              flex: 1;
+              overflow: hidden;
+              overflow-y: auto;
+              &::-webkit-scrollbar {
+                -webkit-appearance: none;
+              }
+              &::-webkit-scrollbar:vertical {
+                width: 4px;
+              }
+              &::-webkit-scrollbar-thumb {
+                background-color: #ccc;
+                border-radius: 10px;
+              }
+            }
+            .area-edit {
+              height: 80px;
+              font-size: 15px;
+              padding: 10px;
+              user-select: text;
+              border: 1px solid var(--boder-dividing-color);
+              outline: none !important;
+              border-radius: 5px;
+              resize: none; /* Tắt tính năng co giãn */
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+                "Droid Sans", "Helvetica Neue", sans-serif;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+              flex: 1;
+              overflow: hidden;
+              overflow-y: auto;
+              ::-webkit-scrollbar {
+                width: 14px;
+              }
+              ::-webkit-scrollbar-thumb {
+                border: 5px solid rgba(0, 0, 0, 0);
+                background-clip: padding-box;
+                border-radius: 8px;
+                background-color: #aaaaaa;
+              }
+            }
+            .btn-edit-content {
+              padding: 0 16px;
+              font-weight: 600;
+              background-color: rgb(234, 237, 240);
+              height: 24px;
+              border-radius: 2px;
+              line-height: 24px;
+              cursor: pointer;
+              :hover {
+                background-color: rgb(223, 226, 231);
+              }
+            }
+          }
+        }
         .footer {
           height: 68px;
           padding: 14px 16px;

@@ -4,33 +4,41 @@ import * as S from "./styles";
 import { AppContext } from "Context/AppProvider";
 import {
   collection,
-  getDocs,
-  orderBy,
   query,
   where,
   serverTimestamp,
   addDoc,
+  onSnapshot,
+  doc,
+  orderBy,
   getDoc,
+  setDoc,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
+import { addDocument } from "services";
 import { convertImageToBase64 } from "utils/file";
 import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import AvatarGroup from "components/AvatarGroup";
+import messageSend from "assets/audio/messageSend.wav";
 
-const ModalSharingMessage = ({ setIsShowOverlayModalSharingMessage }) => {
-  const modalContainer = useRef();
+const ModalSharingMessage = ({
+  setIsShowOverlayModalSharingMessage,
+  infoMessageSharing,
+}) => {
+  const audio = new Audio(messageSend);
 
   const { userInfo, rooms } = useContext(AppContext);
 
   const [categorySelected, setCategorySelected] = useState("Tất cả");
   const [conversationsSelected, setConversationsSelected] = useState([]);
-  console.log(
-    "🚀 ~ file: index.jsx:38 ~ ModalSharingMessage ~ conversationsSelected:",
-    conversationsSelected
-  );
   const [isShowMessageError, setIsShowMessageError] = useState(false);
+  const [isShowEditArea, setIsShowEditArea] = useState(false);
+  const [textAreaValue, setTextAreaValue] = useState(infoMessageSharing.text);
+
+  const modalContainer = useRef();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -120,6 +128,256 @@ const ModalSharingMessage = ({ setIsShowOverlayModalSharingMessage }) => {
     };
     getFriends();
   }, [userInfo?.friends, keywords]);
+
+  const handleClickSharingMessage = () => {
+    if (textAreaValue) {
+      audio.play();
+      conversationsSelected.forEach((converstation) => {
+        if (converstation.category) {
+          if (converstation.category === "single") {
+            // Trò chuyện gần đây với nhóm và bạn bè => hiện tại chưa phát triển
+          }
+          if (converstation.category === "group") {
+            // Trò chuyện với group
+            const createMes = async () => {
+              const roomRef = doc(db, "rooms", converstation.id);
+
+              const messagesViewedIndex =
+                converstation.messagesViewed.findIndex(
+                  (item) => item.uid === userInfo.uid
+                );
+              const messagesViewed = converstation.messagesViewed.find(
+                (item) => item.uid === userInfo.uid
+              );
+
+              const newMessageViewed = [...converstation.messagesViewed];
+
+              newMessageViewed.splice(messagesViewedIndex, 1, {
+                ...messagesViewed,
+                count: messagesViewed.count + 1,
+              });
+
+              await setDoc(
+                roomRef,
+                {
+                  messageLastest: {
+                    text: textAreaValue,
+                    displayName: userInfo.displayName,
+                    uid: userInfo.uid,
+                    createdAt: serverTimestamp(),
+                  },
+                  totalMessages: converstation.totalMessages + 1,
+                  messagesViewed: newMessageViewed,
+                },
+                {
+                  merge: true,
+                }
+              );
+
+              addDocument("messages", {
+                category: "group",
+                roomId: converstation.id,
+                uid: userInfo.uid,
+                displayName: userInfo.displayName,
+                photoURL: userInfo.photoURL,
+                text: textAreaValue,
+                images: [],
+                infoReply: {},
+              });
+            };
+            createMes();
+          }
+        }
+
+        if (!converstation.category) {
+          // Trò chuyền với bạn bè
+          // kiểm tra xem đã có hội thoại chưa, nếu chưa có thì tạo room
+          const room = rooms.filter(
+            (room) =>
+              room.category === "single" &&
+              room.members.includes(converstation.uid)
+          )[0];
+
+          if (room?.id) {
+            const createMes = async () => {
+              const roomRef = doc(db, "rooms", room.id);
+
+              const messagesViewedIndex = room.messagesViewed.findIndex(
+                (item) => item.uid === userInfo.uid
+              );
+              const messagesViewed = room.messagesViewed.find(
+                (item) => item.uid === userInfo.uid
+              );
+
+              const newMessageViewed = [...room.messagesViewed];
+
+              newMessageViewed.splice(messagesViewedIndex, 1, {
+                ...messagesViewed,
+                count: messagesViewed.count + 1,
+              });
+
+              await setDoc(
+                roomRef,
+                {
+                  messageLastest: {
+                    text: textAreaValue,
+                    displayName: userInfo.displayName,
+                    uid: userInfo.uid,
+                    createdAt: serverTimestamp(),
+                  },
+                  totalMessages: room.totalMessages + 1,
+                  messagesViewed: newMessageViewed,
+                },
+                {
+                  merge: true,
+                }
+              );
+
+              addDocument("messages", {
+                category: "single",
+                roomId: room.id,
+                uid: userInfo.uid,
+                text: textAreaValue,
+                images: [],
+                infoReply: {},
+              });
+            };
+            createMes();
+          } else {
+            const createRoomAndMes = async () => {
+              try {
+                const roomRef = await addDoc(collection(db, "rooms"), {
+                  category: "single",
+                  members: [userInfo.uid, converstation.uid],
+                  messageLastest: {
+                    text: textAreaValue,
+                    displayName: userInfo.displayName,
+                    uid: userInfo.uid,
+                    createdAt: serverTimestamp(),
+                  },
+                  createdAt: serverTimestamp(),
+                  totalMessages: 1,
+                  messagesViewed: [
+                    { uid: userInfo.uid, count: 1 },
+                    { uid: converstation.uid, count: 0 },
+                  ],
+                });
+
+                const response = await getDoc(roomRef);
+
+                if (roomRef && roomRef.id) {
+                  addDocument("messages", {
+                    category: "single",
+                    roomId: response.id,
+                    uid: userInfo.uid,
+                    text: textAreaValue,
+                    images: [],
+                    infoReply: {},
+                  });
+                } else {
+                  console.log("false");
+                }
+              } catch (error) {
+                console.error("Error creating room:", error);
+              }
+            };
+
+            createRoomAndMes();
+          }
+        }
+      });
+
+      // if (room.id) {
+      //   audio.play();
+
+      //   const createMes = async () => {
+      //     const roomRef = doc(db, "rooms", room.id);
+
+      //     const messagesViewedIndex = room.messagesViewed.findIndex(
+      //       (item) => item.uid === userInfo.uid
+      //     );
+      //     const messagesViewed = room.messagesViewed.find(
+      //       (item) => item.uid === userInfo.uid
+      //     );
+
+      //     const newMessageViewed = [...room.messagesViewed];
+
+      //     newMessageViewed.splice(messagesViewedIndex, 1, {
+      //       ...messagesViewed,
+      //       count: messagesViewed.count + 1,
+      //     });
+
+      //     await setDoc(
+      //       roomRef,
+      //       {
+      //         messageLastest: {
+      //           text: inputValue,
+      //           displayName: userInfo.displayName,
+      //           uid: userInfo.uid,
+      //           createdAt: serverTimestamp(),
+      //         },
+      //         totalMessages: room.totalMessages + 1,
+      //         messagesViewed: newMessageViewed,
+      //       },
+      //       {
+      //         merge: true,
+      //       }
+      //     );
+
+      //     addDocument("messages", {
+      //       category: "single",
+      //       roomId: room.id,
+      //       uid: userInfo.uid,
+      //       text: inputValue,
+      //       images: [],
+      //       infoReply: infoReply,
+      //     });
+      //   };
+      //   createMes();
+      // } else {
+      //   const createRoomAndMes = async () => {
+      //     try {
+      //       const roomRef = await addDoc(collection(db, "rooms"), {
+      //         category: "single",
+      //         members: [userInfo.uid, selectedUserMessaging.uidSelected],
+      //         messageLastest: {
+      //           text: inputValue,
+      //           displayName: userInfo.displayName,
+      //           uid: userInfo.uid,
+      //           createdAt: serverTimestamp(),
+      //         },
+      //         createdAt: serverTimestamp(),
+      //         totalMessages: 1,
+      //         messagesViewed: [
+      //           { uid: userInfo.uid, count: 1 },
+      //           { uid: selectedUserMessaging.uidSelected, count: 0 },
+      //         ],
+      //       });
+
+      //       const response = await getDoc(roomRef);
+
+      //       if (roomRef && roomRef.id) {
+      //         setRoom({ id: response.id, ...response.data() });
+      //         addDocument("messages", {
+      //           category: "single",
+      //           roomId: response.id,
+      //           uid: userInfo.uid,
+      //           text: inputValue,
+      //           infoReply: infoReply,
+      //         });
+      //       } else {
+      //         console.log("false");
+      //       }
+      //     } catch (error) {
+      //       console.error("Error creating room:", error);
+      //     }
+      //   };
+
+      //   createRoomAndMes();
+      // }
+    }
+    setIsShowOverlayModalSharingMessage(false);
+  };
 
   const renderCategoryList = useMemo(() => {
     if (userInfo?.categoriesTemplate) {
@@ -668,21 +926,57 @@ const ModalSharingMessage = ({ setIsShowOverlayModalSharingMessage }) => {
                   </div>
                 </div>
               </div>
+              <div
+                className="container-message-preview"
+                style={{
+                  borderTop: isShowEditArea
+                    ? "1px solid var(--boder-dividing-color)"
+                    : "",
+                }}
+              >
+                <div className="label-message-preview">Nội dung chia sẻ</div>
+                <div className="box-message-preview">
+                  {isShowEditArea ? (
+                    <textarea
+                      className="area-edit"
+                      autoComplete="off"
+                      spellCheck="false"
+                      value={textAreaValue}
+                      onChange={(e) => setTextAreaValue(e.target.value)}
+                    />
+                  ) : (
+                    <>
+                      <div className="preview-content">{textAreaValue}</div>
+                      <div
+                        className="btn-edit-content"
+                        onClick={() => {
+                          setIsShowEditArea(true);
+                        }}
+                      >
+                        Sửa
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
               <div className="footer">
                 <div
                   className="btn-cancel"
-                  onClick={() => setIsShowOverlayModalSharingMessage(false)}
+                  onClick={() => {
+                    setIsShowOverlayModalSharingMessage(false);
+                  }}
                 >
                   Hủy
                 </div>
                 <div
                   className={
-                    conversationsSelected.length > 1
+                    conversationsSelected.length > 0
                       ? "btn-sharing-message btn-sharing-message--active"
                       : "btn-sharing-message"
                   }
+                  onClick={() => handleClickSharingMessage()}
                 >
-                  Tạo Nhóm
+                  Chia sẻ
                 </div>
               </div>
             </div>

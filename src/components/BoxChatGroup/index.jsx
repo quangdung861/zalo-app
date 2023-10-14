@@ -25,6 +25,7 @@ import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImagesToBase64 } from "utils/image";
+import ModalSharingMessage from "components/ModalSharingMessage";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -41,6 +42,10 @@ const BoxChatGroup = () => {
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isShowAlertRecallRejectMessage, setIsShowAlertRecallRejectMessage] =
     useState(false);
+  const [
+    isShowOverlayModalSharingMessage,
+    setIsShowOverlayModalSharingMessage,
+  ] = useState(false);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -121,6 +126,13 @@ const BoxChatGroup = () => {
     Object.assign(toolbarChatInputElement.style, {
       borderBottom: "1px solid var(--boder-dividing-color)",
     });
+  };
+
+  const [infoMessageSharing, setInfoMessageSharing] = useState({});
+  const handleSharingMessage = ({ infoMessage }) => {
+    setInfoMessageSharing(infoMessage);
+    setIsShowOverlayModalSharingMessage(true);
+    console.log("ahihi");
   };
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
@@ -438,7 +450,7 @@ const BoxChatGroup = () => {
       setIsShowDropdownOption(false);
       return;
     }
-    
+
     setIsShowDropdownOption(false);
     setIsShowAlertRecallRejectMessage(true);
     setTimeout(function () {
@@ -501,7 +513,13 @@ const BoxChatGroup = () => {
                           })
                         }
                       ></i>
-                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-share"
+                        title="Chia sẻ"
+                        onClick={() =>
+                          handleSharingMessage({ infoMessage: item })
+                        }
+                      ></i>
                       <i
                         className="fa-solid fa-ellipsis"
                         title="Thêm"
@@ -597,7 +615,9 @@ const BoxChatGroup = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
+                    <span
+                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                    >
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
@@ -671,7 +691,9 @@ const BoxChatGroup = () => {
                       {item.text}
                     </>
                   ) : (
-                    <span style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}>
+                    <span
+                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                    >
                       Tin nhắn đã được thu hồi
                     </span>
                   )}
@@ -694,7 +716,13 @@ const BoxChatGroup = () => {
                           })
                         }
                       ></i>
-                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-share"
+                        title="Chia sẻ"
+                        onClick={() =>
+                          handleSharingMessage({ infoMessage: item })
+                        }
+                      ></i>
                       <i
                         className="fa-solid fa-ellipsis"
                         title="Thêm"
@@ -1131,7 +1159,7 @@ const BoxChatGroup = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
-                userSelect: "none"
+                userSelect: "none",
               }}
             >
               Hình ảnh phải có kích thước nhỏ hơn 0.5MB
@@ -1156,7 +1184,7 @@ const BoxChatGroup = () => {
                 textAlign: "center",
                 fontWeight: "500",
                 zIndex: 999,
-                userSelect: "none"
+                userSelect: "none",
               }}
             >
               Bạn chỉ có thể thu hồi tin nhắn trong 1 phút sau khi gửi
@@ -1288,6 +1316,14 @@ const BoxChatGroup = () => {
               </div>
             </div>
           </div>
+        )}
+        {isShowOverlayModalSharingMessage && (
+          <ModalSharingMessage
+            setIsShowOverlayModalSharingMessage={
+              setIsShowOverlayModalSharingMessage
+            }
+            infoMessageSharing={infoMessageSharing}
+          />
         )}
       </S.Container>
     </S.Wrapper>

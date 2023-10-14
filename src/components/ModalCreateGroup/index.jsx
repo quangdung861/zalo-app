@@ -21,6 +21,7 @@ import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import { convertImagesToBase64 } from "utils/image";
+import searchEmpty from "assets/searchEmpty.png";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
@@ -147,7 +148,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
   const renderFriendList = () => {
     if (friends[0]) {
-      return friends.map((item) => {
+      return friends.map((item, index) => {
         let categoryName;
 
         const infoFriend = userInfo.friends.find(
@@ -193,6 +194,38 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
           </div>
         );
       });
+    } else {
+      return (
+        <div
+          className="container-empty"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "120px 0px",
+          }}
+        >
+          <img
+            src={searchEmpty}
+            alt=""
+            style={{
+              marginBottom: "20px",
+              width: "160px",
+              objectFit: "cover",
+            }}
+          />
+          <div
+            style={{
+              fontWeight: 500,
+              marginBottom: "8px",
+            }}
+          >
+            Không tìm thấy kết quả
+          </div>
+          <div className="text">Vui lòng thử lại từ khóa hoặc bộ lọc khác</div>
+        </div>
+      );
     }
   };
 
@@ -539,7 +572,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   textAlign: "center",
                   fontWeight: "500",
                   zIndex: 999,
-                  userSelect: "none"
+                  userSelect: "none",
                 }}
               >
                 Hình ảnh phải có kích thước nhỏ hơn 0.5MB

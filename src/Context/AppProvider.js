@@ -95,10 +95,7 @@ const AppProvider = ({ children }) => {
   }, [uid]);
 
   const [strangerList, setStrangerList] = useState([]);
-  console.log(
-    "🚀 ~ file: AppProvider.js:98 ~ AppProvider ~ strangerList:",
-    strangerList
-  );
+
   const [keywords, setKeywords] = useState("");
 
   useEffect(() => {

@@ -13,7 +13,6 @@ body {
   font-size: 14px;
   color: #081c36;
   overflow: hidden;
-  
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -24,7 +23,7 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
@@ -56,4 +55,8 @@ code {
   --box-shadow-default: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   --sidebar-width: 64px;
   --section-left-width: 350px;
+}
+
+::selection {
+  background: #8fbfff;
 }

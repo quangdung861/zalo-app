@@ -46,8 +46,10 @@ const BoxChat = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
   const [isShowOverlayModalDetailImage, setIsShowOverlayModalDetailImage] =
     useState(false);
-  const [isShowOverlayModalSharingMessage, setIsShowOverlayModalSharingMessage] =
-    useState(false);
+  const [
+    isShowOverlayModalSharingMessage,
+    setIsShowOverlayModalSharingMessage,
+  ] = useState(false);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -572,7 +574,9 @@ const BoxChat = () => {
     return;
   };
 
-  const handleSharingMessage = () => {
+  const [infoMessageSharing, setInfoMessageSharing] = useState({});
+  const handleSharingMessage = ({ infoMessage }) => {
+    setInfoMessageSharing(infoMessage);
     setIsShowOverlayModalSharingMessage(true);
     console.log("ahihi");
   };
@@ -633,7 +637,9 @@ const BoxChat = () => {
                       <i
                         className="fa-solid fa-share"
                         title="Chia sẻ"
-                        onClick={() => handleSharingMessage()}
+                        onClick={() =>
+                          handleSharingMessage({ infoMessage: item })
+                        }
                       ></i>
                       <i
                         className="fa-solid fa-ellipsis"
@@ -825,7 +831,13 @@ const BoxChat = () => {
                           })
                         }
                       ></i>
-                      <i className="fa-solid fa-share" title="Chia sẻ"></i>
+                      <i
+                        className="fa-solid fa-share"
+                        title="Chia sẻ"
+                        onClick={() =>
+                          handleSharingMessage({ infoMessage: item })
+                        }
+                      ></i>
                       <i
                         className="fa-solid fa-ellipsis"
                         title="Thêm"
@@ -1553,7 +1565,12 @@ const BoxChat = () => {
           </div>
         )}
         {isShowOverlayModalSharingMessage && (
-          <ModalSharingMessage setIsShowOverlayModalSharingMessage={setIsShowOverlayModalSharingMessage} />
+          <ModalSharingMessage
+            setIsShowOverlayModalSharingMessage={
+              setIsShowOverlayModalSharingMessage
+            }
+            infoMessageSharing={infoMessageSharing}
+          />
         )}
       </S.Container>
     </S.Wrapper>
