@@ -58,6 +58,8 @@ export const Container = styled.div`
         .content {
           flex: 1;
           width: 100%;
+          height: calc(100% - 116px);
+          overflow: hidden;
           .create-group-header {
             display: flex;
             align-items: center;
@@ -192,6 +194,7 @@ export const Container = styled.div`
             }
           }
           .friends-container {
+            height: calc(100% - 116px);
             margin: 0px 16px 0;
             padding-top: 2px;
             border-top: 1px solid var(--boder-dividing-color);
@@ -200,8 +203,8 @@ export const Container = styled.div`
             white-space: nowrap;
             .friend-list {
               padding-top: 12px;
+              height: calc(100% - 90px);
               flex: 1;
-              max-height: 308px;
               overflow: hidden;
               overflow-y: auto;
               &::-webkit-scrollbar {

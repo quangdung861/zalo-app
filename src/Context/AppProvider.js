@@ -95,6 +95,10 @@ const AppProvider = ({ children }) => {
   }, [uid]);
 
   const [strangerList, setStrangerList] = useState([]);
+  console.log(
+    "🚀 ~ file: AppProvider.js:98 ~ AppProvider ~ strangerList:",
+    strangerList
+  );
   const [keywords, setKeywords] = useState("");
 
   useEffect(() => {
@@ -131,60 +135,41 @@ const AppProvider = ({ children }) => {
 
         //
 
+        let strangerListRef;
+        if (keywords) {
+          strangerListRef = query(
+            collection(db, "users"),
+            where("keywords", "array-contains", keywords.toLowerCase())
+          );
+        } else {
+          strangerListRef = query(collection(db, "users"));
+        }
+
+        const response = await getDocs(strangerListRef);
+        const documents = response.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+
         const uidFriends = [
           uid,
           ...userInfo.friends.map((friend) => friend.uid),
         ];
 
-        const batches = [];
-
-        while (uidFriends.length) {
-          // firestore limits batches to 10
-          const batch = uidFriends.splice(0, 10);
-
-          // add the batch request to to a queue
-
-          let strangerListRef;
-
-          if (keywords) {
-            strangerListRef = query(
-              collection(db, "users"),
-              where("uid", "not-in", [...batch]),
-              where("keywords", "array-contains", keywords.toLowerCase())
-            );
-          } else {
-            strangerListRef = query(
-              collection(db, "users"),
-              where("uid", "not-in", [...batch])
-            );
-          }
-
-          batches.push(
-            getDocs(strangerListRef).then((response) =>
-              response.docs.map((doc) => {
-                const id = doc.id;
-                const data = doc.data();
-                return {
-                  ...data,
-                  id: id,
-                };
-              })
-            )
-          );
-        }
-
-        // after all of the data is fetched, return it
-        const documents = await Promise.all(batches).then((content) =>
-          content.flat()
+        const result = documents.filter(
+          (item) => !uidFriends.includes(item.uid)
         );
-
-        return setStrangerList(documents);
+        return setStrangerList(result);
       };
       getStrangerList();
     } else {
       setStrangerList([]);
     }
-  }, [userInfo, keywords]);
+  }, [userInfo, keywords, uid]);
 
   const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
 

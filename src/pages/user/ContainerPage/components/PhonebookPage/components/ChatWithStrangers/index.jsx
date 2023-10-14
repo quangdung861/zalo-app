@@ -55,6 +55,16 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [loading, setLoading] = useState(false);
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
+     // STRANGER
+     const strangerRef = doc(db, "users", id);
+     await setDoc(
+       strangerRef,
+       {
+         invitationReceive: [userInfo.uid, ...invitationReceive],
+       },
+       { merge: true }
+     );
+     // ME
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
       userInfoRef,
@@ -63,15 +73,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       },
       { merge: true }
     );
-    // STRANGER
-    const strangerRef = doc(db, "users", id);
-    await setDoc(
-      strangerRef,
-      {
-        invitationReceive: [userInfo.uid, ...invitationReceive],
-      },
-      { merge: true }
-    );
+   
   };
 
   const dropdownRef = useRef(null);
@@ -125,9 +127,9 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     if (strangerList[0]) {
       setLoading(false);
       if (orderBy === "desc") {
-        strangerList.sort((a, b) => b.displayName.localeCompare(a.displayName)); //desc
+        strangerList.sort((a, b) => b.displayName?.localeCompare(a.displayName)); //desc
       } else {
-        strangerList.sort((a, b) => a.displayName.localeCompare(b.displayName)); //asc
+        strangerList.sort((a, b) => a.displayName?.localeCompare(b.displayName)); //asc
       }
 
       return strangerList?.map((item, index) => {

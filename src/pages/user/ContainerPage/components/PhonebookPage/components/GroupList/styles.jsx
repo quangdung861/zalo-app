@@ -3,12 +3,13 @@ import styled from "styled-components";
 export const Wrapper = styled.div``;
 
 export const Container = styled.div`
+  --headerHeight: 68px;
   .grouplist {
     user-select: none;
     .grouplist-header {
-      height: 65px;
+      height: var(--headerHeight);
       padding: 0 19px;
-      line-height: 65px;
+      line-height: var(--headerHeight);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -35,8 +36,21 @@ export const Container = styled.div`
     }
     .grouplist-content {
       padding: 0 12px;
-      min-height: 100vh;
+      min-height: calc(100vh - var(--headerHeight));
+      max-height: calc(100vh - var(--headerHeight));
       background-color: #f1f1f1;
+      overflow: hidden;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+      }
+      &::-webkit-scrollbar:vertical {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+      }
       .total-groups {
         height: 64px;
         line-height: 64px;
@@ -142,6 +156,7 @@ export const Container = styled.div`
         background-color: #fff;
         border-bottom-right-radius: 4px;
         border-bottom-left-radius: 4px;
+        margin-bottom: 24px;
         .item-group {
           height: 72px;
           padding: 0 16px;
