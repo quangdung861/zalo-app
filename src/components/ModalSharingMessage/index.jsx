@@ -23,6 +23,7 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import AvatarGroup from "components/AvatarGroup";
 import messageSend from "assets/audio/messageSend.wav";
+import searchEmpty from "assets/searchEmpty.png";
 
 const ModalSharingMessage = ({
   setIsShowOverlayModalSharingMessage,
@@ -286,95 +287,6 @@ const ModalSharingMessage = ({
           }
         }
       });
-
-      // if (room.id) {
-      //   audio.play();
-
-      //   const createMes = async () => {
-      //     const roomRef = doc(db, "rooms", room.id);
-
-      //     const messagesViewedIndex = room.messagesViewed.findIndex(
-      //       (item) => item.uid === userInfo.uid
-      //     );
-      //     const messagesViewed = room.messagesViewed.find(
-      //       (item) => item.uid === userInfo.uid
-      //     );
-
-      //     const newMessageViewed = [...room.messagesViewed];
-
-      //     newMessageViewed.splice(messagesViewedIndex, 1, {
-      //       ...messagesViewed,
-      //       count: messagesViewed.count + 1,
-      //     });
-
-      //     await setDoc(
-      //       roomRef,
-      //       {
-      //         messageLastest: {
-      //           text: inputValue,
-      //           displayName: userInfo.displayName,
-      //           uid: userInfo.uid,
-      //           createdAt: serverTimestamp(),
-      //         },
-      //         totalMessages: room.totalMessages + 1,
-      //         messagesViewed: newMessageViewed,
-      //       },
-      //       {
-      //         merge: true,
-      //       }
-      //     );
-
-      //     addDocument("messages", {
-      //       category: "single",
-      //       roomId: room.id,
-      //       uid: userInfo.uid,
-      //       text: inputValue,
-      //       images: [],
-      //       infoReply: infoReply,
-      //     });
-      //   };
-      //   createMes();
-      // } else {
-      //   const createRoomAndMes = async () => {
-      //     try {
-      //       const roomRef = await addDoc(collection(db, "rooms"), {
-      //         category: "single",
-      //         members: [userInfo.uid, selectedUserMessaging.uidSelected],
-      //         messageLastest: {
-      //           text: inputValue,
-      //           displayName: userInfo.displayName,
-      //           uid: userInfo.uid,
-      //           createdAt: serverTimestamp(),
-      //         },
-      //         createdAt: serverTimestamp(),
-      //         totalMessages: 1,
-      //         messagesViewed: [
-      //           { uid: userInfo.uid, count: 1 },
-      //           { uid: selectedUserMessaging.uidSelected, count: 0 },
-      //         ],
-      //       });
-
-      //       const response = await getDoc(roomRef);
-
-      //       if (roomRef && roomRef.id) {
-      //         setRoom({ id: response.id, ...response.data() });
-      //         addDocument("messages", {
-      //           category: "single",
-      //           roomId: response.id,
-      //           uid: userInfo.uid,
-      //           text: inputValue,
-      //           infoReply: infoReply,
-      //         });
-      //       } else {
-      //         console.log("false");
-      //       }
-      //     } catch (error) {
-      //       console.error("Error creating room:", error);
-      //     }
-      //   };
-
-      //   createRoomAndMes();
-      // }
     }
     setIsShowOverlayModalSharingMessage(false);
   };
@@ -401,10 +313,13 @@ const ModalSharingMessage = ({
   }, [categorySelected]);
 
   const renderFriendList = () => {
+    console.log(friends);
+
     if (friends[0]) {
       return friends.map((item) => {
         let categoryName;
-
+        console.log("ahihi");
+        console.log(friends.length);
         const infoFriend = userInfo.friends.find(
           (friend) => friend.uid === item.uid
         );
@@ -452,6 +367,49 @@ const ModalSharingMessage = ({
           </div>
         );
       });
+    } else {
+      return (
+        <div
+          className="container-empty"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "40px 0px",
+            backgroundColor: "#fff",
+          }}
+        >
+          <img
+            src={searchEmpty}
+            alt=""
+            style={{
+              marginBottom: "20px",
+              maxWidth: "130px",
+              width: "100%",
+              objectFit: "cover",
+            }}
+          />
+          <div
+            style={{
+              fontWeight: 500,
+              marginBottom: "8px",
+              color: "rgb(151, 164, 181)",
+            }}
+          >
+            Không tìm thấy kết quả
+          </div>
+          <div
+            className="text"
+            style={{
+              color: "rgb(151, 164, 181)",
+              fontWeight: 500,
+            }}
+          >
+            Vui lòng thử lại từ khóa hoặc bộ lọc khác
+          </div>
+        </div>
+      );
     }
   };
 
@@ -894,7 +852,52 @@ const ModalSharingMessage = ({
                       <>
                         {newRooms?.length >= 1 ? (
                           <div className="conversation-list">
-                            <>{renderGroupList}</>
+                            {renderGroupList.every(
+                              (item) => item === undefined
+                            ) ? (
+                              <div
+                                className="container-empty"
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: "40px 0px",
+                                  backgroundColor: "#fff",
+                                }}
+                              >
+                                <img
+                                  src={searchEmpty}
+                                  alt=""
+                                  style={{
+                                    marginBottom: "20px",
+                                    maxWidth: "130px",
+                                    width: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    fontWeight: 500,
+                                    marginBottom: "8px",
+                                    color: "rgb(151, 164, 181)",
+                                  }}
+                                >
+                                  Không tìm thấy kết quả
+                                </div>
+                                <div
+                                  className="text"
+                                  style={{
+                                    color: "rgb(151, 164, 181)",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  Vui lòng thử lại từ khóa hoặc bộ lọc khác
+                                </div>
+                              </div>
+                            ) : (
+                              renderGroupList
+                            )}
                           </div>
                         ) : (
                           <div className="container-empty">

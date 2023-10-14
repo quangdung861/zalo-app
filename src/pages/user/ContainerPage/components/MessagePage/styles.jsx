@@ -430,7 +430,7 @@ export const Container = styled.div`
         &__content {
           .room-list {
             .notification-compatible {
-              left: auto;
+              margin: 0 0 0 auto;
               right: 12px;
             }
           }
