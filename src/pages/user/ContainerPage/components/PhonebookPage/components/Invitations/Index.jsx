@@ -79,20 +79,6 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   }, [userInfo.invitationReceive]);
 
   const handleInvitationRecall = async ({ uid, invitationReceive, id }) => {
-    // USER
-    const newInvitationSent = userInfo.invitationSent.filter(
-      (item) => item !== uid
-    );
-    const userInfoRef = doc(db, "users", userInfo.id);
-    await setDoc(
-      userInfoRef,
-      {
-        invitationSent: newInvitationSent,
-      },
-      {
-        merge: true,
-      }
-    );
     // STRANGER
     const newInvitationReceive = invitationReceive.filter(
       (item) => item !== userInfo.uid
@@ -102,6 +88,20 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       strangerRef,
       {
         invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+    // ME
+    const newInvitationSent = userInfo.invitationSent.filter(
+      (item) => item !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: newInvitationSent,
       },
       {
         merge: true,
