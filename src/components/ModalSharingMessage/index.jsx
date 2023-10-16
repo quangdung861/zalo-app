@@ -136,7 +136,7 @@ const ModalSharingMessage = ({
       conversationsSelected.forEach((converstation) => {
         if (converstation.category) {
           if (converstation.category === "single") {
-            // Trò chuyện gần đây với nhóm và bạn bè => hiện tại chưa phát triển
+            // Trò chuyện gần đây với nhóm, bạn bè, cloud => hiện tại chưa phát triển
           }
           if (converstation.category === "group") {
             // Trò chuyện với group
@@ -313,13 +313,9 @@ const ModalSharingMessage = ({
   }, [categorySelected]);
 
   const renderFriendList = () => {
-    console.log(friends);
-
     if (friends[0]) {
       return friends.map((item) => {
         let categoryName;
-        console.log("ahihi");
-        console.log(friends.length);
         const infoFriend = userInfo.friends.find(
           (friend) => friend.uid === item.uid
         );

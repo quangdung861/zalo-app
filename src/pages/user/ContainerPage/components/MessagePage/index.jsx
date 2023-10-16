@@ -380,8 +380,24 @@ const MessagePage = () => {
           }
         }
 
+        let categoryData;
+        const groupData = userInfo.groups.find(
+          (item) => item.id === infoGroup?.id
+        );
+
+        if (groupData) {
+          categoryData = userInfo.categoriesTemplate.find(
+            (item) => item.name === groupData.category
+          );
+        }
+
         if (categorySelected) {
-          return;
+          if (!categoryData?.name) {
+            return;
+          }
+          if (categorySelected !== categoryData?.name) {
+            return;
+          }
         }
 
         if (filterOption === "unseen") {
@@ -433,6 +449,16 @@ const MessagePage = () => {
                   {room.name || infoGroup?.displayName}
                 </div>
                 <div className="new-message">
+                {categoryData && (
+                    <i
+                      className="fa-solid fa-bookmark category-icon"
+                      style={{
+                        color: categoryData.color,
+                        marginRight: "8px",
+                      }}
+                      title={categoryData.name}
+                    ></i>
+                  )}
                   <span className="new-message__author">
                     {room.messageLastest?.uid === userInfo.uid
                       ? "Bạn: "

@@ -353,7 +353,26 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
         console.log("Tài liệu không tồn tại");
       }
 
-      console.log(room);
+      const allUserGroup = [userInfo, ...friendsSelected];
+
+      for (let i = 0; i < allUserGroup.length; i++) {
+        const messageRef = doc(db, "users", allUserGroup[i].id);
+        await setDoc(
+          messageRef,
+          {
+            groups: [
+              ...allUserGroup[i].groups,
+              {
+                id: room.id,
+                category: "",
+              },
+            ],
+          },
+          {
+            merge: true,
+          }
+        );
+      }
 
       const userRef = query(
         collection(db, "users"),

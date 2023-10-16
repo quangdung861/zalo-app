@@ -46,11 +46,13 @@ const BoxChatGroup = () => {
     isShowOverlayModalSharingMessage,
     setIsShowOverlayModalSharingMessage,
   ] = useState(false);
+  const [categoryDropdown, setCategoryDropdown] = useState(false);
 
   const inputRef = useRef();
   const imagesRef = useRef();
   const boxChatRef = useRef();
   const dropdownRef = useRef();
+  const categoryRef = useRef();
 
   const audio = new Audio(messageSend);
 
@@ -97,6 +99,67 @@ const BoxChatGroup = () => {
       updateMessageViewed(docRef, newMessageViewed);
     }
   }, [room]);
+
+
+  const [categoryGroup, setCategoryGroup] = useState({});
+
+  useEffect(() => {
+    const infoGroup = userInfo.groups.find(
+      (item) => item.id === selectedGroupMessaging?.room?.id
+    );
+
+    const categoryResult = userInfo.categoriesTemplate.find(
+      (item) => item.name === infoGroup?.category
+    );
+
+    setCategoryGroup(categoryResult);
+  }, [selectedGroupMessaging, userInfo]);
+
+  const handleCategoryUser = async (value) => {
+    const groupIndex = userInfo.groups.findIndex(
+      (item) => item.id === selectedGroupMessaging.room.id
+    );
+
+    const newGroups = userInfo.groups;
+
+    if (userInfo.groups[groupIndex].category === value) {
+      newGroups.splice(groupIndex, 1, {
+        id: selectedGroupMessaging.room.id,
+        category: "",
+      });
+
+      const userInfoRef = doc(db, "users", userInfo.id);
+
+      await setDoc(
+        userInfoRef,
+        {
+          groups: newGroups,
+        },
+        {
+          merge: true,
+        }
+      );
+      return;
+    }
+
+    newGroups.splice(groupIndex, 1, {
+      id: selectedGroupMessaging.room.id,
+      category: value,
+    });
+
+    const userInfoRef = doc(db, "users", userInfo.id);
+
+    await setDoc(
+      userInfoRef,
+      {
+        groups: newGroups,
+      },
+      {
+        merge: true,
+      }
+    );
+    setCategoryDropdown(false);
+  };
 
   const updateMessageViewed = async (docRef, newMessageViewed) => {
     setDoc(
@@ -815,7 +878,6 @@ const BoxChatGroup = () => {
     setInputValue(inputValue + emoji.native);
   };
 
-  const [categoryUser, setCategoryUser] = useState({});
 
   const [avatars, setAvatars] = useState();
   const [name, setName] = useState();
@@ -978,11 +1040,56 @@ const BoxChatGroup = () => {
                 </div>
 
                 <div className="last-time">
-                  <>
                     {/* <></>
                     <span className="new-seperator"></span> */}
                     <div style={{ color: "#7589A3" }}>Nhóm</div>
-                  </>
+                    <span className="new-seperator"></span>
+                    <div className="category">
+                      {categoryGroup?.name ? (
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => setCategoryDropdown(true)}
+                        >
+                          <i
+                            className="fa-solid fa-bookmark category-icon"
+                            style={{
+                              color: categoryGroup.color,
+                              marginRight: "8px",
+                            }}
+                          ></i>
+                          <span
+                            style={{
+                              color: categoryGroup.color,
+                            }}
+                          >
+                            {categoryGroup.name}
+                          </span>
+                        </div>
+                      ) : (
+                        <i
+                          className="fa-regular fa-bookmark category-icon"
+                          onClick={() => setCategoryDropdown(true)}
+                        ></i>
+                      )}
+
+                      {categoryDropdown && (
+                        <div className="category-dropdown" ref={categoryRef}>
+                          {userInfo?.categoriesTemplate?.map((item, index) => (
+                            <div
+                              key={index}
+                              className="category-dropdown__item"
+                              onClick={() => handleCategoryUser(item.name)}
+                            >
+                              <i
+                                className="fa-solid fa-bookmark"
+                                style={{ color: item.color }}
+                              ></i>
+                              {item.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                 </div>
               </div>
             </div>

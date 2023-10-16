@@ -27,7 +27,6 @@ export const Container = styled.div`
         align-items: center;
         max-width: 100%;
         width: 380px;
-        overflow: hidden;
         .btn-come-back {
           display: none;
           min-width: 32px;
@@ -90,6 +89,7 @@ export const Container = styled.div`
               }
               .category-dropdown {
                 position: absolute;
+                z-index: 99;
                 top: 24px;
                 background-color: #fff;
                 border-radius: 4px;
