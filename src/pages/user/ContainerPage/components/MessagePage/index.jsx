@@ -813,7 +813,7 @@ const MessagePage = () => {
                 <div className="content-welcome__header">
                   <h2>Chào mừng đến với Zalo PC!</h2>
                   <div>
-                    khám phá tiện ích hổ trợ làm việc và trò chuyện cùng người
+                    Khám phá tiện ích hổ trợ làm việc và trò chuyện cùng người
                     thân, bạn bè được tối ưu hóa cho máy tính của bạn.
                   </div>
                 </div>

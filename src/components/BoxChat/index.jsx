@@ -364,6 +364,7 @@ const BoxChat = () => {
                 roomId: response.id,
                 uid: userInfo.uid,
                 text: inputValue,
+                images: [],
                 infoReply: infoReply,
               });
             } else {
