@@ -12,7 +12,7 @@ import {
 import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
-import avatarCloud from "assets/avatarCloudjpg.jpg"
+import avatarCloud from "assets/avatarCloudjpg.jpg";
 
 const FormEmail = ({ setRegisterWay }) => {
   const [formData, setFormData] = useState({
@@ -192,6 +192,7 @@ const FormEmail = ({ setRegisterWay }) => {
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
+            groups: [],
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(formData.fullName.value.toLowerCase()),
@@ -238,8 +239,7 @@ const FormEmail = ({ setRegisterWay }) => {
             members: [data.user.uid, "my-cloud"],
             info: [
               {
-                avatar:
-                  avatarCloud,
+                avatar: avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },

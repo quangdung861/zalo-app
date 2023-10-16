@@ -14,7 +14,7 @@ import {
 import { addDocument, generateKeywords } from "../../../services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
-import avatarCloud from "assets/avatarCloudjpg.jpg"
+import avatarCloud from "assets/avatarCloudjpg.jpg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -29,14 +29,13 @@ const LoginPage = () => {
           addDocument("users", {
             displayName: data.user.displayName,
             email: data.user.email,
-            photoURL: data.user.photoURL
-              ? data.user.photoURL
-              : avatarDefault,
+            photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
             photoCover:
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
+            groups: [],
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
@@ -83,15 +82,12 @@ const LoginPage = () => {
             members: [data.user.uid, "my-cloud"],
             info: [
               {
-                avatar:
-                  avatarCloud,
+                avatar: avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },
               {
-                avatar: data.user.photoURL
-                  ? data.user.photoURL
-                  : avatarDefault,
+                avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
                 name: data.user.displayName,
                 uid: data.user.uid,
               },
@@ -123,14 +119,13 @@ const LoginPage = () => {
           addDocument("users", {
             displayName: data.user.displayName,
             email: data.user.email,
-            photoURL: data.user.photoURL
-              ? data.user.photoURL
-              : avatarDefault,
+            photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
             photoCover:
               "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
+            groups: [],
             invitationSent: [],
             invitationReceive: [],
             keywords: generateKeywords(data.user.displayName.toLowerCase()),
@@ -167,7 +162,7 @@ const LoginPage = () => {
               value: true,
               updatedAt: serverTimestamp(),
             },
-             isOnline: {
+            isOnline: {
               value: true,
               updatedAt: serverTimestamp(),
             },
@@ -177,15 +172,12 @@ const LoginPage = () => {
             members: [data.user.uid, "my-cloud"],
             info: [
               {
-                avatar:
-                  avatarCloud,
+                avatar: avatarCloud,
                 name: "Cloud của tôi",
                 uid: "my-cloud",
               },
               {
-                avatar: data.user.photoURL
-                  ? data.user.photoURL
-                  : avatarDefault,
+                avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
                 name: data.user.displayName,
                 uid: data.user.uid,
               },
