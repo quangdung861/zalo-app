@@ -360,13 +360,24 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
         await setDoc(
           messageRef,
           {
-            groups: [
-              ...allUserGroup[i].groups,
-              {
-                id: room.id,
-                category: "",
-              },
-            ],
+            ...(allUserGroup[i]?.groups
+              ? {
+                  groups: [
+                    ...allUserGroup[i]?.groups,
+                    {
+                      id: room.id,
+                      category: "",
+                    },
+                  ],
+                }
+              : {
+                  groups: [
+                    {
+                      id: room.id,
+                      category: "",
+                    },
+                  ],
+                }),
           },
           {
             merge: true,

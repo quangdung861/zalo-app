@@ -381,7 +381,7 @@ const MessagePage = () => {
         }
 
         let categoryData;
-        const groupData = userInfo.groups.find(
+        const groupData = userInfo?.groups?.find(
           (item) => item.id === infoGroup?.id
         );
 

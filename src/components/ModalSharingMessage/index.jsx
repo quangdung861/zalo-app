@@ -409,6 +409,8 @@ const ModalSharingMessage = ({
     }
   };
 
+  const friendList = renderFriendList();
+
   const handleSelectedConversation = (conversation) => {
     if (conversationsSelected[0]) {
       let friendsSelectedIndex;
@@ -608,6 +610,21 @@ const ModalSharingMessage = ({
           const infoParnerData = infoPartner.find(
             (item) => room.id === item.id
           );
+
+          console.log(categorySelected);
+
+          if (categorySelected) {
+            const group = userInfo.groups?.find(
+              (group) => group.id === room.id
+            );
+            if (
+              categorySelected !== "Tất cả" &&
+              categorySelected !== group.category
+            ) {
+              return;
+            }
+          }
+
           if (keywords) {
             const isKeywords = infoParnerData.keywordsName.includes(
               keywords.toLowerCase()
@@ -672,7 +689,13 @@ const ModalSharingMessage = ({
         }
       });
     }
-  }, [infoPartner, keywords, newRooms, conversationsSelected]);
+  }, [
+    infoPartner,
+    keywords,
+    newRooms,
+    conversationsSelected,
+    categorySelected,
+  ]);
 
   return (
     <S.Wrapper>
@@ -786,7 +809,55 @@ const ModalSharingMessage = ({
                             ))}
                           </>
                         ) : (
-                          <>{renderFriendList()}</>
+                          <>
+                            {Array.isArray(renderFriendList()) &&
+                            !renderFriendList().every(
+                              (item) => item === undefined
+                            ) ? (
+                              renderFriendList()
+                            ) : (
+                              <div
+                                className="container-empty"
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: "40px 0px",
+                                  backgroundColor: "#fff",
+                                }}
+                              >
+                                <img
+                                  src={searchEmpty}
+                                  alt=""
+                                  style={{
+                                    marginBottom: "20px",
+                                    maxWidth: "130px",
+                                    width: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    fontWeight: 500,
+                                    marginBottom: "8px",
+                                    color: "rgb(151, 164, 181)",
+                                  }}
+                                >
+                                  Không tìm thấy kết quả
+                                </div>
+                                <div
+                                  className="text"
+                                  style={{
+                                    color: "rgb(151, 164, 181)",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  Vui lòng thử lại từ khóa hoặc bộ lọc khác
+                                </div>
+                              </div>
+                            )}
+                          </>
                         )}{" "}
                       </div>
                     ) : (
