@@ -1354,7 +1354,7 @@ const BoxChatGroup = () => {
                   autoComplete="off"
                   spellCheck="false"
                   // style={{ textTransform: "capitalize" }}
-                  placeholder={`Nhắn tin tới ${
+                  placeholder={`Nhập @, tin nhắn tới ${
                     (room?.name &&
                       (room?.name?.length < 40
                         ? room?.name
