@@ -554,6 +554,7 @@ export const Container = styled.div`
         position: relative;
         display: flex;
         align-items: center;
+        z-index: 99;
         .emoji-mart {
           position: absolute;
           bottom: 50px;
@@ -597,17 +598,109 @@ export const Container = styled.div`
         align-items: center;
         &__left {
           flex: 1;
+          position: relative;
+          .dropdown-tagname {
+            position: absolute;
+            width: 300px;
+            margin: 12px 0;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: var(--box-shadow-default);
+            bottom: 100%;
+            user-select: none;
+            z-index: 99;
+            .description {
+              height: 50px;
+              display: flex;
+              align-items: center;
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+              .box-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #e0ac00;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 12px;
+                > i {
+                  color: #fff;
+                  font-size: 20px;
+                }
+              }
+              .text {
+                margin-right: 20px;
+                overflow: hidden;
+              }
+              .icon-close {
+                position: absolute;
+                font-size: 18px;
+                right: 6px;
+                top: 10px;
+                color: #7589a3;
+              }
+            }
+            .member-list {
+              margin: 12px 0;
+              height: 100%;
+              max-height: 100px;
+              overflow: hidden;
+              overflow-y: auto;
+              &::-webkit-scrollbar {
+                -webkit-appearance: none;
+              }
+              &::-webkit-scrollbar:vertical {
+                width: 6px;
+              }
+              &::-webkit-scrollbar-thumb {
+                border-radius: 6px;
+                background-color: #d8dadc;
+              }
+              .member-item {
+                height: 48px;
+                display: flex;
+                align-items: center;
+                padding: 0 16px;
+                transition: all 0.2s ease;
+                &__avatar {
+                  width: 32px;
+                  height: 32px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                }
+                &__name {
+                  margin-left: 12px;
+                }
+                &:hover {
+                  cursor: pointer;
+                  background-color: #f1f1f1;
+                }
+              }
+            }
+          }
           .input-message-text {
             width: 100%;
-            padding: 12px 10px 18px 16px;
+            padding: 18px 10px 18px 16px;
             border: none;
             height: 58px;
             font-size: 15px;
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
+            outline: none;
+            resize: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+              "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+              "Helvetica Neue", sans-serif;
+            &::-webkit-scrollbar {
+              appearance: none;
+              width: 0;
+            }
             &::placeholder {
               max-width: 500px;
               overflow: hidden;
               white-space: nowrap;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+                "Droid Sans", "Helvetica Neue", sans-serif;
             }
           }
         }

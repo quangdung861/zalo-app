@@ -47,12 +47,15 @@ const BoxChatGroup = () => {
     setIsShowOverlayModalSharingMessage,
   ] = useState(false);
   const [categoryDropdown, setCategoryDropdown] = useState(false);
+  const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(true);
+  const [usernames, setUsernames] = useState({});
 
   const inputRef = useRef();
   const imagesRef = useRef();
   const boxChatRef = useRef();
   const dropdownRef = useRef();
   const categoryRef = useRef();
+  const dropdownTagnameRef = useRef();
 
   const audio = new Audio(messageSend);
 
@@ -64,6 +67,12 @@ const BoxChatGroup = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsShowDropdownOption(false);
+      }
+      if (
+        dropdownTagnameRef.current &&
+        !dropdownTagnameRef.current.contains(event.target)
+      ) {
+        setIsShowDropdownTagName(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -100,7 +109,6 @@ const BoxChatGroup = () => {
     }
   }, [room]);
 
-
   const [categoryGroup, setCategoryGroup] = useState({});
 
   useEffect(() => {
@@ -114,6 +122,13 @@ const BoxChatGroup = () => {
 
     setCategoryGroup(categoryResult);
   }, [selectedGroupMessaging, userInfo]);
+
+  useEffect(() => {
+    let arrName = selectedGroupMessaging.name.split(", ");
+    selectedGroupMessaging.room.members.forEach((memberId, index) => {
+      setUsernames((cur) => ({ ...cur, [memberId]: arrName[index] }));
+    });
+  }, []);
 
   const handleCategoryUser = async (value) => {
     const groupIndex = userInfo.groups.findIndex(
@@ -193,13 +208,24 @@ const BoxChatGroup = () => {
 
   const [infoMessageSharing, setInfoMessageSharing] = useState({});
   const handleSharingMessage = ({ infoMessage }) => {
-    setInfoMessageSharing(infoMessage);
+    let arrName = selectedGroupMessaging.name.split(", ");
+    let text = infoMessage.text;
+    selectedGroupMessaging.room.members.forEach((memberId, index) => {
+      const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+      const replacement = `@${arrName[index]}`;
+      text = text.replace(searchPattern, replacement);
+    });
+
+    setInfoMessageSharing({
+      ...infoMessage,
+      text,
+    });
     setIsShowOverlayModalSharingMessage(true);
-    console.log("ahihi");
   };
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
+      e.preventDefault();
       if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
           audio.play();
@@ -224,7 +250,7 @@ const BoxChatGroup = () => {
               roomRef,
               {
                 messageLastest: {
-                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
+                  text: displayedText || (imageBase64FullInfo && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
@@ -298,7 +324,7 @@ const BoxChatGroup = () => {
               roomRef,
               {
                 messageLastest: {
-                  text: inputValue,
+                  text: displayedText,
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
@@ -461,7 +487,15 @@ const BoxChatGroup = () => {
   }, [messages, userInfo]);
 
   const handleReplyMessage = ({ name, id, text, image }) => {
-    setInfoReply({ name, id, text, image });
+    let textResult = text;
+    let arrName = selectedGroupMessaging.name.split(", ");
+    selectedGroupMessaging.room.members.forEach((memberId, index) => {
+      const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+      const replacement = `@${arrName[index]}`;
+      textResult = textResult.replace(searchPattern, replacement);
+    });
+
+    setInfoReply({ name, id, text: textResult, image });
     setIsReplyMessage(true);
     if (inputRef?.current) {
       setTimeout(() => {
@@ -484,8 +518,16 @@ const BoxChatGroup = () => {
 
   const handleCopyText = (text) => {
     if (text) {
+      let textResult = text;
+      let arrName = selectedGroupMessaging.name.split(", ");
+      selectedGroupMessaging.room.members.forEach((memberId, index) => {
+        const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+        const replacement = `@${arrName[index]}`;
+        textResult = textResult.replace(searchPattern, replacement);
+      });
+
       navigator.clipboard
-        .writeText(text)
+        .writeText(textResult)
         .then(() => true)
         .catch((err) => console.log("ERROR>>>", err));
     }
@@ -554,6 +596,20 @@ const BoxChatGroup = () => {
 
           return <div className="format-date-message"> {formattedDate} </div>;
         }
+      };
+
+      const renderText = () => {
+        let arrName = selectedGroupMessaging.name.split(", ");
+        let text = item.text;
+        selectedGroupMessaging.room.members.forEach((memberId, index) => {
+          const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+          const replacement = `@${arrName[index]}`;
+          text = text.replace(
+            searchPattern,
+            `<span style="color: #0068ff; cursor: pointer">${replacement}</span>`
+          );
+        });
+        return <div dangerouslySetInnerHTML={{ __html: text }} />;
       };
 
       return (
@@ -675,7 +731,7 @@ const BoxChatGroup = () => {
                           );
                         })}
 
-                      {item.text}
+                      {renderText()}
                     </>
                   ) : (
                     <span
@@ -751,7 +807,7 @@ const BoxChatGroup = () => {
                           );
                         })}
 
-                      {item.text}
+                      {renderText()}
                     </>
                   ) : (
                     <span
@@ -863,10 +919,29 @@ const BoxChatGroup = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const handleInputChange = (value) => {
-    setInputValue(value);
+    let valueInput = value;
+    if (
+      valueInput.slice(-2) === " @" ||
+      (valueInput.slice(-2) === "@" && valueInput.length === 1)
+    ) {
+      setIsShowDropdownTagName(true);
+    } else {
+      setIsShowDropdownTagName(false);
+    }
+
+    setInputValue(valueInput);
   };
+
+  const replaceUsernames = (text) => {
+    for (const [user, name] of Object.entries(usernames)) {
+      const searchPattern = new RegExp(`@${user}`, "g");
+      text = text.replace(searchPattern, `@${name}`);
+    }
+    return text;
+  };
+
+  const displayedText = replaceUsernames(inputValue);
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
   const handleToggleEmojiPicker = () => {
@@ -877,7 +952,6 @@ const BoxChatGroup = () => {
   const handleSelectEmoji = (emoji) => {
     setInputValue(inputValue + emoji.native);
   };
-
 
   const [avatars, setAvatars] = useState();
   const [name, setName] = useState();
@@ -1007,6 +1081,30 @@ const BoxChatGroup = () => {
     document.body.removeChild(link);
   };
 
+  const handleSelectTagname = (memberId) => {
+    handleInputChange(inputValue + memberId);
+  };
+
+  const renderMemberList = () => {
+    const arrNameMembers = selectedGroupMessaging.name.split(", ");
+    return selectedGroupMessaging.room.members.map((member, index) => {
+      return (
+        <div
+          className="member-item"
+          key={member}
+          onClick={() => handleSelectTagname(member)}
+        >
+          <img
+            src={selectedGroupMessaging.avatars[index]}
+            alt=""
+            className="member-item__avatar"
+          />
+          <div className="member-item__name">{arrNameMembers[index]}</div>
+        </div>
+      );
+    });
+  };
+
   return (
     <S.Wrapper>
       <S.Container isReplyMessage={isReplyMessage}>
@@ -1040,56 +1138,56 @@ const BoxChatGroup = () => {
                 </div>
 
                 <div className="last-time">
-                    {/* <></>
+                  {/* <></>
                     <span className="new-seperator"></span> */}
-                    <div style={{ color: "#7589A3" }}>Nhóm</div>
-                    <span className="new-seperator"></span>
-                    <div className="category">
-                      {categoryGroup?.name ? (
-                        <div
-                          style={{ cursor: "pointer" }}
-                          onClick={() => setCategoryDropdown(true)}
-                        >
-                          <i
-                            className="fa-solid fa-bookmark category-icon"
-                            style={{
-                              color: categoryGroup.color,
-                              marginRight: "8px",
-                            }}
-                          ></i>
-                          <span
-                            style={{
-                              color: categoryGroup.color,
-                            }}
-                          >
-                            {categoryGroup.name}
-                          </span>
-                        </div>
-                      ) : (
+                  <div style={{ color: "#7589A3" }}>Nhóm</div>
+                  <span className="new-seperator"></span>
+                  <div className="category">
+                    {categoryGroup?.name ? (
+                      <div
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setCategoryDropdown(true)}
+                      >
                         <i
-                          className="fa-regular fa-bookmark category-icon"
-                          onClick={() => setCategoryDropdown(true)}
+                          className="fa-solid fa-bookmark category-icon"
+                          style={{
+                            color: categoryGroup.color,
+                            marginRight: "8px",
+                          }}
                         ></i>
-                      )}
+                        <span
+                          style={{
+                            color: categoryGroup.color,
+                          }}
+                        >
+                          {categoryGroup.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <i
+                        className="fa-regular fa-bookmark category-icon"
+                        onClick={() => setCategoryDropdown(true)}
+                      ></i>
+                    )}
 
-                      {categoryDropdown && (
-                        <div className="category-dropdown" ref={categoryRef}>
-                          {userInfo?.categoriesTemplate?.map((item, index) => (
-                            <div
-                              key={index}
-                              className="category-dropdown__item"
-                              onClick={() => handleCategoryUser(item.name)}
-                            >
-                              <i
-                                className="fa-solid fa-bookmark"
-                                style={{ color: item.color }}
-                              ></i>
-                              {item.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    {categoryDropdown && (
+                      <div className="category-dropdown" ref={categoryRef}>
+                        {userInfo?.categoriesTemplate?.map((item, index) => (
+                          <div
+                            key={index}
+                            className="category-dropdown__item"
+                            onClick={() => handleCategoryUser(item.name)}
+                          >
+                            <i
+                              className="fa-solid fa-bookmark"
+                              style={{ color: item.color }}
+                            ></i>
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1214,9 +1312,27 @@ const BoxChatGroup = () => {
             <div className="box-chat-input">
               <div className="box-chat-input__left">
                 {/* Nhận content từ người dùng */}
-                <input
+                {isShowDropdownTagName && (
+                  <div className="dropdown-tagname" ref={dropdownTagnameRef}>
+                    <div className="description">
+                      <div className="box-icon">
+                        <i className="fa-solid fa-lightbulb"></i>
+                      </div>
+                      <div className="text">
+                        Press ↑ or ↓ to select and Enter to use.
+                      </div>
+                      <i className="fa-solid fa-xmark icon-close"></i>
+                    </div>
+                    <div className="member-list">{renderMemberList()}</div>
+                  </div>
+                )}
+                {/* {displayedText} */}
+                <textarea
+                  id="input-message-text"
                   className="input-message-text"
                   type="text"
+                  autoComplete="off"
+                  spellCheck="false"
                   // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhắn tin tới ${
                     (room?.name &&
@@ -1231,7 +1347,7 @@ const BoxChatGroup = () => {
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}
-                  value={inputValue}
+                  value={displayedText}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}
                 />

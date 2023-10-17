@@ -176,6 +176,7 @@ const BoxChat = () => {
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
+      e.preventDefault();
       if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
           audio.play();
@@ -1359,10 +1360,13 @@ const BoxChat = () => {
             <div className="box-chat-input">
               <div className="box-chat-input__left">
                 {/* Nhận content từ người dùng */}
-                <input
+
+                <textarea
                   className="input-message-text"
                   type="text"
                   // style={{ textTransform: "capitalize" }}
+                  autoComplete="off"
+                  spellCheck="false"
                   placeholder={`Nhắn tin tới ${
                     selectedUserMessaging.displayNameSelected.length < 40
                       ? selectedUserMessaging.displayNameSelected

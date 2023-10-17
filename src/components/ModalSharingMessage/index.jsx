@@ -611,8 +611,6 @@ const ModalSharingMessage = ({
             (item) => room.id === item.id
           );
 
-          console.log(categorySelected);
-
           if (categorySelected) {
             const group = userInfo.groups?.find(
               (group) => group.id === room.id

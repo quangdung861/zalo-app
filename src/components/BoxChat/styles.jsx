@@ -614,15 +614,27 @@ export const Container = styled.div`
           flex: 1;
           .input-message-text {
             width: 100%;
-            padding: 12px 10px 18px 16px;
+            padding: 18px 10px 18px 16px;
             border: none;
             height: 58px;
             font-size: 15px;
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
+            outline: none;
+            resize: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+              "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+              "Helvetica Neue", sans-serif;
+            &::-webkit-scrollbar {
+              appearance: none;
+              width: 0;
+            }
             &::placeholder {
               max-width: 500px;
               overflow: hidden;
               white-space: nowrap;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+                "Droid Sans", "Helvetica Neue", sans-serif;
             }
           }
         }
