@@ -47,7 +47,7 @@ const BoxChatGroup = () => {
     setIsShowOverlayModalSharingMessage,
   ] = useState(false);
   const [categoryDropdown, setCategoryDropdown] = useState(false);
-  const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(true);
+  const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(false);
   const [usernames, setUsernames] = useState({});
 
   const inputRef = useRef();
@@ -1323,7 +1323,27 @@ const BoxChatGroup = () => {
                       </div>
                       <i className="fa-solid fa-xmark icon-close"></i>
                     </div>
-                    <div className="member-list">{renderMemberList()}</div>
+                    <div className="member-list">
+                      <div
+                        className="member-item"
+                        onClick={() =>
+                          handleSelectTagname(
+                            selectedGroupMessaging.room.members.join(" @")
+                          )
+                        }
+                      >
+                        <div>
+                          <div className="left left--tag">
+                            <span>@</span>
+                          </div>
+                        </div>
+                        <div className="member-item__name">
+                          Báo cáo cho cả nhóm ·{" "}
+                          <span style={{ color: "#0068FF" }}>@All</span>
+                        </div>
+                      </div>
+                      {renderMemberList()}
+                    </div>
                   </div>
                 )}
                 {/* {displayedText} */}

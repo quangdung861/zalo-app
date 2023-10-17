@@ -602,7 +602,7 @@ export const Container = styled.div`
           .dropdown-tagname {
             position: absolute;
             width: 300px;
-            margin: 12px 0;
+            /* margin: 12px 0; */
             background-color: #fff;
             border-radius: 4px;
             box-shadow: var(--box-shadow-default);
@@ -674,6 +674,29 @@ export const Container = styled.div`
                 &:hover {
                   cursor: pointer;
                   background-color: #f1f1f1;
+                }
+                .left {
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  > i {
+                    font-size: 16px;
+                    color: #fff;
+                  }
+                }
+                .left--tag {
+                  width: 32px;
+                  height: 32px;
+                  background-color: #e0ac00;
+                  > span {
+                    font-size: 18px;
+                    color: #fff;
+                    margin-bottom: 3px;
+                    font-weight: 600;
+                  }
                 }
               }
             }
