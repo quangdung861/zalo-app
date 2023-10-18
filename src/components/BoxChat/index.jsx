@@ -176,7 +176,9 @@ const BoxChat = () => {
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
-      e.preventDefault();
+      if (!e?.isPreventDefault) {
+        e.preventDefault();
+      }
       if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
           audio.play();
@@ -1085,6 +1087,7 @@ const BoxChat = () => {
       const imageBase64FullInfo = await convertImagesToBase64(files);
       const e = {
         key: "Enter",
+        isPreventDefault: true,
       };
 
       handleKeyDown(imageBase64FullInfo, e);
@@ -1430,7 +1433,7 @@ const BoxChat = () => {
                 <textarea
                   className="input-message-text"
                   type="text"
-                  // style={{ textTransform: "capitalize" }}
+                  // style={{ textTransform: "capitalize" }}z
                   autoComplete="off"
                   spellCheck="false"
                   placeholder={`Nhắn tin tới ${

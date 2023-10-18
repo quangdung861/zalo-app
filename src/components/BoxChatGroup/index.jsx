@@ -217,7 +217,9 @@ const BoxChatGroup = () => {
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
     if (e?.key === "Enter") {
-      e.preventDefault();
+      if (!e?.isPreventDefault) {
+        e.preventDefault();
+      }
       if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
           audio.play();
@@ -413,6 +415,7 @@ const BoxChatGroup = () => {
       const imageBase64FullInfo = await convertImagesToBase64(files);
       const e = {
         key: "Enter",
+        isPreventDefault: true,
       };
 
       handleKeyDown(imageBase64FullInfo, e);
