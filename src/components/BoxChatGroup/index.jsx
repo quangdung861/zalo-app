@@ -49,6 +49,7 @@ const BoxChatGroup = () => {
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(false);
   const [usernames, setUsernames] = useState({});
+  console.log("🚀 ~ file: index.jsx:53 ~ BoxChatGroup ~ usernames:", usernames);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -124,11 +125,12 @@ const BoxChatGroup = () => {
   }, [selectedGroupMessaging, userInfo]);
 
   useEffect(() => {
-    let arrName = selectedGroupMessaging.name.split(", ");
-    selectedGroupMessaging.room.members.forEach((memberId, index) => {
-      setUsernames((cur) => ({ ...cur, [memberId]: arrName[index] }));
-    });
-  }, []);
+    // let arrName = selectedGroupMessaging.name.split(", ");
+    // console.log(selectedGroupMessaging.room.members);
+    // selectedGroupMessaging.room.members.forEach((memberId, index) => {
+    //   setUsernames((cur) => ({ ...cur, [memberId]: arrName[index] }));
+    // });
+  }, [room]);
 
   const handleCategoryUser = async (value) => {
     const groupIndex = userInfo.groups.findIndex(
@@ -208,11 +210,10 @@ const BoxChatGroup = () => {
 
   const [infoMessageSharing, setInfoMessageSharing] = useState({});
   const handleSharingMessage = ({ infoMessage }) => {
-    let arrName = selectedGroupMessaging.name.split(", ");
     let text = infoMessage.text;
-    selectedGroupMessaging.room.members.forEach((memberId, index) => {
-      const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
-      const replacement = `@${arrName[index]}`;
+    infoUsers.forEach((member, index) => {
+      const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
+      const replacement = `@${member.displayName}`;
       text = text.replace(searchPattern, replacement);
     });
 
@@ -496,7 +497,7 @@ const BoxChatGroup = () => {
   useEffect(() => {
     if (messages[0]) {
       const allUser = messages.map((item) => item.uid);
-      var uniqueArr = [...new Set(allUser)];
+      var uniqueArr = [...new Set([...allUser, ...room.members])];
 
       const fetchData = async () => {
         const docRef = query(
@@ -511,6 +512,10 @@ const BoxChatGroup = () => {
           };
         });
         setInfoUsers(documents);
+
+        documents.forEach((member, index) => {
+          setUsernames((cur) => ({ ...cur, [member.uid]: member.displayName }));
+        });
       };
       fetchData();
     }
@@ -518,10 +523,9 @@ const BoxChatGroup = () => {
 
   const handleReplyMessage = ({ name, id, text, image }) => {
     let textResult = text;
-    let arrName = selectedGroupMessaging.name.split(", ");
-    selectedGroupMessaging.room.members.forEach((memberId, index) => {
-      const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
-      const replacement = `@${arrName[index]}`;
+    infoUsers.forEach((member, index) => {
+      const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
+      const replacement = `@${member.displayName}`;
       textResult = textResult.replace(searchPattern, replacement);
     });
 
@@ -629,11 +633,10 @@ const BoxChatGroup = () => {
       };
 
       const renderText = () => {
-        let arrName = selectedGroupMessaging.name.split(", ");
         let text = item.text;
-        selectedGroupMessaging.room.members.forEach((memberId, index) => {
-          const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
-          const replacement = `@${arrName[index]}`;
+        infoUsers?.forEach((member, index) => {
+          const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
+          const replacement = `@${member.displayName}`;
           text = text.replace(
             searchPattern,
             `<span style="color: #0068ff; cursor: pointer">${replacement}</span>`
@@ -972,6 +975,10 @@ const BoxChatGroup = () => {
   };
 
   const displayedText = replaceUsernames(inputValue);
+  console.log(
+    "🚀 ~ file: index.jsx:981 ~ BoxChatGroup ~ displayedText:",
+    displayedText
+  );
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
   const handleToggleEmojiPicker = () => {
@@ -1116,20 +1123,15 @@ const BoxChatGroup = () => {
   };
 
   const renderMemberList = () => {
-    const arrNameMembers = selectedGroupMessaging.name.split(", ");
-    return selectedGroupMessaging.room.members.map((member, index) => {
+    return infoUsers?.map((member, index) => {
       return (
         <div
           className="member-item"
-          key={member}
-          onClick={() => handleSelectTagname(`user:${member}:user`)}
+          key={member.uid}
+          onClick={() => handleSelectTagname(`user:${member.uid}:user`)}
         >
-          <img
-            src={selectedGroupMessaging.avatars[index]}
-            alt=""
-            className="member-item__avatar"
-          />
-          <div className="member-item__name">{arrNameMembers[index]}</div>
+          <img src={member.photoURL} alt="" className="member-item__avatar" />
+          <div className="member-item__name">{member.displayName}</div>
         </div>
       );
     });
