@@ -201,6 +201,11 @@ export const Container = styled.div`
               display: flex;
               flex-direction: column;
               align-items: flex-end;
+              .icon-tagname {
+                color: #005ae0;
+                font-size: 20px;
+                margin-top: 3px;
+              }
               .unseen {
                 display: flex;
                 justify-content: center;

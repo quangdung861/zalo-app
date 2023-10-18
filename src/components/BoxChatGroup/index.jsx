@@ -211,7 +211,7 @@ const BoxChatGroup = () => {
     let arrName = selectedGroupMessaging.name.split(", ");
     let text = infoMessage.text;
     selectedGroupMessaging.room.members.forEach((memberId, index) => {
-      const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+      const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
       const replacement = `@${arrName[index]}`;
       text = text.replace(searchPattern, replacement);
     });
@@ -246,6 +246,16 @@ const BoxChatGroup = () => {
               count: messagesViewed.count + 1,
             });
 
+            const regex = /@user:([^:]+):user/g;
+            const mentions = [];
+
+            let mention;
+            while ((mention = regex.exec(inputValue)) !== null) {
+              mentions.push(mention[1]);
+            }
+
+            // Hợp nhất hai mảng và gộp các giá trị trùng nhau thành một
+
             await setDoc(
               roomRef,
               {
@@ -257,6 +267,12 @@ const BoxChatGroup = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
+                ...(room.mentioned && {
+                  mentioned: [...new Set([...room.mentioned, ...mentions])],
+                }),
+                ...(!room.mentioned && {
+                  mentioned: mentions,
+                }),
               },
               {
                 merge: true,
@@ -320,6 +336,14 @@ const BoxChatGroup = () => {
               count: messagesViewed.count + 1,
             });
 
+            const regex = /@user:([^:]+):user/g;
+            const mentions = [];
+
+            let mention;
+            while ((mention = regex.exec(inputValue)) !== null) {
+              mentions.push(mention[1]);
+            }
+
             await setDoc(
               roomRef,
               {
@@ -331,6 +355,12 @@ const BoxChatGroup = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
+                ...(room.mentioned && {
+                  mentioned: [...new Set([...room.mentioned, ...mentions])],
+                }),
+                ...(!room.mentioned && {
+                  mentioned: mentions,
+                }),
               },
               {
                 merge: true,
@@ -490,7 +520,7 @@ const BoxChatGroup = () => {
     let textResult = text;
     let arrName = selectedGroupMessaging.name.split(", ");
     selectedGroupMessaging.room.members.forEach((memberId, index) => {
-      const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+      const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
       const replacement = `@${arrName[index]}`;
       textResult = textResult.replace(searchPattern, replacement);
     });
@@ -521,7 +551,7 @@ const BoxChatGroup = () => {
       let textResult = text;
       let arrName = selectedGroupMessaging.name.split(", ");
       selectedGroupMessaging.room.members.forEach((memberId, index) => {
-        const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+        const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
         const replacement = `@${arrName[index]}`;
         textResult = textResult.replace(searchPattern, replacement);
       });
@@ -602,7 +632,7 @@ const BoxChatGroup = () => {
         let arrName = selectedGroupMessaging.name.split(", ");
         let text = item.text;
         selectedGroupMessaging.room.members.forEach((memberId, index) => {
-          const searchPattern = new RegExp(`@${memberId}`, "g"); // Biểu thức chính quy với biến
+          const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
           const replacement = `@${arrName[index]}`;
           text = text.replace(
             searchPattern,
@@ -935,7 +965,7 @@ const BoxChatGroup = () => {
 
   const replaceUsernames = (text) => {
     for (const [user, name] of Object.entries(usernames)) {
-      const searchPattern = new RegExp(`@${user}`, "g");
+      const searchPattern = new RegExp(`@user:${user}:user`, "g");
       text = text.replace(searchPattern, `@${name}`);
     }
     return text;
@@ -1092,7 +1122,7 @@ const BoxChatGroup = () => {
         <div
           className="member-item"
           key={member}
-          onClick={() => handleSelectTagname(member)}
+          onClick={() => handleSelectTagname(`user:${member}:user`)}
         >
           <img
             src={selectedGroupMessaging.avatars[index]}
@@ -1328,7 +1358,9 @@ const BoxChatGroup = () => {
                         className="member-item"
                         onClick={() =>
                           handleSelectTagname(
-                            selectedGroupMessaging.room.members.join(" @")
+                            selectedGroupMessaging.room.members
+                              .map((memberId) => `user:${memberId}:user`)
+                              .join(" @")
                           )
                         }
                       >

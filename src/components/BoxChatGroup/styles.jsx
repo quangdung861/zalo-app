@@ -554,7 +554,7 @@ export const Container = styled.div`
         position: relative;
         display: flex;
         align-items: center;
-        z-index: 99;
+        z-index: 3;
         .emoji-mart {
           position: absolute;
           bottom: 50px;

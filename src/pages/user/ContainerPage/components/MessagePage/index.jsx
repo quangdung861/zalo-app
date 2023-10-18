@@ -380,6 +380,32 @@ const MessagePage = () => {
           }
         }
 
+        if (room.mentioned) {
+          if (room.mentioned[0] && unseenMessages === 0) {
+            const mentionIndex = room.mentioned.findIndex(
+              (item) => item === userInfo.uid
+            );
+            if (mentionIndex !== -1) {
+              const newMentiond = [...room.mentioned];
+              newMentiond.splice(mentionIndex, 1);
+
+              const updateMentionRoom = async () => {
+                const docRef = doc(db, "rooms", room.id);
+                await setDoc(
+                  docRef,
+                  {
+                    mentioned: newMentiond,
+                  },
+                  {
+                    merge: true,
+                  }
+                );
+              };
+              updateMentionRoom();
+            }
+          }
+        }
+
         let categoryData;
         const groupData = userInfo?.groups?.find(
           (item) => item.id === infoGroup?.id
@@ -449,7 +475,7 @@ const MessagePage = () => {
                   {room.name || infoGroup?.displayName}
                 </div>
                 <div className="new-message">
-                {categoryData && (
+                  {categoryData && (
                     <i
                       className="fa-solid fa-bookmark category-icon"
                       style={{
@@ -476,8 +502,15 @@ const MessagePage = () => {
                 {formatDate !== "Invalid date" ? formatDate : "..."}
               </div>
               {!!unseenMessages && (
-                <div className="unseen">
-                  {unseenMessages < 5 ? unseenMessages : "N"}
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  {room?.mentioned?.includes(userInfo.uid) && (
+                    <div className="icon-tagname">@</div>
+                  )}
+                  <div className="unseen">
+                    {unseenMessages < 5 ? unseenMessages : "N"}
+                  </div>
                 </div>
               )}
             </div>
