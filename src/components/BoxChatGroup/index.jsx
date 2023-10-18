@@ -49,7 +49,6 @@ const BoxChatGroup = () => {
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(false);
   const [usernames, setUsernames] = useState({});
-  console.log("🚀 ~ file: index.jsx:53 ~ BoxChatGroup ~ usernames:", usernames);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -123,14 +122,6 @@ const BoxChatGroup = () => {
 
     setCategoryGroup(categoryResult);
   }, [selectedGroupMessaging, userInfo]);
-
-  useEffect(() => {
-    // let arrName = selectedGroupMessaging.name.split(", ");
-    // console.log(selectedGroupMessaging.room.members);
-    // selectedGroupMessaging.room.members.forEach((memberId, index) => {
-    //   setUsernames((cur) => ({ ...cur, [memberId]: arrName[index] }));
-    // });
-  }, [room]);
 
   const handleCategoryUser = async (value) => {
     const groupIndex = userInfo.groups.findIndex(
@@ -598,11 +589,35 @@ const BoxChatGroup = () => {
     return;
   };
 
+  const handleDeleteMessage = async ({ message }) => {
+    const messageRef = doc(db, "messages", message.id);
+
+    await setDoc(
+      messageRef,
+      {
+        ...(message.isDeleted && {
+          isDeleted: [...message.isDeleted, userInfo.uid],
+        }),
+        ...(!message.isDeleted && {
+          isDeleted: [userInfo.uid],
+        }),
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
   const renderMessages = () => {
     return messages?.map((item) => {
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );
+
+      if (item.isDeleted?.includes(userInfo.uid)) {
+        return undefined;
+      }
+
       let CREATEDAT_URL;
 
       const renderCreatedAtMessage = () => {
@@ -707,11 +722,33 @@ const BoxChatGroup = () => {
                           ></i>
                           Thu hồi
                         </div>
+                        <div
+                          className="menu-item"
+                          style={{ color: "#d91b1b" }}
+                          onClick={() =>
+                            handleDeleteMessage({
+                              message: item,
+                            })
+                          }
+                        >
+                          <i
+                            className="fa-regular fa-trash-can"
+                            style={{ color: "#d91b1b" }}
+                          ></i>
+                          Xoá chỉ ở phía tôi
+                        </div>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="myself-options recall">
+                  <div
+                    className="myself-options recall"
+                    onClick={() =>
+                      handleDeleteMessage({
+                        message: item,
+                      })
+                    }
+                  >
                     <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
@@ -894,11 +931,33 @@ const BoxChatGroup = () => {
                           <i className="fa-regular fa-copy"></i>
                           Copy tin nhắn
                         </div>
+                        <div
+                          className="menu-item"
+                          style={{ color: "#d91b1b" }}
+                          onClick={() =>
+                            handleDeleteMessage({
+                              message: item,
+                            })
+                          }
+                        >
+                          <i
+                            className="fa-regular fa-trash-can"
+                            style={{ color: "#d91b1b" }}
+                          ></i>
+                          Xoá chỉ ở phía tôi
+                        </div>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="other-options recall">
+                  <div
+                    className="other-options recall"
+                    onClick={() =>
+                      handleDeleteMessage({
+                        message: item,
+                      })
+                    }
+                  >
                     <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
@@ -975,10 +1034,6 @@ const BoxChatGroup = () => {
   };
 
   const displayedText = replaceUsernames(inputValue);
-  console.log(
-    "🚀 ~ file: index.jsx:981 ~ BoxChatGroup ~ displayedText:",
-    displayedText
-  );
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
   const handleToggleEmojiPicker = () => {

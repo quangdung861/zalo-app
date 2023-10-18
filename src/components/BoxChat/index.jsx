@@ -580,7 +580,25 @@ const BoxChat = () => {
   const handleSharingMessage = ({ infoMessage }) => {
     setInfoMessageSharing(infoMessage);
     setIsShowOverlayModalSharingMessage(true);
-    console.log("ahihi");
+  };
+
+  const handleDeleteMessage = async ({ message }) => {
+    const messageRef = doc(db, "messages", message.id);
+
+    await setDoc(
+      messageRef,
+      {
+        ...(message.isDeleted && {
+          isDeleted: [...message.isDeleted, userInfo.uid],
+        }),
+        ...(!message.isDeleted && {
+          isDeleted: [userInfo.uid],
+        }),
+      },
+      {
+        merge: true,
+      }
+    );
   };
 
   const renderMessages = useMemo(() => {
@@ -588,6 +606,10 @@ const BoxChat = () => {
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );
+
+      if (item.isDeleted?.includes(userInfo.uid)) {
+        return undefined;
+      }
 
       let CREATEDAT_URL;
       const getCreatedAtMessage = () => {
@@ -678,11 +700,33 @@ const BoxChat = () => {
                           ></i>
                           Thu hồi
                         </div>
+                        <div
+                          className="menu-item"
+                          style={{ color: "#d91b1b" }}
+                          onClick={() =>
+                            handleDeleteMessage({
+                              message: item,
+                            })
+                          }
+                        >
+                          <i
+                            className="fa-regular fa-trash-can"
+                            style={{ color: "#d91b1b" }}
+                          ></i>
+                          Xoá chỉ ở phía tôi
+                        </div>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="myself-options recall">
+                  <div
+                    className="myself-options recall"
+                    onClick={() =>
+                      handleDeleteMessage({
+                        message: item,
+                      })
+                    }
+                  >
                     <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
@@ -859,11 +903,33 @@ const BoxChat = () => {
                           <i className="fa-regular fa-copy"></i>
                           Copy tin nhắn
                         </div>
+                        <div
+                          className="menu-item"
+                          style={{ color: "#d91b1b" }}
+                          onClick={() =>
+                            handleDeleteMessage({
+                              message: item,
+                            })
+                          }
+                        >
+                          <i
+                            className="fa-regular fa-trash-can"
+                            style={{ color: "#d91b1b" }}
+                          ></i>
+                          Xoá chỉ ở phía tôi
+                        </div>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="other-options recall">
+                  <div
+                    className="other-options recall"
+                    onClick={() =>
+                      handleDeleteMessage({
+                        message: item,
+                      })
+                    }
+                  >
                     <i className="fa-regular fa-trash-can"></i>
                   </div>
                 )}
