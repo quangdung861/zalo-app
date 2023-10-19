@@ -210,6 +210,7 @@ const BoxChat = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
+                deleted: [],
               },
               {
                 merge: true,
@@ -244,6 +245,7 @@ const BoxChat = () => {
                   { uid: userInfo.uid, count: 1 },
                   { uid: selectedUserMessaging.uidSelected, count: 0 },
                 ],
+                deleted: [],
               });
 
               const response = await getDoc(roomRef);
@@ -322,6 +324,7 @@ const BoxChat = () => {
               },
               totalMessages: room.totalMessages + 1,
               messagesViewed: newMessageViewed,
+              deleted: [],
             },
             {
               merge: true,
@@ -356,6 +359,7 @@ const BoxChat = () => {
                 { uid: userInfo.uid, count: 1 },
                 { uid: selectedUserMessaging.uidSelected, count: 0 },
               ],
+              deleted: [],
             });
 
             const response = await getDoc(roomRef);

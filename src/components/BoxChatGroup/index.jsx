@@ -267,6 +267,7 @@ const BoxChatGroup = () => {
                 ...(!room.mentioned && {
                   mentioned: mentions,
                 }),
+                deleted: [],
               },
               {
                 merge: true,
@@ -355,6 +356,7 @@ const BoxChatGroup = () => {
                 ...(!room.mentioned && {
                   mentioned: mentions,
                 }),
+                deleted: [],
               },
               {
                 merge: true,

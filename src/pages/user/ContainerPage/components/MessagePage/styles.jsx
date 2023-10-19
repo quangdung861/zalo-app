@@ -136,8 +136,8 @@ export const Container = styled.div`
         .room-list {
           height: calc(100vh - 64px - 32px);
           position: relative;
-          overflow: hidden;
-          overflow-y: auto;
+          overflow-y: scroll;
+          overflow-x: visible;
           &::-webkit-scrollbar {
             -webkit-appearance: none;
           }
@@ -147,89 +147,161 @@ export const Container = styled.div`
           &::-webkit-scrollbar-thumb {
             border-radius: 10px;
           }
-          .room-item {
-            height: 72px;
-            padding: 0 16px;
-            /* background-color: #ccc; */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            &__left {
+          .container-room-item {
+            position: relative;
+            .room-item {
+              height: 72px;
+              padding: 0 16px;
+              /* background-color: #ccc; */
               display: flex;
               align-items: center;
-              gap: 12px;
-              flex: 1;
-              > img {
-                width: 48px;
-                flex-shrink: 0;
-                height: 48px;
-                object-fit: cover;
-                border-radius: 50%;
-              }
-
-              .info {
-                .room-name {
-                  font-size: 16px;
-                  font-weight: 500;
-                  margin-bottom: 6px;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  width: 160px;
-                  text-overflow: ellipsis;
-                }
-                .new-message {
-                  color: #7589a3;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  width: 160px;
-                  text-overflow: ellipsis;
-                  &__author {
-                    color: #7589a3;
-                  }
-                  &__text {
-                    color: #7589a3;
-                  }
-                }
-              }
-            }
-            &__right {
-              height: 100%;
-              padding-top: 12px;
-              font-size: 12px;
-              color: #7589a3;
-              display: flex;
-              flex-direction: column;
-              align-items: flex-end;
-              .icon-tagname {
-                color: #005ae0;
-                font-size: 20px;
-                margin-top: 3px;
-              }
-              .unseen {
+              justify-content: space-between;
+              cursor: pointer;
+              position: relative;
+              &__left {
                 display: flex;
-                justify-content: center;
                 align-items: center;
-                width: 16px;
-                height: 16px;
+                gap: 12px;
+                flex: 1;
+                > img {
+                  width: 48px;
+                  flex-shrink: 0;
+                  height: 48px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                }
+
+                .info {
+                  .room-name {
+                    font-size: 16px;
+                    font-weight: 500;
+                    margin-bottom: 6px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    width: 160px;
+                    text-overflow: ellipsis;
+                  }
+                  .new-message {
+                    color: #7589a3;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    width: 160px;
+                    text-overflow: ellipsis;
+                    &__author {
+                      color: #7589a3;
+                    }
+                    &__text {
+                      color: #7589a3;
+                    }
+                  }
+                }
+              }
+              &__right {
+                height: 100%;
+                padding-top: 12px;
                 font-size: 12px;
-                line-height: 12px;
-                margin-top: 8px;
-                border-radius: 50%;
-                color: #fff;
-                background-color: #c31818;
+                color: #7589a3;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                .icon-tagname {
+                  color: #005ae0;
+                  font-size: 20px;
+                  margin-top: 3px;
+                }
+                .unseen {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  width: 16px;
+                  height: 16px;
+                  font-size: 12px;
+                  line-height: 12px;
+                  margin-top: 8px;
+                  border-radius: 50%;
+                  color: #fff;
+                  background-color: #c31818;
+                }
+              }
+              :hover {
+                background-color: #f1f1f1;
+              }
+              .dropdown-menu {
+                background-color: #fff;
+                width: 220px;
+                position: absolute;
+                right: 0px;
+                top: 12px;
+                border-radius: 4px;
+                box-shadow: var(--box-shadow-default);
+                padding: 8px 0px;
+                z-index: 11;
+                .menu-item {
+                  padding: 0 8px;
+                  height: 36px;
+                  display: flex;
+                  align-items: center;
+                  padding: 12px;
+                  > i {
+                    margin-right: 16px;
+                    font-size: 16px;
+                    color: rgb(117, 137, 163);
+                  }
+                  :hover {
+                    cursor: pointer;
+                    background-color: #f1f1f1;
+                  }
+                }
               }
             }
-            :hover {
-              background-color: #f1f1f1;
+
+            .btn-show-option {
+              display: none;
+              width: 24px;
+              height: 24px;
+              position: absolute;
+              right: 10px;
+              top: 10px;
+              justify-content: center;
+              align-items: center;
+              border-radius: 4px;
+              cursor: pointer;
+              z-index: 10;
+              &:hover {
+                background-color: #e3e0e0;
+              }
+            }
+
+            &:hover {
+              .btn-show-option {
+                display: flex;
+              }
+              .room-item {
+                &__right {
+                  .date {
+                    display: none;
+                  }
+                }
+              }
             }
           }
+
           .room-item--active {
             background-color: #e5efff;
             :hover {
               background-color: #e5efff;
             }
           }
+
+          .btn-show-option--active:hover {
+            &:hover {
+              background-color: #c6daf8;
+            }
+            > i {
+              color: #005ae0;
+            }
+          }
+
           .notification-compatible {
             user-select: none;
             width: 93%;

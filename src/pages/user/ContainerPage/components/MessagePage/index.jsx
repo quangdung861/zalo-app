@@ -79,9 +79,23 @@ const MessagePage = () => {
   }
 
   const categoryRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [categorySelected, setCategorySelected] = useState("");
+  const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsShowDropdownOption(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const toogleBoxChat = ({
     uidSelected,
@@ -135,7 +149,7 @@ const MessagePage = () => {
             where("uid", "==", uidSelected)
           );
           const response = await getDocs(partnerRef);
-          response.docs.map((doc) => {
+          response.docs.forEach((doc) => {
             const id = doc.id;
             const data = doc.data();
             // const keywordsName = generateKeywords(
@@ -217,6 +231,47 @@ const MessagePage = () => {
 
   const [keywords, setKeywords] = useState("");
 
+  const handleDeleteRoomChat = async ({ room }) => {
+    const roomRef = doc(db, "rooms", room.id);
+
+    await setDoc(
+      roomRef,
+      {
+        ...(room.deleted && {
+          deleted: [...room.deleted, userInfo.uid],
+        }),
+        ...(!room.deleted && {
+          deleted: [userInfo.uid],
+        }),
+      },
+      {
+        merge: true,
+      }
+    );
+    setIsShowDropdownOption(false);
+  };
+
+  const handleDeleteRoomChatGroup = async ({ room }) => {
+    const roomRef = doc(db, "rooms", room.id);
+
+    await setDoc(
+      roomRef,
+      {
+        ...(room.deleted && {
+          deleted: [...room.deleted, userInfo.uid],
+        }),
+        ...(!room.deleted && {
+          deleted: [userInfo.uid],
+        }),
+      },
+      {
+        merge: true,
+      }
+    );
+
+    setIsShowDropdownOption(false);
+  };
+
   const renderRooms = useMemo(() => {
     setTotalUnseenMessageRef(0);
 
@@ -226,6 +281,12 @@ const MessagePage = () => {
 
     return rooms?.map((room) => {
       if (room.category === "single" || room.category === "my cloud") {
+        if (room.deleted) {
+          if (room.deleted.includes(userInfo.uid)) {
+            return;
+          }
+        }
+
         const infoPartnerResult = infoPartner.find((item) => {
           return room.members.includes(item.uid);
         });
@@ -294,69 +355,102 @@ const MessagePage = () => {
         }
 
         return (
-          <div
-            key={room.id}
-            className={
-              uidSelected === selectedUserMessaging.uidSelected
-                ? "room-item room-item--active"
-                : "room-item"
-            }
-            onClick={() =>
-              toogleBoxChat({
-                uidSelected: uidSelected,
-                photoURLSelected: infoPartnerResult?.photoURL,
-                displayNameSelected: infoPartnerResult?.displayName,
-              })
-            }
-          >
-            <div className="room-item__left">
-              <img
-                // className="image-with-replacement"
-                src={infoPartnerResult?.photoURL}
-                alt=""
-                onError={(e) => {
-                  e.target.src = avatarDefault;
-                }}
-              />
+          <div className="container-room-item " key={room.id}>
+            <div
+              className={
+                uidSelected === selectedUserMessaging.uidSelected
+                  ? "room-item room-item--active"
+                  : "room-item"
+              }
+              onClick={() =>
+                toogleBoxChat({
+                  uidSelected: uidSelected,
+                  photoURLSelected: infoPartnerResult?.photoURL,
+                  displayNameSelected: infoPartnerResult?.displayName,
+                })
+              }
+            >
+              <div className="room-item__left">
+                <img
+                  // className="image-with-replacement"
+                  src={infoPartnerResult?.photoURL}
+                  alt=""
+                  onError={(e) => {
+                    e.target.src = avatarDefault;
+                  }}
+                />
 
-              <div className="info">
-                <div className="room-name">
-                  {infoPartnerResult?.displayName}
+                <div className="info">
+                  <div className="room-name">
+                    {infoPartnerResult?.displayName}
+                  </div>
+                  <div className="new-message">
+                    {categoryData && (
+                      <i
+                        className="fa-solid fa-bookmark category-icon"
+                        style={{
+                          color: categoryData.color,
+                          marginRight: "8px",
+                        }}
+                        title={categoryData.name}
+                      ></i>
+                    )}
+                    <span className="new-message__author">
+                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
+                    </span>
+                    <span className="new-message__text">
+                      {room.messageLastest?.text}
+                    </span>
+                  </div>
                 </div>
-                <div className="new-message">
-                  {categoryData && (
+              </div>
+              <div className="room-item__right">
+                <div className="date">
+                  {formatDate !== "Invalid date" ? formatDate : "..."}
+                </div>
+
+                {!!unseenMessages && (
+                  <div className="unseen">
+                    {unseenMessages < 5 ? unseenMessages : "N"}
+                  </div>
+                )}
+              </div>
+              {isShowDropdownOption?.id === room.id && (
+                <div className="dropdown-menu" ref={dropdownRef}>
+                  <div
+                    className="menu-item"
+                    style={{ color: "#d91b1b" }}
+                    onClick={() => handleDeleteRoomChat({ room: room })}
+                  >
                     <i
-                      className="fa-solid fa-bookmark category-icon"
-                      style={{
-                        color: categoryData.color,
-                        marginRight: "8px",
-                      }}
-                      title={categoryData.name}
+                      className="fa-regular fa-trash-can"
+                      style={{ color: "#d91b1b" }}
                     ></i>
-                  )}
-                  <span className="new-message__author">
-                    {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
-                  </span>
-                  <span className="new-message__text">
-                    {room.messageLastest?.text}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="room-item__right">
-              <div className="date">
-                {formatDate !== "Invalid date" ? formatDate : "..."}
-              </div>
-              {!!unseenMessages && (
-                <div className="unseen">
-                  {unseenMessages < 5 ? unseenMessages : "N"}
+                    Xoá hội thoại
+                  </div>
                 </div>
               )}
+            </div>
+            <div
+              className={
+                uidSelected === selectedUserMessaging.uidSelected
+                  ? "btn-show-option btn-show-option--active"
+                  : "btn-show-option"
+              }
+              onClick={() => setIsShowDropdownOption({ id: room.id })}
+            >
+              <i className="fa-solid fa-ellipsis"></i>
             </div>
           </div>
         );
       }
       if (room.category === "group") {
+        if (room.deleted) {
+          if (room.deleted.includes(userInfo.uid)) {
+            return;
+          }
+        }
+
         const infoGroup = infoPartner.find((item) => item.id === room.id);
 
         const formatDate = moment(
@@ -439,80 +533,111 @@ const MessagePage = () => {
         };
 
         return (
-          <div
-            key={room.id}
-            className={
-              room.id === selectedGroupMessaging?.room?.id
-                ? "room-item room-item--active"
-                : "room-item"
-            }
-            onClick={() =>
-              toogleBoxChatGroup({
-                room,
-                avatars: infoGroup.photoURL,
-                name: infoGroup.displayName,
-              })
-            }
-          >
-            <div className="room-item__left">
-              {room.avatar?.url && (
-                <img
-                  // className="image-with-replacement"
-                  src={room.avatar?.url}
-                  alt=""
-                  onError={(e) => {
-                    e.target.src = avatarDefault;
-                  }}
-                />
-              )}
+          <div className="container-room-item " key={room.id}>
+            <div
+              className={
+                room.id === selectedGroupMessaging?.room?.id
+                  ? "room-item room-item--active"
+                  : "room-item"
+              }
+              onClick={() =>
+                toogleBoxChatGroup({
+                  room,
+                  avatars: infoGroup.photoURL,
+                  name: infoGroup.displayName,
+                })
+              }
+            >
+              <div className="room-item__left">
+                {room.avatar?.url && (
+                  <img
+                    // className="image-with-replacement"
+                    src={room.avatar?.url}
+                    alt=""
+                    onError={(e) => {
+                      e.target.src = avatarDefault;
+                    }}
+                  />
+                )}
 
-              {!room.avatar?.url && infoGroup?.photoURL && (
-                <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
-              )}
+                {!room.avatar?.url && infoGroup?.photoURL && (
+                  <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
+                )}
 
-              <div className="info">
-                <div className="room-name">
-                  {room.name || infoGroup?.displayName}
+                <div className="info">
+                  <div className="room-name">
+                    {room.name || infoGroup?.displayName}
+                  </div>
+                  <div className="new-message">
+                    {categoryData && (
+                      <i
+                        className="fa-solid fa-bookmark category-icon"
+                        style={{
+                          color: categoryData.color,
+                          marginRight: "8px",
+                        }}
+                        title={categoryData.name}
+                      ></i>
+                    )}
+                    <span className="new-message__author">
+                      {room.messageLastest?.uid === userInfo.uid
+                        ? "Bạn: "
+                        : room?.messageLastest?.displayName &&
+                          `${room?.messageLastest?.displayName}: `}
+                    </span>
+                    <span className="new-message__text">
+                      {room?.messageLastest?.text}
+                    </span>
+                  </div>
                 </div>
-                <div className="new-message">
-                  {categoryData && (
+              </div>
+              <div className="room-item__right">
+                <div className="date">
+                  {formatDate !== "Invalid date" ? formatDate : "..."}
+                </div>
+                {!!unseenMessages && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    {room?.mentioned?.includes(userInfo.uid) && (
+                      <div className="icon-tagname">@</div>
+                    )}
+                    <div className="unseen">
+                      {unseenMessages < 5 ? unseenMessages : "N"}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {isShowDropdownOption?.id === room.id && (
+                <div className="dropdown-menu" ref={dropdownRef}>
+                  <div
+                    className="menu-item"
+                    style={{ color: "#d91b1b" }}
+                    onClick={() => handleDeleteRoomChatGroup({ room: room })}
+                  >
                     <i
-                      className="fa-solid fa-bookmark category-icon"
-                      style={{
-                        color: categoryData.color,
-                        marginRight: "8px",
-                      }}
-                      title={categoryData.name}
+                      className="fa-regular fa-trash-can"
+                      style={{ color: "#d91b1b" }}
                     ></i>
-                  )}
-                  <span className="new-message__author">
-                    {room.messageLastest?.uid === userInfo.uid
-                      ? "Bạn: "
-                      : room?.messageLastest?.displayName &&
-                        `${room?.messageLastest?.displayName}: `}
-                  </span>
-                  <span className="new-message__text">
-                    {room?.messageLastest?.text}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="room-item__right">
-              <div className="date">
-                {formatDate !== "Invalid date" ? formatDate : "..."}
-              </div>
-              {!!unseenMessages && (
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
-                >
-                  {room?.mentioned?.includes(userInfo.uid) && (
-                    <div className="icon-tagname">@</div>
-                  )}
-                  <div className="unseen">
-                    {unseenMessages < 5 ? unseenMessages : "N"}
+                    Xoá hội thoại
                   </div>
                 </div>
               )}
+            </div>
+            <div
+              className={
+                room.id === selectedGroupMessaging?.room?.id
+                  ? "btn-show-option btn-show-option--active"
+                  : "btn-show-option"
+              }
+              onClick={() => setIsShowDropdownOption({ id: room.id })}
+            >
+              <i className="fa-solid fa-ellipsis"></i>
             </div>
           </div>
         );
@@ -525,6 +650,7 @@ const MessagePage = () => {
     categorySelected,
     selectedUserMessaging,
     selectedGroupMessaging,
+    isShowDropdownOption,
   ]);
 
   // useEffect(() => {
