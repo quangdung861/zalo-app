@@ -234,7 +234,7 @@ const MessagePage = () => {
 
   const [keywords, setKeywords] = useState("");
 
-  const [roomDelete, setRoomDelete] = useState();
+  const [roomDelete, setRoomDelete] = useState(null);
 
   const handleDeleteRoomChat = async () => {
     const now = moment().valueOf();
@@ -243,7 +243,10 @@ const MessagePage = () => {
     );
     newDeleted.push({ uid: userInfo.uid, createdAt: now });
 
-    if (roomDelete.category === "single" || roomDelete.category === "my cloud") {
+    if (
+      roomDelete.category === "single" ||
+      roomDelete.category === "my cloud"
+    ) {
       const roomRef = doc(db, "rooms", roomDelete.id);
       await setDoc(
         roomRef,
@@ -257,6 +260,17 @@ const MessagePage = () => {
           merge: true,
         }
       );
+
+      const uidDeleted = roomDelete.members.filter(
+        (item) => item !== userInfo.uid
+      )[0];
+
+      if (uidDeleted === selectedUserMessaging?.uidSelected) {
+        setSelectedUserMessaging({});
+        setSelectedGroupMessaging({});
+        setIsShowBoxChat(false);
+        setIsShowBoxChatGroup(false);
+      }
     }
 
     if (roomDelete.category === "group") {
@@ -274,12 +288,16 @@ const MessagePage = () => {
           merge: true,
         }
       );
-    }
 
+      if (roomDelete?.id === selectedGroupMessaging?.room?.id) {
+        setSelectedUserMessaging({});
+        setSelectedGroupMessaging({});
+        setIsShowBoxChat(false);
+        setIsShowBoxChatGroup(false);
+      }
+    }
     setIsShowDropdownOption(false);
-    setRoomDelete();
-    setIsShowBoxChat(false);
-    setIsShowBoxChatGroup(false);
+    setRoomDelete(null);
   };
 
   const renderRooms = useMemo(() => {
@@ -421,26 +439,27 @@ const MessagePage = () => {
                   </div>
                 )}
               </div>
-              {isShowDropdownOption?.id === room.id && (
-                <div className="dropdown-menu" ref={dropdownRef}>
-                  <div
-                    className="menu-item"
-                    style={{ color: "#d91b1b" }}
-                    onClick={() => {
-                      setIsShowDropdownOption(false);
-                      setRoomDelete(room);
-                      setIsShowOverlayModalConfirmDelete(true);
-                    }}
-                  >
-                    <i
-                      className="fa-regular fa-trash-can"
-                      style={{ color: "#d91b1b" }}
-                    ></i>
-                    Xoá hội thoại
-                  </div>
-                </div>
-              )}
             </div>
+            {isShowDropdownOption?.id === room.id && (
+              <div className="dropdown-menu" ref={dropdownRef}>
+                <div
+                  className="menu-item"
+                  style={{ color: "#d91b1b" }}
+                  onClick={() => {
+                    setIsShowDropdownOption(false);
+                    setRoomDelete(room);
+                    setIsShowOverlayModalConfirmDelete(true);
+                  }}
+                >
+                  <i
+                    className="fa-regular fa-trash-can"
+                    style={{ color: "#d91b1b" }}
+                  ></i>
+                  Xoá hội thoại
+                </div>
+              </div>
+            )}
+
             <div
               className={
                 uidSelected === selectedUserMessaging.uidSelected
@@ -622,27 +641,26 @@ const MessagePage = () => {
                   </div>
                 )}
               </div>
-
-              {isShowDropdownOption?.id === room.id && (
-                <div className="dropdown-menu" ref={dropdownRef}>
-                  <div
-                    className="menu-item"
-                    style={{ color: "#d91b1b" }}
-                    onClick={() => {
-                      setIsShowDropdownOption(false);
-                      setRoomDelete(room);
-                      setIsShowOverlayModalConfirmDelete(true);
-                    }}
-                  >
-                    <i
-                      className="fa-regular fa-trash-can"
-                      style={{ color: "#d91b1b" }}
-                    ></i>
-                    Xoá hội thoại
-                  </div>
-                </div>
-              )}
             </div>
+            {isShowDropdownOption?.id === room.id && (
+              <div className="dropdown-menu" ref={dropdownRef}>
+                <div
+                  className="menu-item"
+                  style={{ color: "#d91b1b" }}
+                  onClick={() => {
+                    setIsShowDropdownOption(false);
+                    setRoomDelete(room);
+                    setIsShowOverlayModalConfirmDelete(true);
+                  }}
+                >
+                  <i
+                    className="fa-regular fa-trash-can"
+                    style={{ color: "#d91b1b" }}
+                  ></i>
+                  Xoá hội thoại
+                </div>
+              </div>
+            )}
             <div
               className={
                 room.id === selectedGroupMessaging?.room?.id

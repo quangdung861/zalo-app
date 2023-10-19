@@ -226,31 +226,31 @@ export const Container = styled.div`
               :hover {
                 background-color: #f1f1f1;
               }
-              .dropdown-menu {
-                background-color: #fff;
-                width: 220px;
-                position: absolute;
-                right: 0px;
-                top: 12px;
-                border-radius: 4px;
-                box-shadow: var(--box-shadow-default);
-                padding: 8px 0px;
-                z-index: 11;
-                .menu-item {
-                  padding: 0 8px;
-                  height: 36px;
-                  display: flex;
-                  align-items: center;
-                  padding: 12px;
-                  > i {
-                    margin-right: 16px;
-                    font-size: 16px;
-                    color: rgb(117, 137, 163);
-                  }
-                  :hover {
-                    cursor: pointer;
-                    background-color: #f1f1f1;
-                  }
+            }
+            .dropdown-menu {
+              background-color: #fff;
+              width: 220px;
+              position: absolute;
+              right: 0px;
+              top: 12px;
+              border-radius: 4px;
+              box-shadow: var(--box-shadow-default);
+              padding: 8px 0px;
+              z-index: 11;
+              .menu-item {
+                padding: 0 8px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                > i {
+                  margin-right: 16px;
+                  font-size: 16px;
+                  color: rgb(117, 137, 163);
+                }
+                :hover {
+                  cursor: pointer;
+                  background-color: #f1f1f1;
                 }
               }
             }
