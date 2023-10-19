@@ -24,6 +24,7 @@ import slideList from "./slideList";
 import searchEmpty2 from "assets/searchEmpty2.png";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
+import ModalConfirm from "components/ModalConfirm";
 
 const MessagePage = () => {
   const {
@@ -84,6 +85,8 @@ const MessagePage = () => {
   const [loading, setLoading] = useState(true);
   const [categorySelected, setCategorySelected] = useState("");
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
+  const [isShowOverlayModalConfirmDelete, setIsShowOverlayModalConfirmDelete] =
+    useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -231,45 +234,52 @@ const MessagePage = () => {
 
   const [keywords, setKeywords] = useState("");
 
-  const handleDeleteRoomChat = async ({ room }) => {
-    const roomRef = doc(db, "rooms", room.id);
+  const [roomDelete, setRoomDelete] = useState();
 
-    await setDoc(
-      roomRef,
-      {
-        ...(room.deleted && {
-          deleted: [...room.deleted, userInfo.uid],
-        }),
-        ...(!room.deleted && {
-          deleted: [userInfo.uid],
-        }),
-      },
-      {
-        merge: true,
-      }
+  const handleDeleteRoomChat = async () => {
+    const now = moment().valueOf();
+    const newDeleted = [...roomDelete.deleted].filter(
+      (item) => item.uid !== userInfo.uid
     );
+    newDeleted.push({ uid: userInfo.uid, createdAt: now });
+
+    if (roomDelete.category === "single" || roomDelete.category === "cloud") {
+      const roomRef = doc(db, "rooms", roomDelete.id);
+      await setDoc(
+        roomRef,
+        {
+          deleted: newDeleted,
+          hideTemporarily: [
+            ...new Set([...roomDelete.hideTemporarily, userInfo.uid]),
+          ],
+        },
+        {
+          merge: true,
+        }
+      );
+    }
+
+    if (roomDelete.category === "group") {
+      const roomRef = doc(db, "rooms", roomDelete.id);
+
+      await setDoc(
+        roomRef,
+        {
+          deleted: newDeleted,
+          hideTemporarily: [
+            ...new Set([...roomDelete.hideTemporarily, userInfo.uid]),
+          ],
+        },
+        {
+          merge: true,
+        }
+      );
+    }
+
     setIsShowDropdownOption(false);
-  };
-
-  const handleDeleteRoomChatGroup = async ({ room }) => {
-    const roomRef = doc(db, "rooms", room.id);
-
-    await setDoc(
-      roomRef,
-      {
-        ...(room.deleted && {
-          deleted: [...room.deleted, userInfo.uid],
-        }),
-        ...(!room.deleted && {
-          deleted: [userInfo.uid],
-        }),
-      },
-      {
-        merge: true,
-      }
-    );
-
-    setIsShowDropdownOption(false);
+    setRoomDelete();
+    setIsShowBoxChat(false);
+    setIsShowBoxChatGroup(false);
   };
 
   const renderRooms = useMemo(() => {
@@ -280,13 +290,9 @@ const MessagePage = () => {
     }
 
     return rooms?.map((room) => {
-      if (room.category === "single" || room.category === "my cloud") {
-        if (room.deleted) {
-          if (room.deleted.includes(userInfo.uid)) {
-            return;
-          }
-        }
+      if (room.hideTemporarily?.includes(userInfo.uid)) return;
 
+      if (room.category === "single" || room.category === "my cloud") {
         const infoPartnerResult = infoPartner.find((item) => {
           return room.members.includes(item.uid);
         });
@@ -420,7 +426,11 @@ const MessagePage = () => {
                   <div
                     className="menu-item"
                     style={{ color: "#d91b1b" }}
-                    onClick={() => handleDeleteRoomChat({ room: room })}
+                    onClick={() => {
+                      setIsShowDropdownOption(false);
+                      setRoomDelete(room);
+                      setIsShowOverlayModalConfirmDelete(true);
+                    }}
                   >
                     <i
                       className="fa-regular fa-trash-can"
@@ -618,7 +628,11 @@ const MessagePage = () => {
                   <div
                     className="menu-item"
                     style={{ color: "#d91b1b" }}
-                    onClick={() => handleDeleteRoomChatGroup({ room: room })}
+                    onClick={() => {
+                      setIsShowDropdownOption(false);
+                      setRoomDelete(room);
+                      setIsShowOverlayModalConfirmDelete(true);
+                    }}
                   >
                     <i
                       className="fa-regular fa-trash-can"
@@ -987,6 +1001,15 @@ const MessagePage = () => {
 
       {isShowOverlayModal && (
         <ModalCreateGroup setIsShowOverlayModal={setIsShowOverlayModal} />
+      )}
+
+      {isShowOverlayModalConfirmDelete && (
+        <ModalConfirm
+          setIsShowOverlayModalConfirmDelete={
+            setIsShowOverlayModalConfirmDelete
+          }
+          handleDeleteRoomChat={handleDeleteRoomChat}
+        />
       )}
     </S.Wrapper>
   );

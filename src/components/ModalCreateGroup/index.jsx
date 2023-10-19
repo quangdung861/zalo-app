@@ -336,6 +336,8 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       //
       name: groupName,
       avatar: imgPreviewAvatar || "",
+      deleted: [],
+      hideTemporarily: [],
     };
 
     try {

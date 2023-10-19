@@ -210,7 +210,7 @@ const BoxChat = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
-                deleted: [],
+                hideTemporarily: [],
               },
               {
                 merge: true,
@@ -246,6 +246,7 @@ const BoxChat = () => {
                   { uid: selectedUserMessaging.uidSelected, count: 0 },
                 ],
                 deleted: [],
+                hideTemporarily: [],
               });
 
               const response = await getDoc(roomRef);
@@ -324,7 +325,7 @@ const BoxChat = () => {
               },
               totalMessages: room.totalMessages + 1,
               messagesViewed: newMessageViewed,
-              deleted: [],
+              hideTemporarily: [],
             },
             {
               merge: true,
@@ -360,6 +361,7 @@ const BoxChat = () => {
                 { uid: selectedUserMessaging.uidSelected, count: 0 },
               ],
               deleted: [],
+              hideTemporarily: [],
             });
 
             const response = await getDoc(roomRef);
@@ -609,6 +611,18 @@ const BoxChat = () => {
 
   const renderMessages = useMemo(() => {
     return messages?.map((item) => {
+      const infoDeleted = room.deleted?.find(
+        (item) => item.uid === userInfo.uid
+      );
+
+      if (infoDeleted) {
+        const formatDate = moment(item.createdAt)._i.seconds * 1000;
+
+        if (formatDate < infoDeleted?.createdAt) {
+          return;
+        }
+      }
+
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );
@@ -945,7 +959,7 @@ const BoxChat = () => {
         </div>
       );
     });
-  }, [messages, infoUsers, isShowDropdownOption]);
+  }, [messages, infoUsers, isShowDropdownOption, room.deleted]);
 
   const renderCreatedAt = () => {
     if (room.createdAt) {

@@ -267,7 +267,7 @@ const BoxChatGroup = () => {
                 ...(!room.mentioned && {
                   mentioned: mentions,
                 }),
-                deleted: [],
+                hideTemporarily: [],
               },
               {
                 merge: true,
@@ -356,7 +356,7 @@ const BoxChatGroup = () => {
                 ...(!room.mentioned && {
                   mentioned: mentions,
                 }),
-                deleted: [],
+                hideTemporarily: [],
               },
               {
                 merge: true,
@@ -615,6 +615,18 @@ const BoxChatGroup = () => {
 
   const renderMessages = () => {
     return messages?.map((item) => {
+      const infoDeleted = room.deleted?.find(
+        (item) => item.uid === userInfo.uid
+      );
+
+      if (infoDeleted) {
+        const formatDate = moment(item.createdAt)._i.seconds * 1000;
+
+        if (formatDate < infoDeleted?.createdAt) {
+          return;
+        }
+      }
+
       const newInfoUser = infoUsers?.find(
         (infoUser) => infoUser.uid === item.uid
       );
