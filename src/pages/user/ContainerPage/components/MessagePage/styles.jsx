@@ -279,7 +279,7 @@ export const Container = styled.div`
               .room-item {
                 &__right {
                   .date {
-                    display: none;
+                    visibility: hidden;
                   }
                 }
               }
