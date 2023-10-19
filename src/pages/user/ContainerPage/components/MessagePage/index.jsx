@@ -235,7 +235,6 @@ const MessagePage = () => {
   const [keywords, setKeywords] = useState("");
 
   const [roomDelete, setRoomDelete] = useState();
-  console.log("🚀 ~ file: index.jsx:238 ~ MessagePage ~ roomDelete:", roomDelete)
 
   const handleDeleteRoomChat = async () => {
     const now = moment().valueOf();
@@ -243,8 +242,6 @@ const MessagePage = () => {
       (item) => item.uid !== userInfo.uid
     );
     newDeleted.push({ uid: userInfo.uid, createdAt: now });
-
-    console.log(newDeleted);
 
     if (roomDelete.category === "single" || roomDelete.category === "my cloud") {
       const roomRef = doc(db, "rooms", roomDelete.id);
