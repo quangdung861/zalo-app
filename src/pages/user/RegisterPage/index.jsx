@@ -97,6 +97,8 @@ const LoginPage = () => {
             },
             totalMessages: 0,
             messagesViewed: [{ uid: data.user.uid, count: 0 }],
+            deleted: [],
+            hideTemporarily: [],
           });
         }
       }
@@ -187,6 +189,8 @@ const LoginPage = () => {
             },
             totalMessages: 0,
             messagesViewed: [{ uid: data.user.uid, count: 0 }],
+            deleted: [],
+            hideTemporarily: [],
           });
         }
       }
