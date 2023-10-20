@@ -138,6 +138,7 @@ export const Container = styled.div`
           position: relative;
           overflow-y: scroll;
           overflow-x: visible;
+          position: relative;
           &::-webkit-scrollbar {
             -webkit-appearance: none;
           }
@@ -306,13 +307,11 @@ export const Container = styled.div`
             user-select: none;
             width: 93%;
             max-width: 324px;
-            position: sticky;
+            position: fixed;
             z-index: 98;
             margin: 0 auto;
-            left: 0;
-            right: 0;
-            top: 452px;
-            bottom: 14px;
+            bottom: 12px;
+            left: calc(var(--sidebar-width) + 13px);
             background-color: #fff;
             border-radius: 6px;
             overflow: hidden;
