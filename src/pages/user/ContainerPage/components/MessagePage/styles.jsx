@@ -307,11 +307,13 @@ export const Container = styled.div`
             user-select: none;
             width: 93%;
             max-width: 324px;
-            position: fixed;
+            position: sticky;
             z-index: 98;
             margin: 0 auto;
-            bottom: 12px;
-            left: calc(var(--sidebar-width) + 13px);
+            top: 436px;
+            bottom: 16px;
+            left: 0;
+            right: 0;
             background-color: #fff;
             border-radius: 6px;
             overflow: hidden;
