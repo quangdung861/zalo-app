@@ -103,8 +103,7 @@ const AppProvider = ({ children }) => {
       const getStrangerList = async () => {
         // Nơi add thêm trường dữ liệu mới - sau khi add xong thì comment lại!
 
-        /**
-         * 
+       
         
         const allUsesrRef = query(collection(db, "messages"));
         const response2 = await getDocs(allUsesrRef);
@@ -150,8 +149,7 @@ const AppProvider = ({ children }) => {
             }
           );
         }
-        * 
-         */
+     
         //
 
         let strangerListRef;
