@@ -345,7 +345,7 @@ export const Container = styled.div`
                 position: absolute;
                 bottom: 0;
                 left: -140px;
-                z-index: 99;
+                z-index: 4;
                 user-select: none;
                 width: auto;
                 height: auto;
@@ -613,7 +613,7 @@ export const Container = styled.div`
               .box-emoji {
                 position: absolute;
                 bottom: 0;
-                z-index: 99;
+                z-index: 4;
                 user-select: none;
                 width: auto;
                 height: auto;
@@ -789,10 +789,10 @@ export const Container = styled.div`
         position: relative;
         display: flex;
         align-items: center;
-        z-index: 100;
+        z-index: 4;
         .emoji-mart {
           position: absolute;
-          z-index: 99;
+          z-index: 4;
           bottom: 50px;
           left: 8px;
           box-shadow: var(--box-shadow-default);
