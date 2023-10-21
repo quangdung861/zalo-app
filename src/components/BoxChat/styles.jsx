@@ -808,6 +808,7 @@ export const Container = styled.div`
         align-items: center;
         .emoji-mart {
           position: absolute;
+          z-index: 99;
           bottom: 50px;
           left: 8px;
           box-shadow: var(--box-shadow-default);

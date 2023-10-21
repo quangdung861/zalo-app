@@ -789,9 +789,10 @@ export const Container = styled.div`
         position: relative;
         display: flex;
         align-items: center;
-        z-index: 3;
+        z-index: 100;
         .emoji-mart {
           position: absolute;
+          z-index: 99;
           bottom: 50px;
           left: 8px;
           box-shadow: var(--box-shadow-default);
