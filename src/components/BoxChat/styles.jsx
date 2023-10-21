@@ -255,6 +255,7 @@ export const Container = styled.div`
               min-width: 115px;
               min-height: 83px;
               word-break: break-word;
+              position: relative;
               > img.image-item {
                 cursor: pointer;
               }
@@ -308,6 +309,111 @@ export const Container = styled.div`
               .box-date {
                 text-align: left;
               }
+              .reaction-emoji {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                user-select: none;
+                .emoji-newest {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 50%;
+                  border: 0.5px solid var(--boder-dividing-color);
+                  padding: 5px;
+                  background-color: #fff;
+                  cursor: pointer;
+                  > img {
+                    width: 16px;
+                    object-fit: cover;
+                  }
+                  > span {
+                    font-size: 14px;
+                  }
+                }
+                .total-emoji {
+                  display: flex;
+                  position: relative;
+                  margin: 0 5px;
+                  padding: 1px 10px;
+                  cursor: pointer;
+                  border: 0.5px solid var(--boder-dividing-color);
+                  border-radius: 15px;
+                  white-space: nowrap;
+                  align-items: center;
+                  z-index: 4;
+                  gap: 4px;
+                  background-color: #fff;
+                  > img {
+                    width: 16px;
+                    object-fit: cover;
+                  }
+                }
+              }
+              .box-emoji {
+                position: absolute;
+                bottom: 0;
+                left: -140px;
+                z-index: 99;
+                user-select: none;
+                width: auto;
+                height: auto;
+                .btn-emoji {
+                  width: 26px;
+                  height: 26px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 50%;
+                  background-color: #fff;
+                  border: 1px solid var(--boder-dividing-color);
+                  cursor: pointer;
+                  position: absolute;
+                  bottom: -14px;
+                  right: -174px;
+                  > i {
+                    font-size: 14px;
+                    color: #7589a3;
+                  }
+                }
+                .dropdown-emoji-list {
+                  /* visibility: hidden; */
+                  /* transition-delay: 0.5s;  */
+                  position: absolute;
+                  bottom: 15px;
+                  left: 0;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 6px 18px;
+                  background-color: #fff;
+                  border: 1px solid var(--boder-dividing-color);
+                  border-radius: 30px;
+                  .emoji-item {
+                    width: 24px;
+                    height: auto;
+                    object-fit: cover;
+                    cursor: pointer;
+                    &:hover {
+                      transform: scale(1.2);
+                      transition: transform 0.1s ease;
+                    }
+                  }
+                  .btn-close {
+                    color: #7589a3;
+                    cursor: pointer;
+                  }
+                  /* &:hover {
+                    visibility: visible;
+                  } */
+                }
+
+                /* .btn-emoji:hover + .dropdown-emoji-list {
+                  visibility: visible;
+                } */
+              }
+
               .message-reply {
                 background-color: #c7e0ff;
                 border-radius: 6px;
@@ -319,10 +425,11 @@ export const Container = styled.div`
               }
             }
           }
+
           .container-options {
             position: relative;
             .myself-options {
-              margin: 0 12px 10px 0px;
+              margin: 0 12px 16px 0px;
               background-color: rgba(255, 255, 255, 0.3);
               border-radius: 6px;
               height: 22px;
@@ -350,7 +457,7 @@ export const Container = styled.div`
               background-color: #fff;
               width: 220px;
               position: absolute;
-              z-index: 2;
+              z-index: 99;
               left: -124px;
               bottom: 120%;
               border-radius: 4px;
@@ -412,6 +519,7 @@ export const Container = styled.div`
               min-width: 115px;
               min-height: 83px;
               word-break: break-word;
+              position: relative;
               .reply-content {
                 padding: 10px 9px 10px 12px;
                 margin-bottom: 8px;
@@ -464,6 +572,111 @@ export const Container = styled.div`
               .box-date {
                 text-align: left;
               }
+              .reaction-emoji {
+                display: flex;
+                flex-direction: row-reverse;
+                justify-content: flex-start;
+                align-items: center;
+                user-select: none;
+                .emoji-newest {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 50%;
+                  border: 0.5px solid var(--boder-dividing-color);
+                  padding: 5px;
+                  background-color: #fff;
+                  cursor: pointer;
+                  > img {
+                    width: 16px;
+                    object-fit: cover;
+                  }
+                  > span {
+                    font-size: 14px;
+                  }
+                }
+                .total-emoji {
+                  display: flex;
+                  position: relative;
+                  margin: 0 5px;
+                  padding: 1px 10px;
+                  cursor: pointer;
+                  border: 0.5px solid var(--boder-dividing-color);
+                  border-radius: 15px;
+                  white-space: nowrap;
+                  align-items: center;
+                  z-index: 4;
+                  gap: 4px;
+                  background-color: #fff;
+                  > img {
+                    width: 16px;
+                    object-fit: cover;
+                  }
+                }
+              }
+              .box-emoji {
+                position: absolute;
+                bottom: 0;
+                z-index: 99;
+                user-select: none;
+                width: auto;
+                height: auto;
+                right: 0;
+                .btn-emoji {
+                  width: 26px;
+                  height: 26px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 50%;
+                  background-color: #fff;
+                  border: 1px solid var(--boder-dividing-color);
+                  cursor: pointer;
+                  position: absolute;
+                  bottom: -14px;
+                  right: 10px;
+                  > i {
+                    font-size: 14px;
+                    color: #7589a3;
+                  }
+                }
+                .dropdown-emoji-list {
+                  /* visibility: hidden; */
+                  /* transition-delay: 0.5s;  */
+                  position: absolute;
+                  bottom: 15px;
+                  left: -90px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 6px 18px;
+                  background-color: #fff;
+                  border: 1px solid var(--boder-dividing-color);
+                  border-radius: 30px;
+                  .emoji-item {
+                    width: 24px;
+                    height: auto;
+                    object-fit: cover;
+                    cursor: pointer;
+                    &:hover {
+                      transform: scale(1.2);
+                      transition: transform 0.1s ease;
+                    }
+                  }
+                  .btn-close {
+                    color: #7589a3;
+                    cursor: pointer;
+                  }
+                  /* &:hover {
+                    visibility: visible;
+                  } */
+                }
+
+                /* .btn-emoji:hover + .dropdown-emoji-list {
+                  visibility: visible;
+                } */
+              }
               .message-reply {
                 background-color: #c7e0ff;
                 border-radius: 6px;
@@ -478,7 +691,7 @@ export const Container = styled.div`
           .container-options {
             position: relative;
             .other-options {
-              margin: 0 0 10px 12px;
+              margin: 0 0 16px 12px;
               background-color: rgba(255, 255, 255, 0.3);
               border-radius: 6px;
               height: 22px;
@@ -506,7 +719,7 @@ export const Container = styled.div`
               background-color: #fff;
               width: 220px;
               position: absolute;
-              z-index: 2;
+              z-index: 99;
               left: 80px;
               bottom: 120%;
               border-radius: 4px;

@@ -26,6 +26,11 @@ import ModalAccountGroup from "components/ModalAccoutGroup";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImagesToBase64 } from "utils/image";
 import ModalSharingMessage from "components/ModalSharingMessage";
+import smileIcon from "assets/emoji/smile.png";
+import heartIcon from "assets/emoji/heart.png";
+import surpriseIcon from "assets/emoji/surprise.png";
+import cryIcon from "assets/emoji/cry.png";
+import angryIcon from "assets/emoji/angry.png";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -49,6 +54,7 @@ const BoxChatGroup = () => {
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [isShowDropdownTagName, setIsShowDropdownTagName] = useState(false);
   const [usernames, setUsernames] = useState({});
+  const [emojis, setEmojis] = useState();
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -56,8 +62,32 @@ const BoxChatGroup = () => {
   const dropdownRef = useRef();
   const categoryRef = useRef();
   const dropdownTagnameRef = useRef();
+  const dropdownSelectEmoji = useRef();
 
   const audio = new Audio(messageSend);
+
+  const dataIconEmoji = [
+    {
+      id: "smile",
+      src: smileIcon,
+    },
+    {
+      id: "heart",
+      src: heartIcon,
+    },
+    {
+      id: "surprise",
+      src: surpriseIcon,
+    },
+    {
+      id: "cry",
+      src: cryIcon,
+    },
+    {
+      id: "angry",
+      src: angryIcon,
+    },
+  ];
 
   const [isShowContainerImageList, setIsShowContainerImageList] =
     useState(true);
@@ -73,6 +103,12 @@ const BoxChatGroup = () => {
         !dropdownTagnameRef.current.contains(event.target)
       ) {
         setIsShowDropdownTagName(false);
+      }
+      if (
+        dropdownSelectEmoji.current &&
+        !dropdownSelectEmoji.current.contains(event.target)
+      ) {
+        setEmojis(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -283,6 +319,28 @@ const BoxChatGroup = () => {
               text: inputValue,
               images: imageBase64FullInfo || [],
               infoReply: infoReply,
+              emojiList: [
+                {
+                  id: "smile",
+                  uids: [],
+                },
+                {
+                  id: "heart",
+                  uids: [],
+                },
+                {
+                  id: "surprise",
+                  uids: [],
+                },
+                {
+                  id: "cry",
+                  uids: [],
+                },
+                {
+                  id: "angry",
+                  uids: [],
+                },
+              ],
             });
           };
           createMes();
@@ -372,6 +430,28 @@ const BoxChatGroup = () => {
               text: inputValue,
               images: [],
               infoReply: infoReply,
+              emojiList: [
+                {
+                  id: "smile",
+                  uids: [],
+                },
+                {
+                  id: "heart",
+                  uids: [],
+                },
+                {
+                  id: "surprise",
+                  uids: [],
+                },
+                {
+                  id: "cry",
+                  uids: [],
+                },
+                {
+                  id: "angry",
+                  uids: [],
+                },
+              ],
             });
           };
           createMes();
@@ -613,6 +693,73 @@ const BoxChatGroup = () => {
     );
   };
 
+  const handleAddEmoji = async ({ id, message }) => {
+    const emojiList = message.emojiList;
+
+    const myData = emojiList.find((item) => item.id === id);
+
+    const myDataIndex = myData.uids.findIndex(
+      (item) => item.uid === userInfo.uid
+    );
+
+    if (myDataIndex !== -1) {
+      const updatedEmojiList = emojiList.map((emoji) => {
+        const updatedUids = emoji.uids.map((uid) => {
+          if (uid.uid === userInfo.uid) {
+            return { ...uid, isNewest: false };
+          }
+          return uid; // Giữ nguyên các phần tử khác trong mảng uids
+        });
+
+        return { ...emoji, uids: updatedUids };
+      });
+
+      updatedEmojiList
+        .find((item) => item.id === id)
+        .uids.splice(myDataIndex, 1, {
+          ...updatedEmojiList.find((item) => item.id === id).uids[myDataIndex],
+          isNewest: true,
+          quantity:
+            updatedEmojiList.find((item) => item.id === id).uids[myDataIndex]
+              ?.quantity + 1,
+        });
+
+      const messagesRef = doc(db, "messages", message.id);
+
+      await setDoc(
+        messagesRef,
+        {
+          emojiList: updatedEmojiList,
+        },
+        {
+          merge: true,
+        }
+      );
+      setEmojis();
+    } else {
+      emojiList
+        .find((item) => item.id === id)
+        .uids.push({
+          uid: userInfo.uid,
+          isNewest: true,
+          quantity: 1,
+        });
+
+      const messagesRef = doc(db, "messages", message.id);
+
+      await setDoc(
+        messagesRef,
+        {
+          emojiList: emojiList,
+        },
+        {
+          merge: true,
+        }
+      );
+      setEmojis();
+    }
+  };
+
   const renderMessages = () => {
     return messages?.map((item) => {
       const infoDeleted = room.deleted?.find(
@@ -677,8 +824,37 @@ const BoxChatGroup = () => {
         return <div dangerouslySetInnerHTML={{ __html: text }} />;
       };
 
+      let total = 0;
+
+      item.emojiList.forEach((element) => {
+        element.uids.forEach((item) => {
+          total = total + item.quantity;
+        });
+      });
+
+      const isNewest = item.emojiList.find((emoji) =>
+        emoji.uids.find((item) => item.uid === userInfo.uid && item.isNewest)
+      );
+
+      const sortedEmojiList = item.emojiList.sort((a, b) => {
+        const sumQuantityA = a.uids.reduce(
+          (total, uid) => total + uid.quantity,
+          0
+        );
+        const sumQuantityB = b.uids.reduce(
+          (total, uid) => total + uid.quantity,
+          0
+        );
+
+        return sumQuantityB - sumQuantityA; // Sắp xếp theo thứ tự giảm dần
+      });
+
       return (
-        <div key={item.id} className="message-item">
+        <div
+          key={item.id}
+          className="message-item"
+          onMouseLeave={() => setEmojis()}
+        >
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
               <div className="container-options">
@@ -829,6 +1005,107 @@ const BoxChatGroup = () => {
                   )}
 
                   <div className="box-date">{renderCreatedAtMessage()}</div>
+                  {total > 0 && (
+                    <div className="reaction-emoji">
+                      {isNewest && (
+                        <div className="emoji-newest">
+                          <img
+                            src={
+                              dataIconEmoji.find(
+                                (item) => item.id === isNewest.id
+                              ).src
+                            }
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: isNewest.id, message: item })
+                            }
+                          />
+                        </div>
+                      )}
+
+                      <div className="total-emoji">
+                        <span>{total}</span>
+
+                        {sortedEmojiList
+                          .slice(0, 3)
+                          .map(
+                            (emoji, index) =>
+                              emoji.uids[0] && (
+                                <img
+                                  key={emoji.id}
+                                  src={
+                                    dataIconEmoji.find(
+                                      (item) => item.id === emoji.id
+                                    ).src
+                                  }
+                                  alt=""
+                                />
+                              )
+                          )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="box-emoji">
+                    <div
+                      className="btn-emoji"
+                      onMouseEnter={() => setEmojis(item.id)}
+                    >
+                      <i className="fa-regular fa-thumbs-up"></i>
+                    </div>
+                    {emojis === item.id && (
+                      <div
+                        className="dropdown-emoji-list"
+                        ref={dropdownSelectEmoji}
+                      >
+                        <img
+                          src={smileIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "smile", message: item })
+                          }
+                        />
+                        <img
+                          src={heartIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "heart", message: item })
+                          }
+                        />
+                        <img
+                          src={surpriseIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "surprise", message: item })
+                          }
+                        />
+                        <img
+                          src={cryIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "cry", message: item })
+                          }
+                        />
+                        <img
+                          src={angryIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "angry", message: item })
+                          }
+                        />
+                        <i
+                          className="fa-solid fa-xmark btn-close"
+                          onClick={() => setEmojis()}
+                        ></i>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <img src={item.photoURL} alt="" className="avatar" />
               </div>
@@ -904,6 +1181,106 @@ const BoxChatGroup = () => {
                     </span>
                   )}
                   <div className="box-date">{renderCreatedAtMessage()} </div>
+                  {total > 0 && (
+                    <div className="reaction-emoji">
+                      {isNewest && (
+                        <div className="emoji-newest">
+                          <img
+                            src={
+                              dataIconEmoji.find(
+                                (item) => item.id === isNewest.id
+                              ).src
+                            }
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: isNewest.id, message: item })
+                            }
+                          />
+                        </div>
+                      )}
+
+                      <div className="total-emoji">
+                        <span>{total}</span>
+
+                        {sortedEmojiList
+                          .slice(0, 3)
+                          .map(
+                            (emoji, index) =>
+                              emoji.uids[0] && (
+                                <img
+                                  key={emoji.id}
+                                  src={
+                                    dataIconEmoji.find(
+                                      (item) => item.id === emoji.id
+                                    ).src
+                                  }
+                                  alt=""
+                                />
+                              )
+                          )}
+                      </div>
+                    </div>
+                  )}
+                  <div className="box-emoji">
+                    <div
+                      className="btn-emoji"
+                      onMouseEnter={() => setEmojis(item.id)}
+                    >
+                      <i className="fa-regular fa-thumbs-up"></i>
+                    </div>
+                    {emojis === item.id && (
+                      <div
+                        className="dropdown-emoji-list"
+                        ref={dropdownSelectEmoji}
+                      >
+                        <img
+                          src={smileIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "smile", message: item })
+                          }
+                        />
+                        <img
+                          src={heartIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "heart", message: item })
+                          }
+                        />
+                        <img
+                          src={surpriseIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "surprise", message: item })
+                          }
+                        />
+                        <img
+                          src={cryIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "cry", message: item })
+                          }
+                        />
+                        <img
+                          src={angryIcon}
+                          alt=""
+                          className="emoji-item"
+                          onClick={() =>
+                            handleAddEmoji({ id: "angry", message: item })
+                          }
+                        />
+                        <i
+                          className="fa-solid fa-xmark btn-close"
+                          onClick={() => setEmojis()}
+                        ></i>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="container-options">
