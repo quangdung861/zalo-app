@@ -367,6 +367,9 @@ export const Container = styled.div`
                     color: #7589a3;
                   }
                 }
+                .btn-emoji-hidden {
+                  display: none;
+                }
                 .dropdown-emoji-list {
                   /* visibility: hidden; */
                   /* transition-delay: 0.5s;  */
@@ -471,6 +474,15 @@ export const Container = styled.div`
             }
           }
           &:hover {
+            .box-image {
+              .text {
+                .box-emoji {
+                  .btn-emoji-hidden {
+                    display: flex;
+                  }
+                }
+              }
+            }
             .myself-options {
               visibility: visible;
             }
@@ -624,6 +636,9 @@ export const Container = styled.div`
                     color: #7589a3;
                   }
                 }
+                .btn-emoji-hidden {
+                  display: none;
+                }
                 .dropdown-emoji-list {
                   /* visibility: hidden; */
                   /* transition-delay: 0.5s;  */
@@ -728,6 +743,15 @@ export const Container = styled.div`
             }
           }
           &:hover {
+            .box-image {
+              .text {
+                .box-emoji {
+                  .btn-emoji-hidden {
+                    display: flex;
+                  }
+                }
+              }
+            }
             .other-options {
               visibility: visible;
             }

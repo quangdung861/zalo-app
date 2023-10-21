@@ -801,7 +801,7 @@ const BoxChat = () => {
   };
 
   const renderMessages = useMemo(() => {
-    return messages?.map((item) => {
+    return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
         (item) => item.uid === userInfo.uid
       );
@@ -875,6 +875,15 @@ const BoxChat = () => {
 
         return sumQuantityB - sumQuantityA; // Sắp xếp theo thứ tự giảm dần
       });
+
+      //
+
+      const lastIndex = messages.reduce((lastIndex, element, index) => {
+        if (element.uid !== userInfo.uid) {
+          return index; // Lưu lại chỉ mục của phần tử thỏa mãn điều kiện
+        }
+        return lastIndex; // Nếu không tìm thấy, trả về giá trị trước đó
+      }, -1);
 
       return (
         <div
@@ -1079,11 +1088,12 @@ const BoxChat = () => {
 
                   <div className="box-emoji">
                     <div
-                      className="btn-emoji"
+                      className="btn-emoji btn-emoji-hidden"
                       onMouseEnter={() => setEmojis(item.id)}
                     >
                       <i className="fa-regular fa-thumbs-up"></i>
                     </div>
+
                     {emojis === item.id && (
                       <div
                         className="dropdown-emoji-list"
@@ -1245,12 +1255,22 @@ const BoxChat = () => {
                     </div>
                   )}
                   <div className="box-emoji">
+                    {lastIndex === index && (
+                      <div
+                        className="btn-emoji"
+                        onMouseEnter={() => setEmojis(item.id)}
+                      >
+                        <i className="fa-regular fa-thumbs-up"></i>
+                      </div>
+                    )}
+
                     <div
-                      className="btn-emoji"
+                      className="btn-emoji btn-emoji-hidden"
                       onMouseEnter={() => setEmojis(item.id)}
                     >
                       <i className="fa-regular fa-thumbs-up"></i>
                     </div>
+
                     {emojis === item.id && (
                       <div
                         className="dropdown-emoji-list"
