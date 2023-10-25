@@ -238,6 +238,7 @@ export const Container = styled.div`
               margin-left: 12px;
               border: 1px solid #fff;
               user-select: none;
+              object-fit: cover;
             }
             > .text {
               font-size: 15px;
@@ -251,6 +252,27 @@ export const Container = styled.div`
               min-height: 83px;
               word-break: break-word;
               position: relative;
+              .dropdown-username-reaction {
+                position: absolute;
+                max-width: 200px;
+                max-height: 100px;
+                background-color: #081c35;
+                left: 48px;
+                top: 100%;
+                margin-top: -8px;
+                color: #fff;
+                padding: 6px 20px;
+                border-radius: 4px;
+                user-select: none;
+                z-index: 10;
+                .reaction-userName {
+                  font-size: 12px;
+                  color: #fff;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
               .reply-content {
                 padding: 10px 9px 10px 12px;
                 margin-bottom: 8px;
@@ -508,6 +530,8 @@ export const Container = styled.div`
               margin-left: 12px;
               border: 1px solid #fff;
               user-select: none;
+              object-fit: cover;
+              cursor: pointer;
             }
             > .text {
               font-size: 15px;
@@ -520,6 +544,27 @@ export const Container = styled.div`
               min-height: 83px;
               word-break: break-word;
               position: relative;
+              .dropdown-username-reaction {
+                position: absolute;
+                max-width: 200px;
+                max-height: 100px;
+                background-color: #081c35;
+                right: 48px;
+                top: 100%;
+                margin-top: -8px;
+                color: #fff;
+                padding: 6px 20px;
+                border-radius: 4px;
+                user-select: none;
+                z-index: 5;
+                .reaction-userName {
+                  font-size: 12px;
+                  color: #fff;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
               .reply-content {
                 padding: 10px 9px 10px 12px;
                 margin-bottom: 8px;

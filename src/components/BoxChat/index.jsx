@@ -31,6 +31,7 @@ import heartIcon from "assets/emoji/heart.png";
 import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
+import { CSSTransition } from "react-transition-group";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
@@ -56,6 +57,8 @@ const BoxChat = () => {
     setIsShowOverlayModalSharingMessage,
   ] = useState(false);
   const [emojis, setEmojis] = useState();
+  const [isRenderUserNameInEmojiList, setIsRenderUserNameInEmojiList] =
+    useState(false);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -800,6 +803,34 @@ const BoxChat = () => {
     }
   };
 
+  const handleRemoveEmojis = async ({ message }) => {
+    let newEmojiList = [...message.emojiList];
+    newEmojiList = newEmojiList.map((item) => {
+      const updatedUids = item.uids
+        .map((uid) => {
+          if (uid.uid !== userInfo.uid) {
+            return uid;
+          }
+        })
+        .filter((uid) => uid !== undefined);
+
+      return { ...item, uids: updatedUids };
+    });
+
+    const messagesRef = doc(db, "messages", message.id);
+
+    await setDoc(
+      messagesRef,
+      {
+        emojiList: newEmojiList,
+      },
+      {
+        merge: true,
+      }
+    );
+    setEmojis();
+  };
+
   const renderMessages = useMemo(() => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
@@ -884,6 +915,29 @@ const BoxChat = () => {
         }
         return lastIndex; // Nếu không tìm thấy, trả về giá trị trước đó
       }, -1);
+
+      //
+
+      const userInEmojiList = [];
+
+      sortedEmojiList.forEach((item) =>
+        item.uids.forEach((uid) => userInEmojiList.push(uid.uid))
+      );
+
+      const uniqueUserInEmojiList = [...new Set(userInEmojiList)];
+
+      const renderUserNameInEmojiList = () => {
+        return uniqueUserInEmojiList?.map((uid, index) => {
+          const data = infoUsers?.find((item) => item.uid === uid);
+          if (data) {
+            return (
+              <div key={index} className="reaction-userName">
+                {uid === userInfo.uid ? "Bạn" : data.displayName}
+              </div>
+            );
+          }
+        });
+      };
 
       return (
         <div
@@ -985,6 +1039,18 @@ const BoxChat = () => {
               </div>
               <div className="box-image">
                 <div className="text">
+                  {isRenderUserNameInEmojiList === item.id && (
+                    <div
+                      className="dropdown-username-reaction"
+                      style={{
+                        bottom: messages.length - 1 === index ? "46px" : "auto",
+                        top: messages.length - 1 === index ? "auto" : "100%",
+                      }}
+                    >
+                      {renderUserNameInEmojiList()}
+                    </div>
+                  )}
+
                   {!item.isRecall ? (
                     <>
                       {item.infoReply?.id && (
@@ -1047,7 +1113,13 @@ const BoxChat = () => {
                   {total > 0 && (
                     <div className="reaction-emoji">
                       {isNewest && (
-                        <div className="emoji-newest">
+                        <div
+                          className="emoji-newest"
+                          onClick={() =>
+                            handleAddEmoji({ id: isNewest.id, message: item })
+                          }
+                          onMouseEnter={() => setEmojis(item.id)}
+                        >
                           <img
                             src={
                               dataIconEmoji.find(
@@ -1056,14 +1128,19 @@ const BoxChat = () => {
                             }
                             alt=""
                             className="emoji-item"
-                            onClick={() =>
-                              handleAddEmoji({ id: isNewest.id, message: item })
-                            }
                           />
                         </div>
                       )}
 
-                      <div className="total-emoji">
+                      <div
+                        className="total-emoji"
+                        onMouseEnter={() =>
+                          setIsRenderUserNameInEmojiList(item.id)
+                        }
+                        onMouseLeave={() =>
+                          setIsRenderUserNameInEmojiList(false)
+                        }
+                      >
                         <span>{total}</span>
 
                         {sortedEmojiList
@@ -1087,17 +1164,20 @@ const BoxChat = () => {
                   )}
 
                   <div className="box-emoji">
-                    <div
-                      className="btn-emoji btn-emoji-hidden"
-                      onMouseEnter={() => setEmojis(item.id)}
-                    >
-                      <i className="fa-regular fa-thumbs-up"></i>
-                    </div>
+                    {!isNewest && (
+                      <div
+                        className="btn-emoji btn-emoji-hidden"
+                        onMouseEnter={() => setEmojis(item.id)}
+                      >
+                        <i className="fa-regular fa-thumbs-up"></i>
+                      </div>
+                    )}
 
                     {emojis === item.id && (
                       <div
                         className="dropdown-emoji-list"
                         ref={dropdownSelectEmoji}
+                        style={{ marginBottom: isNewest ? "30px" : "auto" }}
                       >
                         <img
                           src={smileIcon}
@@ -1141,7 +1221,7 @@ const BoxChat = () => {
                         />
                         <i
                           className="fa-solid fa-xmark btn-close"
-                          onClick={() => setEmojis()}
+                          onClick={() => handleRemoveEmojis({ message: item })}
                         ></i>
                       </div>
                     )}
@@ -1153,7 +1233,12 @@ const BoxChat = () => {
           ) : (
             <div className="message-item__other">
               <div className="box-image">
-                <img src={newInfoUser?.photoURL} alt="" className="avatar" />
+                <img
+                  src={newInfoUser?.photoURL}
+                  alt=""
+                  className="avatar"
+                  onClick={() => setIsShowOverlayModal(true)}
+                />
                 <div className="text">
                   {!item.isRecall ? (
                     <>
@@ -1216,7 +1301,13 @@ const BoxChat = () => {
                   {total > 0 && (
                     <div className="reaction-emoji">
                       {isNewest && (
-                        <div className="emoji-newest">
+                        <div
+                          className="emoji-newest"
+                          onClick={() =>
+                            handleAddEmoji({ id: isNewest.id, message: item })
+                          }
+                          onMouseEnter={() => setEmojis(item.id)}
+                        >
                           <img
                             src={
                               dataIconEmoji.find(
@@ -1225,14 +1316,19 @@ const BoxChat = () => {
                             }
                             alt=""
                             className="emoji-item"
-                            onClick={() =>
-                              handleAddEmoji({ id: isNewest.id, message: item })
-                            }
                           />
                         </div>
                       )}
 
-                      <div className="total-emoji">
+                      <div
+                        className="total-emoji"
+                        onMouseEnter={() =>
+                          setIsRenderUserNameInEmojiList(item.id)
+                        }
+                        onMouseLeave={() =>
+                          setIsRenderUserNameInEmojiList(false)
+                        }
+                      >
                         <span>{total}</span>
 
                         {sortedEmojiList
@@ -1255,7 +1351,7 @@ const BoxChat = () => {
                     </div>
                   )}
                   <div className="box-emoji">
-                    {lastIndex === index && (
+                    {lastIndex === index && !isNewest && (
                       <div
                         className="btn-emoji"
                         onMouseEnter={() => setEmojis(item.id)}
@@ -1264,17 +1360,20 @@ const BoxChat = () => {
                       </div>
                     )}
 
-                    <div
-                      className="btn-emoji btn-emoji-hidden"
-                      onMouseEnter={() => setEmojis(item.id)}
-                    >
-                      <i className="fa-regular fa-thumbs-up"></i>
-                    </div>
+                    {!isNewest && (
+                      <div
+                        className="btn-emoji btn-emoji-hidden"
+                        onMouseEnter={() => setEmojis(item.id)}
+                      >
+                        <i className="fa-regular fa-thumbs-up"></i>
+                      </div>
+                    )}
 
                     {emojis === item.id && (
                       <div
                         className="dropdown-emoji-list"
                         ref={dropdownSelectEmoji}
+                        style={{ marginBottom: isNewest ? "30px" : "auto" }}
                       >
                         <img
                           src={smileIcon}
@@ -1318,11 +1417,22 @@ const BoxChat = () => {
                         />
                         <i
                           className="fa-solid fa-xmark btn-close"
-                          onClick={() => setEmojis()}
+                          onClick={() => handleRemoveEmojis({ message: item })}
                         ></i>
                       </div>
                     )}
                   </div>
+                  {isRenderUserNameInEmojiList === item.id && (
+                    <div
+                      className="dropdown-username-reaction"
+                      style={{
+                        bottom: messages.length - 1 === index ? "46px" : "auto",
+                        top: messages.length - 1 === index ? "auto" : "100%",
+                      }}
+                    >
+                      {renderUserNameInEmojiList()}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="container-options">
@@ -1403,7 +1513,14 @@ const BoxChat = () => {
         </div>
       );
     });
-  }, [messages, infoUsers, isShowDropdownOption, room.deleted, emojis]);
+  }, [
+    messages,
+    infoUsers,
+    isShowDropdownOption,
+    room.deleted,
+    emojis,
+    isRenderUserNameInEmojiList,
+  ]);
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
