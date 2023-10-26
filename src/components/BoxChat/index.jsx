@@ -989,7 +989,7 @@ const BoxChat = () => {
               <div className="reaction-item" key={uid2}>
                 <div className="reaction-item__left">
                   <img src={data.photoURL} alt="" />
-                  <span>{data.displayName}</span>
+                  <span>{data.displayName}which is intended for local testing only.  Do not use with production credent</span>
                 </div>
                 <div className="reaction-item__right">
                   {categoriesId.map(

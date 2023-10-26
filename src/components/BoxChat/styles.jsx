@@ -293,11 +293,17 @@ export const Container = styled.div`
                   justify-content: space-between;
                   align-items: center;
                   padding: 0 16px;
+                  gap: 10px;
                   &__left {
                     display: flex;
                     align-items: center;
+                    width: 220px;
+                    max-width: 100%;
+                    overflow: hidden;
                     > span {
                       text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
                     }
                     > img {
                       width: 36px;
@@ -310,6 +316,8 @@ export const Container = styled.div`
                   &__right {
                     display: flex;
                     align-items: center;
+                    justify-content: flex-end;
+                    min-width: 160px;
                     > img {
                       width: 20px;
                       height: 20px;
@@ -338,6 +346,7 @@ export const Container = styled.div`
                     font-weight: 600;
                     font-size: 14px;
                     position: relative;
+                    white-space: nowrap;
                     cursor: pointer;
                     > img {
                       width: 20px;
