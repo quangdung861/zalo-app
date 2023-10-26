@@ -173,7 +173,7 @@ export const Container = styled.div`
         -webkit-appearance: none;
       }
       &::-webkit-scrollbar:vertical {
-        width: 4px;
+        width: 0px;
       }
       &::-webkit-scrollbar-thumb {
         border-radius: 10px;
@@ -389,7 +389,7 @@ export const Container = styled.div`
             height: 100%;
             display: flex;
             align-items: flex-start;
-            margin-right: 16px;
+            margin-right: 15px;
             > img.avatar {
               width: 40px;
               height: 40px;
