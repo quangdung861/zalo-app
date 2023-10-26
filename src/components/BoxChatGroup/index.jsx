@@ -61,6 +61,8 @@ const BoxChatGroup = () => {
   const [viewUserDetail, setViewUserDetail] = useState();
   const [isRenderUserNameInEmojiList, setIsRenderUserNameInEmojiList] =
     useState(false);
+  const [isShowOverlayModalEmotion, setIsShowOverlayModalEmotion] =
+    useState(false);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -69,6 +71,7 @@ const BoxChatGroup = () => {
   const categoryRef = useRef();
   const dropdownTagnameRef = useRef();
   const dropdownSelectEmoji = useRef();
+  const emotionModal = useRef();
 
   const audio = new Audio(messageSend);
 
@@ -115,6 +118,13 @@ const BoxChatGroup = () => {
         !dropdownSelectEmoji.current.contains(event.target)
       ) {
         setEmojis(false);
+      }
+      if (
+        emotionModal.current &&
+        !emotionModal.current.contains(event.target)
+      ) {
+        setIsShowOverlayModalEmotion(false);
+        setClicked("all");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -794,6 +804,8 @@ const BoxChatGroup = () => {
     setEmojis();
   };
 
+  const [clicked, setClicked] = useState("all");
+
   const renderMessages = () => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
@@ -915,12 +927,155 @@ const BoxChatGroup = () => {
         });
       };
 
+      const renderEmotionList = () => {
+        return uniqueUserInEmojiList?.map((uid2, index) => {
+          let categoriesId = [];
+          sortedEmojiList.forEach((emoji) => {
+            const result = emoji.uids.findIndex((uid) => uid.uid === uid2);
+            if (result !== -1) {
+              categoriesId.push(emoji.id);
+            }
+          });
+
+          const data = infoUsers?.find((user) => user.uid === uid2);
+
+          if (clicked !== "all" && !categoriesId.includes(clicked)) return;
+
+          let total = 0;
+          sortedEmojiList.forEach((element) => {
+            element.uids.forEach((item) => {
+              if (item.uid === uid2) {
+                total = total + item.quantity;
+              }
+            });
+          });
+
+          let totalHasFilter = 0;
+          sortedEmojiList.forEach((element) => {
+            if (element.id === clicked) {
+              element.uids.forEach((item) => {
+                if (item.uid === uid2) {
+                  totalHasFilter = totalHasFilter + item.quantity;
+                }
+              });
+            }
+          });
+
+          if (data) {
+            return (
+              <div className="reaction-item" key={uid2}>
+                <div className="reaction-item__left">
+                  <img src={data.photoURL} alt="" />
+                  <span>{data.displayName}</span>
+                </div>
+                <div className="reaction-item__right">
+                  {categoriesId.map(
+                    (categoryId) =>
+                      (clicked === "all" || categoryId === clicked) && (
+                        <img
+                          key={categoryId}
+                          src={
+                            dataIconEmoji.find((item) => item.id === categoryId)
+                              .src
+                          }
+                          alt=""
+                        />
+                      )
+                  )}
+
+                  <span
+                    style={{
+                      width: "16px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      textAlign: "center",
+                    }}
+                  >
+                    {clicked !== "all" ? totalHasFilter : total}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+        });
+      };
+
       return (
         <div
           key={item.id}
           className="message-item"
           onMouseLeave={() => setEmojis()}
         >
+          {isShowOverlayModalEmotion?.message?.id === item.id && (
+            <div className="modal-emoji-overlay">
+              <div className="modal-container">
+                <div className="modal-content" ref={emotionModal}>
+                  <div className="modal-content__header">
+                    <div className="title">Biểu cảm</div>
+                    <div className="icon-close">
+                      <i
+                        className="fa-solid fa-xmark"
+                        onClick={() => {
+                          setIsShowOverlayModalEmotion(false);
+                          setClicked("all");
+                        }}
+                      ></i>
+                    </div>
+                  </div>
+                  <div className="modal-content__content">
+                    <div className="filter-category-list">
+                      <div
+                        className={`filter-category-item ${
+                          clicked === "all" ? "clicked" : ""
+                        }`}
+                        onClick={() => setClicked("all")}
+                      >
+                        Tất cả {total}
+                        <div
+                          className={`dividing-bottom ${
+                            clicked === "all" ? "clicked" : ""
+                          }`}
+                        ></div>
+                      </div>
+                      {sortedEmojiList.map(
+                        (emoji) =>
+                          emoji.uids[0] && (
+                            <div
+                              className={`filter-category-item ${
+                                clicked === emoji.id ? "clicked" : ""
+                              }`}
+                              key={emoji.id}
+                              onClick={() => setClicked(emoji.id)}
+                            >
+                              <img
+                                src={
+                                  dataIconEmoji.find(
+                                    (item) => item.id === emoji.id
+                                  ).src
+                                }
+                                alt=""
+                              />
+                              {emoji.uids.reduce(
+                                (accumulator, currentValue) =>
+                                  accumulator + currentValue.quantity,
+                                0
+                              )}
+                              <div
+                                className={`dividing-bottom ${
+                                  clicked === emoji.id ? "clicked" : ""
+                                }`}
+                              ></div>
+                            </div>
+                          )
+                      )}
+                      <div className="dividing-selected"></div>
+                    </div>
+                    {renderEmotionList()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {item.uid === userInfo.uid ? (
             <div className="message-item__myself">
               <div className="container-options">
@@ -1111,6 +1266,9 @@ const BoxChatGroup = () => {
                         }
                         onMouseLeave={() =>
                           setIsRenderUserNameInEmojiList(false)
+                        }
+                        onClick={() =>
+                          setIsShowOverlayModalEmotion({ message: item })
                         }
                       >
                         <span>{total}</span>
@@ -1308,6 +1466,9 @@ const BoxChatGroup = () => {
                         }
                         onMouseLeave={() =>
                           setIsRenderUserNameInEmojiList(false)
+                        }
+                        onClick={() =>
+                          setIsShowOverlayModalEmotion({ message: item })
                         }
                       >
                         <span>{total}</span>

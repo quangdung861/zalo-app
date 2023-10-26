@@ -218,6 +218,151 @@ export const Container = styled.div`
         }
       }
       .message-item {
+        .modal-emoji-overlay {
+          z-index: 99;
+          background-color: rgba(0, 0, 0, 0.4);
+          position: fixed;
+          inset: 0 0 0 0;
+          animation-name: fadeIn;
+          animation-duration: 0.2s;
+          user-select: none;
+          .modal-container {
+            padding: 0px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            inset: 0 0 0 0;
+            .modal-content {
+              animation-name: zoom;
+              animation-duration: 0.5s;
+              position: absolute;
+              /* height: 97vh; */
+              /* min-height: 60px; */
+              width: 450px;
+              max-width: 100%;
+              z-index: 2;
+              border-radius: 4px;
+              background-color: #fff;
+              &__header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 8px 0 16px;
+                font-size: 16px;
+                font-weight: 500;
+                height: 48px;
+                min-height: 48px;
+                border-bottom: 1px solid var(--boder-dividing-color);
+                .icon-close {
+                  width: 30px;
+                  height: 30px;
+                  line-height: 30px;
+                  text-align: center;
+                  border-radius: 50%;
+                  cursor: pointer;
+                  &:hover {
+                    background-color: #f1f1f1;
+                  }
+                  i {
+                    font-size: 20px;
+                    color: #858282;
+                  }
+                }
+              }
+              &__content {
+                padding: 12px 0;
+                height: 280px;
+                overflow: hidden;
+                overflow-y: scroll;
+                &::-webkit-scrollbar {
+                  -webkit-appearance: none;
+                }
+                &::-webkit-scrollbar:vertical {
+                  width: 4px;
+                }
+                &::-webkit-scrollbar-thumb {
+                  border-radius: 10px;
+                }
+                .reaction-item {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 0 16px;
+                  &__left {
+                    display: flex;
+                    align-items: center;
+                    > span {
+                      text-overflow: ellipsis;
+                    }
+                    > img {
+                      width: 36px;
+                      height: 36px;
+                      object-fit: cover;
+                      border-radius: 50%;
+                      margin-right: 12px;
+                    }
+                  }
+                  &__right {
+                    display: flex;
+                    align-items: center;
+                    > img {
+                      width: 20px;
+                      height: 20px;
+                      margin-right: 8px;
+                      object-fit: contain;
+                    }
+                  }
+                }
+                .reaction-item:not(:last-child) {
+                  margin-bottom: 12px;
+                }
+                .filter-category-list {
+                  display: flex;
+                  justify-content: start;
+                  align-items: center;
+                  padding: 4px 16px 16px;
+                  margin-bottom: 16px;
+                  gap: 10px;
+                  border-bottom: 1px solid var(--boder-dividing-color);
+                  position: relative;
+                  .filter-category-item {
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    color: #476285;
+                    font-weight: 600;
+                    font-size: 14px;
+                    position: relative;
+                    cursor: pointer;
+                    > img {
+                      width: 20px;
+                      height: 20px;
+                      object-fit: contain;
+                      margin-right: 6px;
+                    }
+                    .dividing-bottom {
+                      width: 0;
+                      height: 2px;
+                      background-color: #005ae0;
+                      position: absolute;
+                      top: 0;
+                      margin-top: 33px;
+                      transition: all 0.3s;
+                    }
+                    .dividing-bottom.clicked {
+                      width: 100%;
+                      transition: all 0.3s;
+                    }
+                  }
+                  .filter-category-item.clicked {
+                    color: #005ae0;
+                  }
+                }
+              }
+            }
+          }
+        }
         &__myself {
           display: flex;
           justify-content: flex-end;
