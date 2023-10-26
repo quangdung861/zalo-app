@@ -1356,7 +1356,7 @@ const BoxChatGroup = () => {
                     )}
                   </div>
                 </div>
-                <img src={item.photoURL} alt="" className="avatar" />
+                {/* <img src={item.photoURL} alt="" className="avatar" /> */}
               </div>
             </div>
           ) : (

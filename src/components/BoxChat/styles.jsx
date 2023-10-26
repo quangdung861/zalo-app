@@ -389,6 +389,7 @@ export const Container = styled.div`
             height: 100%;
             display: flex;
             align-items: flex-start;
+            margin-right: 16px;
             > img.avatar {
               width: 40px;
               height: 40px;
@@ -412,6 +413,7 @@ export const Container = styled.div`
               min-height: 83px;
               word-break: break-word;
               position: relative;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
               .dropdown-username-reaction {
                 position: absolute;
                 max-width: 200px;
@@ -699,6 +701,7 @@ export const Container = styled.div`
               user-select: none;
               cursor: pointer;
               object-fit: cover;
+              flex-shrink: 0;
             }
             > .text {
               font-size: 15px;
@@ -711,6 +714,7 @@ export const Container = styled.div`
               min-height: 83px;
               word-break: break-word;
               position: relative;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
               .dropdown-username-reaction {
                 position: absolute;
                 max-width: 200px;
