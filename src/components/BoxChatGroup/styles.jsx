@@ -344,6 +344,7 @@ export const Container = styled.div`
                     font-size: 14px;
                     position: relative;
                     cursor: pointer;
+                    white-space: nowrap;
                     > img {
                       width: 20px;
                       height: 20px;
