@@ -307,6 +307,7 @@ export const Container = styled.div`
                       object-fit: cover;
                       border-radius: 50%;
                       margin-right: 12px;
+                      flex-shrink: 0;
                     }
                   }
                   &__right {
