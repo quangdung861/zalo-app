@@ -116,7 +116,7 @@ const ModalAddFriend = ({
                   className="btn-view-info"
                   onClick={() => {
                     setIsShowOverlayModalAddFriend(false);
-                    setIsShowOverlayModal(true);
+                    setIsShowOverlayModal && setIsShowOverlayModal(true);
                   }}
                 >
                   Thông tin
