@@ -17,6 +17,7 @@ import { addDocument } from "services";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import ModalAccount from "components/ModalAccount";
+import moment from "moment";
 
 const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
@@ -33,7 +34,11 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       if (userInfo.invitationSent[0]) {
         const invitationSentRef = query(
           collection(db, "users"),
-          where("uid", "in", userInfo.invitationSent)
+          where(
+            "uid",
+            "in",
+            userInfo.invitationSent.map((item) => item.uid)
+          )
         );
         const response = await getDocs(invitationSentRef);
         const documents = response.docs?.map((doc) => {
@@ -42,6 +47,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           return {
             id,
             ...data,
+            dataInvitationSent: userInfo.invitationSent.find(
+              (item) => (item.uid = data.uid)
+            ),
           };
         });
 
@@ -58,7 +66,11 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       if (userInfo.invitationReceive[0]) {
         const invitationReceiveRef = query(
           collection(db, "users"),
-          where("uid", "in", userInfo.invitationReceive)
+          where(
+            "uid",
+            "in",
+            userInfo.invitationReceive.map((item) => item.uid)
+          )
         );
         const response = await getDocs(invitationReceiveRef);
         const documents = response.docs?.map((doc) => {
@@ -67,6 +79,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           return {
             id,
             ...data,
+            dataInvitationReceive: userInfo.invitationReceive.find(
+              (item) => (item.uid = data.uid)
+            ),
           };
         });
 
@@ -81,7 +96,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const handleInvitationRecall = async ({ uid, invitationReceive, id }) => {
     // STRANGER
     const newInvitationReceive = invitationReceive.filter(
-      (item) => item !== userInfo.uid
+      (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
     await setDoc(
@@ -95,7 +110,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     );
     // ME
     const newInvitationSent = userInfo.invitationSent.filter(
-      (item) => item !== uid
+      (item) => item.uid !== uid
     );
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
@@ -136,7 +151,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                       >
                         {item.displayName}
                       </span>
-                      <div className="origin">Từ trò chuyện với người lạ</div>
+                      <div className="origin">
+                        {item.dataInvitationSent?.from}
+                      </div>
                     </div>
                   </div>
                   <i
@@ -181,14 +198,14 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   };
 
   // RECEIVE
-  const handleInvitationApprove = async ({
+ const handleInvitationApprove = async ({
     uid,
     invitationSent,
     id,
     friends,
   }) => {
     const newInvitationSent = invitationSent.filter(
-      (item) => item !== userInfo.uid
+      (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
     await setDoc(
@@ -203,7 +220,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     );
     //
     const newInvitationReceive = userInfo.invitationReceive.filter(
-      (item) => item !== uid
+      (item) => item.uid !== uid
     );
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
@@ -220,7 +237,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
 
   const handleInvitationReject = async ({ uid, invitationSent, id }) => {
     const newInvitationSent = invitationSent.filter(
-      (item) => item !== userInfo.uid
+      (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
     await setDoc(
@@ -234,7 +251,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     );
     //
     const newInvitationReceive = userInfo.invitationReceive.filter(
-      (item) => item !== uid
+      (item) => item.uid !== uid
     );
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
@@ -275,7 +292,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                       >
                         {item.displayName}
                       </span>
-                      <div className="origin">Từ trò chuyện với người lạ</div>
+                      <div className="origin">
+                      {moment(item?.dataInvitationReceive?.createdAt)?.fromNow()} - {item.dataInvitationReceive?.from}
+                      </div>
                     </div>
                   </div>
                   <i
@@ -292,7 +311,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
               </div>
 
               <div className="content__center">
-                Xin chào. mình là {item.displayName}. kết bạn với mình nhé!
+                {item.dataInvitationReceive?.message
+                  ? item.dataInvitationReceive?.message
+                  : `  Xin chào, mình là ${item.displayName}. kết bạn với mình nhé!`}
               </div>
               <div className="content__bottom">
                 <div

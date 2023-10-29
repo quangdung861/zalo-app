@@ -182,6 +182,47 @@ export const Container = styled.div`
       flex-direction: column;
       justify-content: flex-end; */
 
+      .suggest-add-friend {
+        height: 51px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #fff;
+        overflow: hidden;
+        padding: 8px 16px;
+        border-top: 1px solid var(--boder-dividing-color);
+        border-bottom: 1px solid var(--boder-dividing-color);
+        margin-top: -20px;
+        margin-bottom: 20px;
+        .left {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          span {
+            font-size: 13px;
+          }
+          i {
+            font-size: 14px;
+          }
+        }
+        .right {
+          .btn-add-friend {
+            background-color: #EAEDF0;
+            font-weight: 600;
+            height: 24px;
+            line-height: 24px;
+            padding: 0 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            &:hover {
+              background-color: #DFE2E7;
+            }
+          }
+        }
+      }
+
       .user-info {
         text-align: center;
         user-select: none;

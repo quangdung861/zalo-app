@@ -32,11 +32,11 @@ import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import { CSSTransition } from "react-transition-group";
+import ModalAddFriend from "components/ModalAddFriend";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
     useContext(AppContext);
-
   const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
@@ -61,6 +61,11 @@ const BoxChat = () => {
     useState(false);
   const [isShowOverlayModalEmotion, setIsShowOverlayModalEmotion] =
     useState(false);
+  const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
+    useState(false);
+  const [messageValue, setMessageValue] = useState(
+    `Xin chào, mình là ${userInfo.displayName}. Mình tìm thấy bạn từ trò chuyện với người lạ. Kết bạn với mình nhé!`
+  );
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -201,6 +206,13 @@ const BoxChat = () => {
   };
 
   const isFriend = userInfo.friends.findIndex(
+    (item) => item.uid === selectedUserMessaging.uidSelected
+  );
+
+  const isReceive = userInfo.invitationReceive.find(
+    (item) => item.uid === selectedUserMessaging.uidSelected
+  );
+  const isSent = userInfo.invitationSent.find(
     (item) => item.uid === selectedUserMessaging.uidSelected
   );
 
@@ -1927,6 +1939,83 @@ const BoxChat = () => {
     document.body.removeChild(link);
   };
 
+  const handleOpenModalAddFriend = () => {
+    setIsShowOverlayModalAddFriend(true);
+  };
+
+  const handleAddFriend = async () => {
+    const { uid, id, invitationReceive } = fullInfoUser;
+    // STRANGER
+    const nowDate = moment().unix() * 1000;
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: [
+          ...invitationReceive,
+          {
+            uid: userInfo.uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
+      },
+      { merge: true }
+    );
+    // ME
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: [
+          ...userInfo.invitationSent,
+          {
+            uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
+      },
+      { merge: true }
+    );
+    setIsShowOverlayModalAddFriend(false);
+  };
+
+  const handleInvitationApprove = async () => {
+    const { uid, invitationSent, id, friends } = fullInfoUser;
+    const newInvitationSent = invitationSent.filter(
+      (item) => item.uid !== userInfo.uid
+    );
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        friends: [{ uid: userInfo.uid, category: "" }, ...friends],
+        invitationSent: newInvitationSent,
+      },
+      {
+        merge: true,
+      }
+    );
+    //
+    const newInvitationReceive = userInfo.invitationReceive.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        friends: [{ uid, category: "" }, ...userInfo.friends],
+        invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
   return (
     <S.Wrapper>
       <S.Container
@@ -2023,7 +2112,19 @@ const BoxChat = () => {
                       </div>
                     </>
                   ) : (
-                    <div style={{ color: "#7589A3" }}>Người lạ</div>
+                    <div
+                      style={{
+                        backgroundColor: "#B1B5B9",
+                        color: "#fff",
+                        padding: "0px 6px",
+                        fontSize: "12px",
+                        borderRadius: "3px",
+                        height: "20px",
+                        lineHeight: "20px",
+                      }}
+                    >
+                      Người lạ
+                    </div>
                   )}
                 </div>
               </div>
@@ -2044,6 +2145,50 @@ const BoxChat = () => {
             </div>
           </div>
           <div className="box-chat__content" ref={boxChatRef}>
+            {isFriend === -1 && !isSent && !isReceive ? (
+              <div className="suggest-add-friend">
+                <div className="left">
+                  <i className="fa-solid fa-user-plus icon"></i>
+                  <span>Gửi yêu cầu kết bạn đến người này</span>
+                </div>
+                <div className="right">
+                  <div
+                    className="btn-add-friend"
+                    onClick={() => handleOpenModalAddFriend()}
+                  >
+                    Gửi kết bạn
+                  </div>
+                  <div className="btn-more"></div>
+                </div>
+              </div>
+            ) : isSent ? (
+              <div
+                className="suggest-add-friend"
+                style={{ justifyContent: "center" }}
+              >
+                <span style={{ color: "#7589a3", userSelect: "none" }}>
+                  Đã gửi yêu cầu kết bạn
+                </span>
+              </div>
+            ) : (
+              isReceive && (
+                <div className="suggest-add-friend">
+                  <div className="left">
+                    <i className="fa-solid fa-user-plus icon"></i>
+                    <span>Đang chờ được đồng ý kết bạn</span>
+                  </div>
+                  <div className="right">
+                    <div
+                      className="btn-add-friend"
+                      style={{ color: "#005ae0", backgroundColor: "#E5EFFF" }}
+                      onClick={() => handleInvitationApprove()}
+                    >
+                      Đồng ý
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
             <div className="user-info">
               {selectedUserMessaging.uidSelected !== "my-cloud" && (
                 <>
@@ -2096,6 +2241,7 @@ const BoxChat = () => {
                 </div>
               )}
             </div>
+
             <div className="created-room">{renderCreatedAt()}</div>
             {renderMessages}
           </div>
@@ -2385,6 +2531,17 @@ const BoxChat = () => {
               setIsShowOverlayModalSharingMessage
             }
             infoMessageSharing={infoMessageSharing}
+          />
+        )}
+        {isShowOverlayModalAddFriend && (
+          <ModalAddFriend
+            setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
+            fullInfoUser={fullInfoUser}
+            userInfo={userInfo}
+            setMessageValue={setMessageValue}
+            messageValue={messageValue}
+            handleAddFriend={handleAddFriend}
+            setIsShowOverlayModal={setIsShowOverlayModal}
           />
         )}
       </S.Container>

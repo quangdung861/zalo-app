@@ -15,6 +15,8 @@ import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import empty from "assets/empty.png";
 import searchEmpty from "assets/searchEmpty.png";
+import moment from "moment";
+import ModalAddFriend from "components/ModalAddFriend";
 
 async function fetchUserList(search) {
   let array = [];
@@ -53,27 +55,64 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   } = useContext(AppContext);
 
   const [loading, setLoading] = useState(false);
+  const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
+    useState(false);
+  const [infoAddfriend, setInfoAddFriend] = useState({});
 
   const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
-     // STRANGER
-     const strangerRef = doc(db, "users", id);
-     await setDoc(
-       strangerRef,
-       {
-         invitationReceive: [userInfo.uid, ...invitationReceive],
-       },
-       { merge: true }
-     );
-     // ME
+    const newStrangerSelected = strangerList.find((item) => item.id === id);
+    setStrangerSelected(newStrangerSelected);
+    setInfoAddFriend({ uid, id, invitationReceive });
+    setIsShowOverlayModalAddFriend(true);
+    setIsShowDropdown(false);
+  };
+
+  // const [messageValue, setMessageValue] =  useState(
+  //   `Xin chào, mình là ${userInfo.displayName}. Mình tìm thấy bạn bằng số điện thoại. Kết bạn với mình nhé!`
+  // );
+
+  const [messageValue, setMessageValue] = useState(
+    `Xin chào, mình là ${userInfo.displayName}. Mình tìm thấy bạn từ trò chuyện với người lạ. Kết bạn với mình nhé!`
+  );
+
+  const handleAddFriend = async () => {
+    const { uid, id, invitationReceive } = infoAddfriend;
+    // STRANGER
+    const nowDate = moment().unix() * 1000;
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: [
+          ...invitationReceive,
+          {
+            uid: userInfo.uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
+      },
+      { merge: true }
+    );
+    // ME
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
       userInfoRef,
       {
-        invitationSent: [uid, ...userInfo.invitationSent],
+        invitationSent: [
+          ...userInfo.invitationSent,
+          {
+            uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
       },
       { merge: true }
     );
-   
+    setIsShowOverlayModalAddFriend(false);
   };
 
   const dropdownRef = useRef(null);
@@ -100,6 +139,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
     setIsShowDropdown(false);
+    setIsShowOverlayModalAddFriend(false);
     const newStrangerSelected = strangerList.find((item) => item.id === id);
     setStrangerSelected(newStrangerSelected);
   };
@@ -127,9 +167,13 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     if (strangerList[0]) {
       setLoading(false);
       if (orderBy === "desc") {
-        strangerList.sort((a, b) => b.displayName?.localeCompare(a.displayName)); //desc
+        strangerList.sort((a, b) =>
+          b.displayName?.localeCompare(a.displayName)
+        ); //desc
       } else {
-        strangerList.sort((a, b) => a.displayName?.localeCompare(b.displayName)); //asc
+        strangerList.sort((a, b) =>
+          a.displayName?.localeCompare(b.displayName)
+        ); //asc
       }
 
       return strangerList?.map((item, index) => {
@@ -168,8 +212,12 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                   <div className="dropdown-menu__item">Đặt tên gợi nhớ</div>
                   <div className="divding-line" />
                   <div className="dropdown-menu__item">Chặn người này</div>
-                  {userInfo.invitationSent.includes(item.uid) ||
-                  userInfo.invitationReceive.includes(item.uid) ? (
+                  {userInfo.invitationSent.find(
+                    (element) => element.uid === item.uid
+                  ) ||
+                  userInfo.invitationReceive.find(
+                    (element) => element.uid === item.uid
+                  ) ? (
                     <></>
                   ) : (
                     <>
@@ -351,6 +399,17 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           <ModalAccount
             setIsShowOverlayModal={setIsShowOverlayModal}
             accountSelected={strangerSelected}
+          />
+        )}
+        {isShowOverlayModalAddFriend && (
+          <ModalAddFriend
+            setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
+            fullInfoUser={strangerSelected}
+            userInfo={userInfo}
+            handleAddFriend={handleAddFriend}
+            setMessageValue={setMessageValue}
+            messageValue={messageValue}
+            handleWatchInfo={handleWatchInfo}
           />
         )}
       </S.Container>
