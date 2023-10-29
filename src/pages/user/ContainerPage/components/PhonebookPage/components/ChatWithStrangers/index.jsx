@@ -41,10 +41,6 @@ async function fetchUserList(search) {
 const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
-  console.log(
-    "🚀 ~ file: index.jsx:44 ~ ChatWithStrangers ~ isShowOverlayModal:",
-    isShowOverlayModal
-  );
 
   const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
@@ -139,10 +135,6 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   }, []);
 
   const [strangerSelected, setStrangerSelected] = useState();
-  console.log(
-    "🚀 ~ file: index.jsx:138 ~ ChatWithStrangers ~ strangerSelected:",
-    strangerSelected
-  );
 
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
