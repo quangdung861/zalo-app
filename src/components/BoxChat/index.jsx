@@ -2146,7 +2146,10 @@ const BoxChat = () => {
           </div>
           <div className="box-chat__content" ref={boxChatRef}>
             {isFriend === -1 && !isSent && !isReceive ? (
-              <div className="suggest-add-friend">
+              <div
+                className="suggest-add-friend"
+                style={{ userSelect: "none" }}
+              >
                 <div className="left">
                   <i className="fa-solid fa-user-plus icon"></i>
                   <span>Gửi yêu cầu kết bạn đến người này</span>
@@ -2164,7 +2167,7 @@ const BoxChat = () => {
             ) : isSent ? (
               <div
                 className="suggest-add-friend"
-                style={{ justifyContent: "center" }}
+                style={{ justifyContent: "center", userSelect: "none" }}
               >
                 <span style={{ color: "#7589a3", userSelect: "none" }}>
                   Đã gửi yêu cầu kết bạn
@@ -2172,7 +2175,10 @@ const BoxChat = () => {
               </div>
             ) : (
               isReceive && (
-                <div className="suggest-add-friend">
+                <div
+                  className="suggest-add-friend"
+                  style={{ userSelect: "none" }}
+                >
                   <div className="left">
                     <i className="fa-solid fa-user-plus icon"></i>
                     <span>Đang chờ được đồng ý kết bạn</span>
