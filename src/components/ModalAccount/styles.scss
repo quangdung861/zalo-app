@@ -153,22 +153,38 @@
               margin-top: 12px;
               text-align: center;
             }
-            .btn-texting {
-              height: 32px;
-              line-height: 32px;
-              font-size: 16px;
-              font-weight: 500;
-              background-color: #f1f1f1;
+            .box-action {
               display: flex;
               justify-content: center;
               align-items: center;
-              border-radius: 4px;
-              width: 50%;
-              margin-top: 16px;
-              margin-bottom: 0px;
-              cursor: pointer;
-              :hover {
-                filter: brightness(95%);
+              gap: 12px;
+              .btn-texting {
+                height: 32px;
+                width: 150px;
+                line-height: 32px;
+                font-size: 16px;
+                font-weight: 500;
+                background-color: #f1f1f1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 4px;
+                margin-top: 16px;
+                margin-bottom: 0px;
+                padding: 0 16px;
+                cursor: pointer;
+                :hover {
+                  filter: brightness(95%);
+                }
+                &.accept {
+                  color: rgb(0, 90, 224);
+                  background-color: #E5EFFF;
+                  pointer-events: auto;
+                  cursor: pointer;
+                  &:hover {
+                    opacity: 0.9;
+                  }
+                }
               }
             }
           }

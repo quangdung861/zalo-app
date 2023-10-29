@@ -90,11 +90,15 @@ const ModalAddFriend = ({
                     className="area-edit"
                     autoComplete="off"
                     spellCheck="false"
+                    maxLength="150"
                     value={messageValue}
                     onChange={(e) => setMessageValue(e.target.value)}
                     onFocus={() => handleFocus()}
                     onBlur={() => handleBlur()}
                   />
+                  <div className="tracking-text-length">
+                    {messageValue.length}/150 ký tự
+                  </div>
                 </div>
                 <div className="block-view-logs">
                   <span>Chặn người này xem nhật ký của tôi</span>

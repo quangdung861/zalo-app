@@ -76,7 +76,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   );
 
   const handleAddFriend = async () => {
-    const { uid, id, invitationReceive } = infoAddfriend;
+    const { uid, id, invitationReceive } = infoAddfriend || strangerSelected;
     // STRANGER
     const nowDate = moment().unix() * 1000;
     const strangerRef = doc(db, "users", id);
@@ -311,6 +311,39 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setIsShowSectionLeft(true);
   };
 
+  const handleInvitationRecall = async () => {
+    const { uid, invitationReceive, id } = strangerSelected;
+
+    // STRANGER
+    const newInvitationReceive = invitationReceive.filter(
+      (item) => item.uid !== userInfo.uid
+    );
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+    // ME
+    const newInvitationSent = userInfo.invitationSent.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: newInvitationSent,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
   return (
     <S.Wrapper>
       <S.Container>
@@ -399,6 +432,8 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           <ModalAccount
             setIsShowOverlayModal={setIsShowOverlayModal}
             accountSelected={strangerSelected}
+            setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
+            handleInvitationRecall={handleInvitationRecall}
           />
         )}
         {isShowOverlayModalAddFriend && (

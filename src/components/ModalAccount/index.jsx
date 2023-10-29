@@ -7,11 +7,17 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
 import coverCloud from "assets/coverCloud.png";
+import ModalAddFriend from "components/ModalAddFriend";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
   isShowOverlayModal,
   accountSelected,
+  handleAddFriend,
+  handleInvitationApprove,
+  handleInvitationRecall,
+  setIsShowOverlayModalAddFriend,
+  isShowOverlayModalAddFriend
 }) => {
   const phoneNumberRef = useRef(null);
 
@@ -199,6 +205,17 @@ const ModalAccount = ({
       });
     }
   };
+
+  const isFriend = userInfo.friends.findIndex(
+    (item) => item.uid === accountSelected.uid
+  );
+
+  const isReceive = userInfo.invitationReceive.find(
+    (item) => item.uid === accountSelected.uid
+  );
+  const isSent = userInfo.invitationSent.find(
+    (item) => item.uid === accountSelected.uid
+  );
 
   return accountSelected.uid === userInfo.uid ? (
     <div className="modal-overlay">
@@ -413,7 +430,7 @@ const ModalAccount = ({
             textAlign: "center",
             fontWeight: "500",
             zIndex: 99,
-            userSelect: "none"
+            userSelect: "none",
           }}
         >
           Hình ảnh phải có kích thước nhỏ hơn 0.5MB
@@ -487,7 +504,7 @@ const ModalAccount = ({
             textAlign: "center",
             fontWeight: "500",
             zIndex: 999,
-            userSelect: "none"
+            userSelect: "none",
           }}
         >
           Hình ảnh phải có kích thước nhỏ hơn 0.5MB
@@ -523,17 +540,47 @@ const ModalAccount = ({
                 </div>
 
                 {accountSelected.uid !== userInfo?.uid && (
-                  <div
-                    className="btn-texting"
-                    onClick={() =>
-                      toogleBoxChat({
-                        uidSelected: accountSelected.uid,
-                        photoURLSelected: accountSelected.photoURL,
-                        displayNameSelected: accountSelected.displayName,
-                      })
-                    }
-                  >
-                    Nhắn tin
+                  <div className="box-action">
+                    <div
+                      className="btn-texting"
+                      onClick={() =>
+                        toogleBoxChat({
+                          uidSelected: accountSelected.uid,
+                          photoURLSelected: accountSelected.photoURL,
+                          displayNameSelected: accountSelected.displayName,
+                        })
+                      }
+                    >
+                      Nhắn tin
+                    </div>
+                    {isFriend === -1 && !isSent && !isReceive ? (
+                      <div
+                        className="btn-texting"
+                        onClick={() => {
+                          setIsShowOverlayModal(false);
+                          setIsShowOverlayModalAddFriend &&
+                            setIsShowOverlayModalAddFriend(true);
+                        }}
+                      >
+                        Kết bạn
+                      </div>
+                    ) : isSent ? (
+                      <div
+                        className="btn-texting"
+                        onClick={() => handleInvitationRecall()}
+                      >
+                        Huỷ lời mời
+                      </div>
+                    ) : (
+                      isReceive && (
+                        <div
+                          className="btn-texting accept"
+                          onClick={() => handleInvitationApprove()}
+                        >
+                          Đồng ý kết bạn
+                        </div>
+                      )
+                    )}
                   </div>
                 )}
               </div>
@@ -560,30 +607,30 @@ const ModalAccount = ({
                 </div>
               </div>
             </div>
-              <div className="footer">
-                <div className="action-list">
-                  <div className="action-item">
-                    <i className="fa-solid fa-users"></i>
-                    <span>Nhóm chung (0)</span>
-                  </div>
-                  <div className="action-item">
-                    <i className="fa-regular fa-address-card"></i>
-                    <span>Chia sẻ danh thiếp</span>
-                  </div>
-                  <div className="action-item">
-                    <i className="fa-solid fa-ban"></i>
-                    <span>Chặn tin nhắn</span>
-                  </div>
-                  <div className="action-item">
-                    <i className="fa-solid fa-triangle-exclamation"></i>
-                    <span>Báo xấu</span>
-                  </div>
-                  <div className="action-item">
-                    <i className="fa-regular fa-trash-can"></i>
-                    <span>Xóa khỏi danh sách bạn bè</span>
-                  </div>
+            <div className="footer">
+              <div className="action-list">
+                <div className="action-item">
+                  <i className="fa-solid fa-users"></i>
+                  <span>Nhóm chung (0)</span>
+                </div>
+                <div className="action-item">
+                  <i className="fa-regular fa-address-card"></i>
+                  <span>Chia sẻ danh thiếp</span>
+                </div>
+                <div className="action-item">
+                  <i className="fa-solid fa-ban"></i>
+                  <span>Chặn tin nhắn</span>
+                </div>
+                <div className="action-item">
+                  <i className="fa-solid fa-triangle-exclamation"></i>
+                  <span>Báo xấu</span>
+                </div>
+                <div className="action-item">
+                  <i className="fa-regular fa-trash-can"></i>
+                  <span>Xóa khỏi danh sách bạn bè</span>
                 </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -605,7 +652,7 @@ const ModalAccount = ({
             textAlign: "center",
             fontWeight: "500",
             zIndex: 999,
-            userSelect: "none"
+            userSelect: "none",
           }}
         >
           Hình ảnh phải có kích thước nhỏ hơn 0.5MB

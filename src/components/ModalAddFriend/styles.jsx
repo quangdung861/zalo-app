@@ -91,6 +91,7 @@ export const Container = styled.div`
           .box-area-edit {
             padding: 0 16px;
             margin-bottom: 16px;
+            position: relative;
             .area-edit {
               width: 100%;
               height: 110px;
@@ -119,6 +120,14 @@ export const Container = styled.div`
                 background-color: #aaaaaa;
               }
             }
+            .tracking-text-length{
+              position: absolute;
+              right: 0;
+              bottom: 0;
+              margin-bottom: 10px;
+              margin-right: 30px;
+              color: #7589A3;
+            }
           }
           .block-view-logs {
             display: flex;
@@ -128,6 +137,7 @@ export const Container = styled.div`
             background-color: #f1f1f1;
             height: 44px;
             padding: 0 16px;
+            border-radius: 3px;
             i.btn-off {
               font-size: 28px;
               color: #b1b5b9;
