@@ -160,7 +160,7 @@
               gap: 12px;
               .btn-texting {
                 height: 32px;
-                width: 150px;
+                width: 155px;
                 line-height: 32px;
                 font-size: 16px;
                 font-weight: 500;
@@ -176,13 +176,30 @@
                 :hover {
                   filter: brightness(95%);
                 }
-                &.accept {
+                &.response {
                   color: rgb(0, 90, 224);
-                  background-color: #E5EFFF;
+                  background-color: #e5efff;
                   pointer-events: auto;
                   cursor: pointer;
                   &:hover {
                     opacity: 0.9;
+                  }
+                }
+              }
+              .box-response {
+                position: relative;
+                .dropdown-response {
+                  background-color: #fff;
+                  position: absolute;
+                  box-shadow: var(--box-shadow-default);
+                  border-radius: 4px;
+                  top: calc(100% + 8px);
+                  > .btn-texting {
+                    margin-top: 0;
+                    background-color: transparent;
+                    &:hover {
+                      background-color: #f1f1f1;
+                    }
                   }
                 }
               }

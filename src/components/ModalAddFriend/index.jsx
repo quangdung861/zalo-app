@@ -1,19 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
-
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { db } from "firebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
+import moment from "moment";
+import { AppContext } from "Context/AppProvider";
 import * as S from "./styles";
 const ModalAddFriend = ({
   setIsShowOverlayModalAddFriend,
   fullInfoUser,
-  userInfo,
-  handleAddFriend,
-  setMessageValue,
-  messageValue,
   setIsShowOverlayModal,
 }) => {
+  const { userInfo } = useContext(AppContext);
+
   const [isViewLogs, setIsViewLogs] = useState(false);
 
   const textAreaRef = useRef(null);
   const modalContainer = useRef(null);
+
+  const [messageValue, setMessageValue] = useState(
+    `Xin chào, mình là ${userInfo.displayName}. Mình tìm thấy bạn từ trò chuyện với người lạ. Kết bạn với mình nhé!`
+  );
 
   useEffect(() => {
     if (textAreaRef) {
@@ -48,6 +53,46 @@ const ModalAddFriend = ({
     Object.assign(textAreaRef.current.style, {
       border: "1px solid var(--boder-dividing-color)",
     });
+  };
+
+  const handleAddFriend = async () => {
+    const { uid, id, invitationReceive } = fullInfoUser;
+    // STRANGER
+    const nowDate = moment().unix() * 1000;
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: [
+          ...invitationReceive,
+          {
+            uid: userInfo.uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
+      },
+      { merge: true }
+    );
+    // ME
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: [
+          ...userInfo.invitationSent,
+          {
+            uid,
+            message: messageValue,
+            from: "Từ trò chuyện với người lạ",
+            createdAt: nowDate,
+          },
+        ],
+      },
+      { merge: true }
+    );
+    setIsShowOverlayModalAddFriend(false);
   };
 
   return (

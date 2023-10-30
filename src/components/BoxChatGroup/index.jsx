@@ -32,6 +32,7 @@ import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAccount from "components/ModalAccount";
+import ModalAddFriend from "components/ModalAddFriend";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -62,6 +63,8 @@ const BoxChatGroup = () => {
   const [isRenderUserNameInEmojiList, setIsRenderUserNameInEmojiList] =
     useState(false);
   const [isShowOverlayModalEmotion, setIsShowOverlayModalEmotion] =
+    useState(false);
+  const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
 
   const inputRef = useRef();
@@ -2349,6 +2352,14 @@ const BoxChatGroup = () => {
             setIsShowOverlayModal={setIsShowOverlayUserInfoModal}
             accountSelected={viewUserDetail}
             isShowOverlayModal={isShowOverlayUserInfoModal}
+            setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
+          />
+        )}
+        {isShowOverlayModalAddFriend && (
+          <ModalAddFriend
+            setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
+            fullInfoUser={viewUserDetail}
+            setIsShowOverlayModal={setIsShowOverlayModal}
           />
         )}
       </S.Container>

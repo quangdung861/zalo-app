@@ -7,21 +7,17 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
 import coverCloud from "assets/coverCloud.png";
-import ModalAddFriend from "components/ModalAddFriend";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
   isShowOverlayModal,
   accountSelected,
-  handleAddFriend,
-  handleInvitationApprove,
-  handleInvitationRecall,
   setIsShowOverlayModalAddFriend,
-  isShowOverlayModalAddFriend
 }) => {
   const phoneNumberRef = useRef(null);
 
   const accountInfoRef = useRef(null);
+  const dropdownResponseRef = useRef(null);
 
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
@@ -39,6 +35,8 @@ const ModalAccount = ({
   // IMAGE
   const [imgPreviewCover, setImgPreviewCover] = useState(null);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
+  //
+  const [isDropdownResponse, setIsDropdownResponse] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,6 +45,12 @@ const ModalAccount = ({
         !accountInfoRef.current.contains(event.target)
       ) {
         setIsShowOverlayModal(false);
+      }
+      if (
+        dropdownResponseRef.current &&
+        !dropdownResponseRef.current.contains(event.target)
+      ) {
+        setIsDropdownResponse(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -216,6 +220,104 @@ const ModalAccount = ({
   const isSent = userInfo.invitationSent.find(
     (item) => item.uid === accountSelected.uid
   );
+
+  //
+
+  const handleInvitationApprove = async () => {
+    const { uid, invitationSent, id, friends } = accountSelected;
+    const newInvitationSent = invitationSent.filter(
+      (item) => item.uid !== userInfo.uid
+    );
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        friends: [{ uid: userInfo.uid, category: "" }, ...friends],
+        invitationSent: newInvitationSent,
+      },
+      {
+        merge: true,
+      }
+    );
+    //
+    const newInvitationReceive = userInfo.invitationReceive.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        friends: [{ uid, category: "" }, ...userInfo.friends],
+        invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
+  const handleInvitationRecall = async () => {
+    const { uid, invitationReceive, id } = accountSelected;
+    // STRANGER
+    const newInvitationReceive = invitationReceive.filter(
+      (item) => item.uid !== userInfo.uid
+    );
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+    // ME
+    const newInvitationSent = userInfo.invitationSent.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationSent: newInvitationSent,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
+
+  const handleInvitationReject = async () => {
+    const { uid, invitationSent, id } = accountSelected;
+    const newInvitationSent = invitationSent.filter(
+      (item) => item.uid !== userInfo.uid
+    );
+    const strangerRef = doc(db, "users", id);
+    await setDoc(
+      strangerRef,
+      {
+        invitationSent: newInvitationSent,
+      },
+      {
+        merge: true,
+      }
+    );
+    //
+    const newInvitationReceive = userInfo.invitationReceive.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        invitationReceive: newInvitationReceive,
+      },
+      {
+        merge: true,
+      }
+    );
+  };
 
   return accountSelected.uid === userInfo.uid ? (
     <div className="modal-overlay">
@@ -538,7 +640,11 @@ const ModalAccount = ({
                 <div className="display-name">
                   {accountSelected.displayName}
                 </div>
-
+                {isReceive && (
+                  <div style={{ fontWeight: 500, marginTop: "8px" }}>
+                    Đã gửi cho bạn một lời mời kết bạn
+                  </div>
+                )}
                 {accountSelected.uid !== userInfo?.uid && (
                   <div className="box-action">
                     <div
@@ -573,11 +679,32 @@ const ModalAccount = ({
                       </div>
                     ) : (
                       isReceive && (
-                        <div
-                          className="btn-texting accept"
-                          onClick={() => handleInvitationApprove()}
-                        >
-                          Đồng ý kết bạn
+                        <div className="box-response">
+                          <div
+                            className="btn-texting response"
+                            onClick={() => setIsDropdownResponse(true)}
+                          >
+                            Trả lời
+                          </div>
+                          {isDropdownResponse && (
+                            <div
+                              className="dropdown-response"
+                              ref={dropdownResponseRef}
+                            >
+                              <div
+                                className="btn-texting"
+                                onClick={() => handleInvitationApprove()}
+                              >
+                                Xác nhận lời mời
+                              </div>
+                              <div
+                                className="btn-texting"
+                                onClick={() => handleInvitationReject()}
+                              >
+                                Xoá lời mời
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )
                     )}

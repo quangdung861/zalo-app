@@ -24,20 +24,18 @@ import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import suggestCloudImage from "assets/suggestCloudImage.png";
 import { convertImagesToBase64 } from "utils/image";
-import { convertBase64ToImage } from "utils/file";
 import ModalSharingMessage from "components/ModalSharingMessage";
 import smileIcon from "assets/emoji/smile.png";
 import heartIcon from "assets/emoji/heart.png";
 import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
-import { CSSTransition } from "react-transition-group";
 import ModalAddFriend from "components/ModalAddFriend";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
     useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat } = useContext(UserLayoutContext);
+  const { setIsShowBoxChat } = useContext(UserLayoutContext);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [isReplyMessage, setIsReplyMessage] = useState(false);
@@ -63,9 +61,6 @@ const BoxChat = () => {
     useState(false);
   const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
-  const [messageValue, setMessageValue] = useState(
-    `Xin chào, mình là ${userInfo.displayName}. Mình tìm thấy bạn từ trò chuyện với người lạ. Kết bạn với mình nhé!`
-  );
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -1943,46 +1938,6 @@ const BoxChat = () => {
     setIsShowOverlayModalAddFriend(true);
   };
 
-  const handleAddFriend = async () => {
-    const { uid, id, invitationReceive } = fullInfoUser;
-    // STRANGER
-    const nowDate = moment().unix() * 1000;
-    const strangerRef = doc(db, "users", id);
-    await setDoc(
-      strangerRef,
-      {
-        invitationReceive: [
-          ...invitationReceive,
-          {
-            uid: userInfo.uid,
-            message: messageValue,
-            from: "Từ trò chuyện với người lạ",
-            createdAt: nowDate,
-          },
-        ],
-      },
-      { merge: true }
-    );
-    // ME
-    const userInfoRef = doc(db, "users", userInfo.id);
-    await setDoc(
-      userInfoRef,
-      {
-        invitationSent: [
-          ...userInfo.invitationSent,
-          {
-            uid,
-            message: messageValue,
-            from: "Từ trò chuyện với người lạ",
-            createdAt: nowDate,
-          },
-        ],
-      },
-      { merge: true }
-    );
-    setIsShowOverlayModalAddFriend(false);
-  };
-
   const handleInvitationApprove = async () => {
     const { uid, invitationSent, id, friends } = fullInfoUser;
     const newInvitationSent = invitationSent.filter(
@@ -2009,38 +1964,6 @@ const BoxChat = () => {
       {
         friends: [{ uid, category: "" }, ...userInfo.friends],
         invitationReceive: newInvitationReceive,
-      },
-      {
-        merge: true,
-      }
-    );
-  };
-
-  const handleInvitationRecall = async () => {
-    const { uid, invitationReceive, id } = fullInfoUser;
-    // STRANGER
-    const newInvitationReceive = invitationReceive.filter(
-      (item) => item.uid !== userInfo.uid
-    );
-    const strangerRef = doc(db, "users", id);
-    await setDoc(
-      strangerRef,
-      {
-        invitationReceive: newInvitationReceive,
-      },
-      {
-        merge: true,
-      }
-    );
-    // ME
-    const newInvitationSent = userInfo.invitationSent.filter(
-      (item) => item.uid !== uid
-    );
-    const userInfoRef = doc(db, "users", userInfo.id);
-    await setDoc(
-      userInfoRef,
-      {
-        invitationSent: newInvitationSent,
       },
       {
         merge: true,
@@ -2444,8 +2367,6 @@ const BoxChat = () => {
               fullInfoUser ? fullInfoUser : { myCloud: selectedUserMessaging }
             }
             isShowOverlayModal={isShowOverlayModal}
-            handleInvitationApprove={handleInvitationApprove}
-            handleInvitationRecall={handleInvitationRecall}
             setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
           />
         )}
@@ -2578,10 +2499,6 @@ const BoxChat = () => {
           <ModalAddFriend
             setIsShowOverlayModalAddFriend={setIsShowOverlayModalAddFriend}
             fullInfoUser={fullInfoUser}
-            userInfo={userInfo}
-            setMessageValue={setMessageValue}
-            messageValue={messageValue}
-            handleAddFriend={handleAddFriend}
             setIsShowOverlayModal={setIsShowOverlayModal}
           />
         )}
