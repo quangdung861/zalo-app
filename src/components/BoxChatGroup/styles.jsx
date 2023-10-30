@@ -141,6 +141,7 @@ export const Container = styled.div`
       }
     }
     &__content {
+      position: relative;
       padding-top: 20px;
       background-color: #eef0f1;
       background-repeat: no-repeat;
@@ -973,6 +974,31 @@ export const Container = styled.div`
       }
       .message-item:last-child {
         margin-bottom: 16px;
+      }
+      .up-to-top {
+        position: sticky;
+        top: calc(100% - 50px);
+        z-index: 99;
+        left: 92%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 100%;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        &:hover {
+          > i {
+            color: #005ae0;
+          }
+        }
+        > i {
+          color: #7589a3;
+          font-size: 18px;
+        }
       }
     }
     /* &__content::before {

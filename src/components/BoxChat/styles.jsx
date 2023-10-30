@@ -151,6 +151,7 @@ export const Container = styled.div`
       }
     }
     &__content {
+      position: relative;
       width: 100%;
       padding-top: 20px;
       background-image: url(${(props) =>
@@ -209,7 +210,7 @@ export const Container = styled.div`
         }
         .right {
           .btn-add-friend {
-            background-color: #EAEDF0;
+            background-color: #eaedf0;
             font-weight: 600;
             height: 24px;
             line-height: 24px;
@@ -217,7 +218,7 @@ export const Container = styled.div`
             border-radius: 3px;
             cursor: pointer;
             &:hover {
-              background-color: #DFE2E7;
+              background-color: #dfe2e7;
             }
           }
         }
@@ -1030,6 +1031,31 @@ export const Container = styled.div`
       }
       .message-item:last-child {
         margin-bottom: 16px;
+      }
+      .up-to-top {
+        position: sticky;
+        top: calc(100% - 50px);
+        z-index: 99;
+        left: 92%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 100%;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        &:hover {
+          > i {
+            color: #005ae0;
+          }
+        }
+        > i {
+          color: #7589a3;
+          font-size: 18px;
+        }
       }
     }
     /* &__content::before {

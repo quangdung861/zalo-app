@@ -97,6 +97,35 @@ const BoxChat = () => {
     },
   ];
 
+  const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
+
+  const handleScroll = () => {
+    const chatWindow = boxChatRef?.current;
+    if (chatWindow) {
+      const isNearBottom =
+        chatWindow.scrollHeight -
+          chatWindow.scrollTop -
+          chatWindow.clientHeight <
+        50;
+      const isNearTop = chatWindow.scrollTop < 200;
+      setShowBtnUpToTop(!isNearBottom && !isNearTop);
+    }
+  };
+
+  useEffect(() => {
+    const chatWindow = boxChatRef?.current;
+
+    if (chatWindow) {
+      chatWindow.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (chatWindow) {
+        chatWindow.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -159,6 +188,14 @@ const BoxChat = () => {
     );
     Object.assign(toolbarChatInputElement.style, {
       borderBottom: "1px solid var(--boder-dividing-color)",
+    });
+  };
+
+  const handleUpToBottom = () => {
+    const chatWindow = boxChatRef?.current;
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight,
+      behavior: "smooth",
     });
   };
 
@@ -2100,7 +2137,15 @@ const BoxChat = () => {
             </div>
           </div>
           <div className="box-chat__content" ref={boxChatRef}>
-            {isFriend === -1 && !isSent && !isReceive ? (
+            {showBtnUpToTop && (
+              <div className="up-to-top" onClick={() => handleUpToBottom()}>
+                <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
+              </div>
+            )}
+            {isFriend === -1 &&
+            !isSent &&
+            !isReceive &&
+            selectedUserMessaging.uidSelected !== "my-cloud" ? (
               <div
                 className="suggest-add-friend"
                 style={{ userSelect: "none" }}
@@ -2119,7 +2164,7 @@ const BoxChat = () => {
                   <div className="btn-more"></div>
                 </div>
               </div>
-            ) : isSent ? (
+            ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
               <div
                 className="suggest-add-friend"
                 style={{ justifyContent: "center", userSelect: "none" }}
@@ -2129,7 +2174,8 @@ const BoxChat = () => {
                 </span>
               </div>
             ) : (
-              isReceive && (
+              isReceive &&
+              selectedUserMessaging.uidSelected !== "my-cloud" && (
                 <div
                   className="suggest-add-friend"
                   style={{ userSelect: "none" }}
@@ -2287,8 +2333,10 @@ const BoxChat = () => {
                   placeholder={`Nhắn tin tới ${
                     selectedUserMessaging.displayNameSelected?.length < 40
                       ? selectedUserMessaging?.displayNameSelected
-                      : selectedUserMessaging?.displayNameSelected?.slice(0, 39) +
-                        "..."
+                      : selectedUserMessaging?.displayNameSelected?.slice(
+                          0,
+                          39
+                        ) + "..."
                   }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}

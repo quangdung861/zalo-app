@@ -616,6 +616,43 @@ const BoxChatGroup = () => {
     }
   }, [messages, userInfo]);
 
+  const [showBtnUpToTop, setShowBtnUpToTop] = useState(true);
+
+  const handleScroll = () => {
+    const chatWindow = boxChatRef?.current;
+    if (chatWindow) {
+      const isNearBottom =
+        chatWindow.scrollHeight -
+          chatWindow.scrollTop -
+          chatWindow.clientHeight <
+        50;
+        const isNearTop = chatWindow.scrollTop < 200;
+      setShowBtnUpToTop(!isNearBottom && !isNearTop);
+    }
+  };
+
+  useEffect(() => {
+    const chatWindow = boxChatRef?.current;
+
+    if (chatWindow) {
+      chatWindow.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (chatWindow) {
+        chatWindow.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  const handleUpToBottom = () => {
+    const chatWindow = boxChatRef?.current;
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
   const handleReplyMessage = ({ name, id, text, image }) => {
     let textResult = text;
     infoUsers.forEach((member, index) => {
@@ -1984,6 +2021,11 @@ const BoxChatGroup = () => {
             </div>
           </div>
           <div className="box-chat__content" ref={boxChatRef}>
+            {showBtnUpToTop && (
+              <div className="up-to-top" onClick={() => handleUpToBottom()}>
+                <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
+              </div>
+            )}
             <div className="user-info">
               <div className="user-info__avatar">
                 {selectedGroupMessaging?.room?.avatar.url ? (
