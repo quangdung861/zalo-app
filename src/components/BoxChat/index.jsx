@@ -2285,9 +2285,9 @@ const BoxChat = () => {
                   autoComplete="off"
                   spellCheck="false"
                   placeholder={`Nhắn tin tới ${
-                    selectedUserMessaging.displayNameSelected.length < 40
-                      ? selectedUserMessaging.displayNameSelected
-                      : selectedUserMessaging.displayNameSelected.slice(0, 39) +
+                    selectedUserMessaging.displayNameSelected?.length < 40
+                      ? selectedUserMessaging?.displayNameSelected
+                      : selectedUserMessaging?.displayNameSelected?.slice(0, 39) +
                         "..."
                   }`}
                   ref={inputRef}

@@ -108,25 +108,30 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   };
 
   const handleUnfriend = async ({ id, uid, friends }) => {
-    // USER_INFO
-    const newUserInfoFriend = userInfo.friends.filter((item) => item.uid !== uid);
-    const userInfoRef = doc(db, "users", userInfo.id);
-    await setDoc(
-      userInfoRef,
-      {
-        friends: newUserInfoFriend,
-      },
-      {
-        merge: true,
-      }
-    );
     // FRIEND
-    const newFriendsOfFriend = friends.filter((item) => item.uid !== userInfo.uid);
+    const newFriendsOfFriend = friends.filter(
+      (item) => item.uid !== userInfo.uid
+    );
     const FriendRef = doc(db, "users", id);
     await setDoc(
       FriendRef,
       {
         friends: newFriendsOfFriend,
+      },
+      {
+        merge: true,
+      }
+    );
+    
+    // USER_INFO
+    const newUserInfoFriend = userInfo.friends.filter(
+      (item) => item.uid !== uid
+    );
+    const userInfoRef = doc(db, "users", userInfo.id);
+    await setDoc(
+      userInfoRef,
+      {
+        friends: newUserInfoFriend,
       },
       {
         merge: true,
