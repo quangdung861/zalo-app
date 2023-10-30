@@ -1036,7 +1036,8 @@ export const Container = styled.div`
         position: sticky;
         top: calc(100% - 50px);
         z-index: 99;
-        left: 92%;
+        left: 100%;
+        margin-right: 16px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1466,6 +1467,16 @@ export const Container = styled.div`
           > .avatar {
             display: none;
           }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 420px) {
+    .box-chat {
+      &__content {
+        .up-to-top {
+          left: 84%;
         }
       }
     }

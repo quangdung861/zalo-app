@@ -21,12 +21,12 @@ export const Container = styled.div`
       justify-content: space-between;
       align-items: center;
       user-select: none;
-
       .left {
         display: flex;
         align-items: center;
         max-width: 100%;
         width: 380px;
+        overflow: hidden;
         .btn-come-back {
           display: none;
           min-width: 32px;
@@ -979,7 +979,8 @@ export const Container = styled.div`
         position: sticky;
         top: calc(100% - 50px);
         z-index: 99;
-        left: 92%;
+        left: 100%;
+        margin-right: 16px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1502,6 +1503,16 @@ export const Container = styled.div`
           > .avatar {
             display: none;
           }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 420px) {
+    .box-chat {
+      &__content {
+        .up-to-top {
+          left: 84%;
         }
       }
     }
