@@ -15,17 +15,21 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import searchEmpty from "assets/searchEmpty.png";
 import Skeleton from "react-loading-skeleton";
 import ModalAccount from "components/ModalAccount";
+import ModalConfirm from "./components/ModalConfirm";
 
 const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+  const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
   const [keywords, setKeywords] = useState("");
 
   const [loading, setLoading] = useState(false);
 
   const [friends, setFriends] = useState([]);
+  const [isShowOverlayModalConfirmDelete, setIsShowOverlayModalConfirmDelete] =
+    useState(false);
+
   useEffect(() => {
     const getFriends = async () => {
       setLoading(true);
@@ -107,8 +111,11 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setFriendSelected(friendSelected);
   };
 
-  const handleUnfriend = async ({ id, uid, friends }) => {
+  const [fullUserInfo, setFullUserInfo] = useState();
+
+  const handleUnfriend = async () => {
     // FRIEND
+    const { id, uid, friends } = fullUserInfo;
     const newFriendsOfFriend = friends.filter(
       (item) => item.uid !== userInfo.uid
     );
@@ -122,7 +129,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
         merge: true,
       }
     );
-    
+
     // USER_INFO
     const newUserInfoFriend = userInfo.friends.filter(
       (item) => item.uid !== uid
@@ -256,13 +263,11 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                       <div className="divding-line" />
                       <div
                         className="dropdown-menu__item unfriend"
-                        onClick={() =>
-                          handleUnfriend({
-                            uid: item.uid,
-                            id: item.id,
-                            friends: item.friends,
-                          })
-                        }
+                        onClick={() => {
+                          setFullUserInfo(item);
+                          setIsShowOverlayModalConfirmDelete(true);
+                          setIsShowDropdown(false);
+                        }}
                       >
                         Xoá bạn
                       </div>
@@ -546,6 +551,15 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           <ModalAccount
             setIsShowOverlayModal={setIsShowOverlayModal}
             accountSelected={friendSelected}
+          />
+        )}
+        {isShowOverlayModalConfirmDelete && (
+          <ModalConfirm
+            setIsShowOverlayModalConfirmDelete={
+              setIsShowOverlayModalConfirmDelete
+            }
+            handleUnfriend={handleUnfriend}
+            fullUserInfo={fullUserInfo}
           />
         )}
       </S.Container>
