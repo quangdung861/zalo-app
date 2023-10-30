@@ -109,7 +109,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
 
   const handleUnfriend = async ({ id, uid, friends }) => {
     // USER_INFO
-    const newUserInfoFriend = userInfo.friends.filter((item) => item !== uid);
+    const newUserInfoFriend = userInfo.friends.filter((item) => item.uid !== uid);
     const userInfoRef = doc(db, "users", userInfo.id);
     await setDoc(
       userInfoRef,
@@ -121,7 +121,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       }
     );
     // FRIEND
-    const newFriendsOfFriend = friends.filter((item) => item !== userInfo.uid);
+    const newFriendsOfFriend = friends.filter((item) => item.uid !== userInfo.uid);
     const FriendRef = doc(db, "users", id);
     await setDoc(
       FriendRef,
@@ -259,7 +259,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                           })
                         }
                       >
-                        Hủy kết bạn
+                        Xoá bạn
                       </div>
                     </>
                   )}
