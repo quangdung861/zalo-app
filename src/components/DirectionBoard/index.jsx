@@ -35,7 +35,7 @@ const DirectionBoard = () => {
                 Mình rất vui nếu có được những góp ý để cải thiện sản phẩm cũng như kết bạn thông
                 qua
                 <div style={{ marginTop: "4px", wordBreak: "break-word" }}>
-                  <b>FB: </b>
+                  {/* <b>FB: </b>
                   <a
                     href="   https://www.facebook.com/dungquangphandev
                   "
@@ -46,7 +46,7 @@ const DirectionBoard = () => {
                     target="_blank"
                   >
                     https://www.facebook.com/dungquangphandev
-                  </a>
+                  </a> */}
                 </div>
                 <div>
                   <b>Zalo: </b>
