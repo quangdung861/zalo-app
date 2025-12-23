@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -25,6 +25,7 @@ import searchEmpty2 from "assets/searchEmpty2.png";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import ModalConfirm from "components/ModalConfirm";
+import Skeleton from "react-loading-skeleton";
 
 const MessagePage = () => {
   const {
@@ -83,6 +84,7 @@ const MessagePage = () => {
   const dropdownRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  console.log("🚀 ~ MessagePage ~ loading:", loading)
   const [categorySelected, setCategorySelected] = useState("");
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowOverlayModalConfirmDelete, setIsShowOverlayModalConfirmDelete] =
@@ -100,7 +102,7 @@ const MessagePage = () => {
     };
   }, []);
 
-  const toogleBoxChat = ({
+  const toogleBoxChat = useCallback(({
     uidSelected,
     photoURLSelected,
     displayNameSelected,
@@ -113,21 +115,18 @@ const MessagePage = () => {
       photoURLSelected,
       displayNameSelected,
     });
-  };
+  }, [setIsShowBoxChat, setIsShowBoxChatGroup, setSelectedGroupMessaging, setSelectedUserMessaging]);
 
-  const [totalUnSeenMessageRef, setTotalUnseenMessageRef] = useState(0);
-
-  useEffect(() => {
-    setTotalUnseenMessage(totalUnSeenMessageRef);
-  }, [totalUnSeenMessageRef]);
-
-  const toogleBoxChatGroup = ({ room, avatars, name }) => {
+  const toogleBoxChatGroup = useCallback(({ room, avatars, name }) => {
     setIsShowBoxChat(false);
     setSelectedUserMessaging(false);
     setIsShowBoxChatGroup(true);
 
     setSelectedGroupMessaging({ room, avatars, name });
-  };
+  }, [setIsShowBoxChat,
+    setSelectedUserMessaging,
+    setIsShowBoxChatGroup,
+    setSelectedGroupMessaging]);
 
   const [filterOption, setFilterOption] = useState("all");
   const [categoryDropdown, setCategoryDropdown] = useState(false);
@@ -138,99 +137,66 @@ const MessagePage = () => {
 
   const [infoPartner, setInfoPartner] = useState([]);
 
-  const fetchData = async () => {
-    let infoPartner = [];
-    for (const room of rooms) {
-      const uidSelected = room.members.filter(
-        (member) => member !== userInfo.uid
-      )[0];
-
-      if (uidSelected !== "my-cloud") {
-        if (room.category === "single") {
-          const partnerRef = query(
-            collection(db, "users"),
-            where("uid", "==", uidSelected)
-          );
-          const response = await getDocs(partnerRef);
-          response.docs.forEach((doc) => {
-            const id = doc.id;
-            const data = doc.data();
-            // const keywordsName = generateKeywords(
-            //   data.displayName.toLowerCase()
-            // );
-
-            infoPartner.push({
-              id: id,
-              displayName: data.displayName,
-              photoURL: data.photoURL,
-              uid: data.uid,
-              keywordsName: data.displayName.toLowerCase(),
-            });
-          });
-        } else if (room.category === "group") {
-          const partnerRef = query(
-            collection(db, "users"),
-            where("uid", "in", room.members)
-          );
-
-          const response = await getDocs(partnerRef);
-          const documents = response.docs
-            .map((doc) => {
-              const id = doc.id;
-              const data = doc.data();
-              return {
-                id: id,
-                displayName: data.displayName,
-                photoURL: data.photoURL,
-              };
-            })
-            .reverse();
-
-          const avatars = documents.map((item) => item.photoURL);
-
-          const name = documents.map((item) => item.displayName).join(", ");
-
-          let keywordsName;
-
-          // if (room.name) {
-          // keywordsName = generateKeywords(room.name.toLowerCase());
-          // } else {
-          // keywordsName = generateKeywords(name.toLowerCase());
-          // }
-
-          infoPartner.push({
-            id: room.id,
-            photoURL: avatars,
-            displayName: name,
-            keywordsName: room.name.toLowerCase() || name.toLowerCase(),
-          });
-        }
-      } else {
-        // const keywordsName = generateKeywords("Cloud của tôi".toLowerCase());
-        infoPartner.push({
-          photoURL: avatarCloud,
-          displayName: "Cloud của tôi",
-          id: "my-cloud",
-          uid: "my-cloud",
-          keywordsName: "Cloud của tôi".toLowerCase(),
-        });
-      }
-    }
-    return infoPartner;
-  };
-
   useEffect(() => {
-    if (rooms[0]) {
-      setLoading(true);
-      const fetchDataAsync = async () => {
-        const fetchedData = await fetchData();
-        setInfoPartner(fetchedData);
-        setLoading(false);
-      };
+    if (!rooms.length || !userInfo?.uid) return;
 
-      fetchDataAsync();
-    }
-  }, [rooms, userInfo]);
+    const fetchDataAsync = async () => {
+      console.log("haha");
+      setLoading(true);
+
+      try {
+        const infoPartnerArray = await Promise.all(rooms.map(async (room) => {
+          const uidSelected = room.members.find(m => m !== userInfo.uid);
+
+          if (uidSelected === "my-cloud") {
+            return {
+              photoURL: avatarCloud,
+              displayName: "Cloud của tôi",
+              id: "my-cloud",
+              uid: "my-cloud",
+              keywordsName: "cloud của tôi",
+            };
+          }
+
+          const partnerRef = query(
+            collection(db, "users"),
+            where("uid", room.category === "single" ? "==" : "in",
+              room.category === "single" ? uidSelected : room.members)
+          );
+
+          const response = await getDocs(partnerRef);
+          const docsData = response.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+          if (room.category === "single") {
+            const user = docsData[0];
+            return {
+              id: user?.id,
+              displayName: user?.displayName,
+              photoURL: user?.photoURL,
+              uid: user?.uid,
+              keywordsName: user?.displayName?.toLowerCase(),
+            };
+          } else {
+            const names = docsData.map(d => d.displayName).join(", ");
+            return {
+              id: room.id,
+              photoURL: docsData.map(d => d.photoURL),
+              displayName: names,
+              keywordsName: (room.name || names).toLowerCase(),
+            };
+          }
+        }));
+
+        setInfoPartner(infoPartnerArray);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDataAsync();
+  }, [rooms, userInfo?.uid]); // Chỉ phụ thuộc vào uid thay vì cả object userInfo
 
   const [keywords, setKeywords] = useState("");
 
@@ -301,14 +267,12 @@ const MessagePage = () => {
   };
 
   const renderRooms = useMemo(() => {
-    setTotalUnseenMessageRef(0);
+    console.log("re-render");
 
-    if (!infoPartner[0]) {
-      return;
-    }
+    if (!infoPartner.length) return null;
 
     return rooms?.map((room) => {
-      if (room.hideTemporarily?.includes(userInfo.uid)) return;
+      if (room.hideTemporarily?.includes(userInfo.uid)) return null;
 
       if (room.category === "single" || room.category === "my cloud") {
         const infoPartnerResult = infoPartner.find((item) => {
@@ -339,8 +303,6 @@ const MessagePage = () => {
 
         const unseenMessages = room.totalMessages - infoMyself.count;
 
-        setTotalUnseenMessageRef((current) => current + unseenMessages);
-
         let keywordsName;
 
         if (room.category === "single") {
@@ -359,22 +321,22 @@ const MessagePage = () => {
           let ind = keywordsName.indexOf(keywords.toLowerCase());
 
           if (ind < 0) {
-            return;
+            return null;
           }
         }
 
         if (categorySelected) {
           if (!categoryData?.name) {
-            return;
+            return null;
           }
           if (categorySelected !== categoryData?.name) {
-            return;
+            return null;
           }
         }
 
         if (filterOption === "unseen") {
           if (unseenMessages <= 0) {
-            return;
+            return null;
           }
         }
 
@@ -491,8 +453,6 @@ const MessagePage = () => {
         );
 
         const unseenMessages = room.totalMessages - infoMyself.count;
-
-        setTotalUnseenMessageRef((current) => current + unseenMessages);
 
         if (keywords) {
           const isKeywords = infoGroup.keywordsName.includes(
@@ -612,7 +572,7 @@ const MessagePage = () => {
                       {room.messageLastest?.uid === userInfo.uid
                         ? "Bạn: "
                         : room?.messageLastest?.displayName &&
-                          `${room?.messageLastest?.displayName}: `}
+                        `${room?.messageLastest?.displayName}: `}
                     </span>
                     <span className="new-message__text">
                       {room?.messageLastest?.text}
@@ -683,13 +643,11 @@ const MessagePage = () => {
     selectedUserMessaging,
     selectedGroupMessaging,
     isShowDropdownOption,
+    rooms,
+    userInfo,
+    toogleBoxChat,
+    toogleBoxChatGroup,
   ]);
-
-  // useEffect(() => {
-  //   let searcharray = [];
-  //   let x = 0;
-  //   if ()
-  // }, [])
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
@@ -901,8 +859,7 @@ const MessagePage = () => {
                 )} */}
 
                 {/*  */}
-
-                {renderRooms}
+                {!loading ? renderRooms : "Loading..."}
                 {renderRooms?.length > 0 &&
                   renderRooms?.every((item) => item === undefined) &&
                   filterOption === "unseen" &&

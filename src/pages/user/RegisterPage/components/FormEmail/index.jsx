@@ -188,7 +188,7 @@ const FormEmail = ({ setRegisterWay }) => {
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
             photoCover:
-              "https://fullstack.edu.vn/static/media/cover-profile.3fb9fed576da4b28386a.png",
+              "https://chiemtaimobile.vn/images/companies/1/%E1%BA%A2nh%20Blog/anh-bia-facebook-dep/anh-bia-facebook-anime-mat-trang.jpg?1705887967948",
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
