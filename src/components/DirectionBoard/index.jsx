@@ -22,7 +22,7 @@ const DirectionBoard = () => {
                   <b>Password: </b> abcd1234
                 </div>
               </div>
-              ----
+{/*               ----
               <div className="content__item">
                 <div>
                   <b style={{ color: " rgb(240, 81, 35)" }}>Lưu ý: </b> Bạn vui
@@ -35,24 +35,21 @@ const DirectionBoard = () => {
                 Mình rất vui nếu có được những góp ý để cải thiện sản phẩm cũng như kết bạn thông
                 qua
                 <div style={{ marginTop: "4px", wordBreak: "break-word" }}>
-                  {/* <b>FB: </b>
-                  <a
-                    href="   https://www.facebook.com/dungquangphandev
-                  "
+                  <b>Email: </b>
+                  <span
                     style={{
                       textDecoration: "none",
                       color: " rgb(240, 81, 35)",
                     }}
-                    target="_blank"
                   >
-                    https://www.facebook.com/dungquangphandev
-                  </a> */}
+                    quangdung861@gmail.com
+                  </span>
                 </div>
                 <div>
                   <b>Zalo: </b>
                   0935411853
                 </div>
-              </div>
+              </div> */}
               <div className="btn-close" onClick={() => setIsshow(false)}>
                 Tạm ẩn
               </div>

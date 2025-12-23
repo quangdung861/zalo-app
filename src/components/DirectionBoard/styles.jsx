@@ -4,10 +4,9 @@ export const Wrapper = styled.div``;
 
 export const Container = styled.div`
   .direction-board {
+    width: 100%;
     max-width: 400px;
-    width: 90%; /* Ví dụ: phần tử con chiếm 50% chiều rộng của phần tử cha */
-    height: 50%; /* Ví dụ: phần tử con chiếm 50% chiều cao của phần tử cha */
-    max-height: 324px;
+    padding-right: 20px;
     background-color: #fff;
     position: absolute;
     top: 30px;
