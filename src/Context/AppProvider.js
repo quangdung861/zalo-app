@@ -30,7 +30,13 @@ const AppProvider = ({ children }) => {
     user: { uid },
   } = useContext(AuthContext);
 
+  const [strangerList, setStrangerList] = useState([]);
+  const [keywords, setKeywords] = useState("");
   const [userInfo, setUserInfo] = useState();
+  const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
+  const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
+  const [room, setRoom] = useState({});
+  const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
     if (userInfo?.id) {
@@ -47,29 +53,32 @@ const AppProvider = ({ children }) => {
           merge: true,
         }
       );
-      // REFRESH REMIND MESSAGE
-      const currentTime = moment();
-      const previousTime = moment(
-        userInfo.notificationDowloadZaloPc?.updatedAt?.toDate()
-      );
-      const duration = moment.duration(currentTime.diff(previousTime));
-      const hoursDifference = duration.asHours();
-      if (hoursDifference > 1) {
-        const docRef = doc(db, "users", userInfo.id);
-        setDoc(
-          docRef,
-          {
-            notificationDowloadZaloPc: {
-              value: true,
-              updatedAt: serverTimestamp(),
-            },
-          },
-          {
-            merge: true,
-          }
-        );
-      }
     }
+
+    if (!userInfo?.notificationDowloadZaloPc?.updatedAt) return;
+
+    const previousTime = moment(
+      userInfo.notificationDowloadZaloPc.updatedAt.toDate()
+    );
+
+    const hoursDifference = moment
+      .duration(moment().diff(previousTime))
+      .asHours();
+
+    if (hoursDifference <= 1) return;
+
+    const docRef = doc(db, "users", userInfo.id);
+
+    setDoc(
+      docRef,
+      {
+        notificationDowloadZaloPc: {
+          value: true,
+          updatedAt: serverTimestamp(),
+        },
+      },
+      { merge: true }
+    );
   }, [userInfo?.id]);
 
   useEffect(() => {
@@ -93,10 +102,6 @@ const AppProvider = ({ children }) => {
     }
     return () => unSubcribe && unSubcribe();
   }, [uid]);
-
-  const [strangerList, setStrangerList] = useState([]);
-
-  const [keywords, setKeywords] = useState("");
 
   useEffect(() => {
     if (userInfo?.friends) {
@@ -190,13 +195,6 @@ const AppProvider = ({ children }) => {
     }
   }, [userInfo, keywords, uid]);
 
-  const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
-
-  const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
-
-  const [room, setRoom] = useState({});
-  const [rooms, setRooms] = useState({});
-
   useEffect(() => {
     let unSubcribe;
     if (uid) {
@@ -216,7 +214,7 @@ const AppProvider = ({ children }) => {
           };
         });
 
-        let newDocuments = [...documents].sort(
+        let newDocuments = documents.sort(
           (a, b) => b.messageLastest.createdAt - a.messageLastest.createdAt
         );
 

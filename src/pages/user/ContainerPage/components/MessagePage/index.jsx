@@ -84,7 +84,6 @@ const MessagePage = () => {
   const dropdownRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
-  console.log("🚀 ~ MessagePage ~ loading:", loading)
   const [categorySelected, setCategorySelected] = useState("");
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowOverlayModalConfirmDelete, setIsShowOverlayModalConfirmDelete] =
@@ -131,17 +130,12 @@ const MessagePage = () => {
   const [filterOption, setFilterOption] = useState("all");
   const [categoryDropdown, setCategoryDropdown] = useState(false);
 
-  const handleFilterOption = (value) => {
-    setFilterOption(value);
-  };
-
   const [infoPartner, setInfoPartner] = useState([]);
 
   useEffect(() => {
     if (!rooms.length || !userInfo?.uid) return;
 
     const fetchDataAsync = async () => {
-      console.log("haha");
       setLoading(true);
 
       try {
@@ -266,388 +260,479 @@ const MessagePage = () => {
     setRoomDelete(null);
   };
 
-  const renderRooms = useMemo(() => {
-    console.log("re-render");
+  const filterRoom = infoPartner.length >= 1 && rooms.length >= 1 ? rooms?.map((room) => {
+    if (room.hideTemporarily?.includes(userInfo.uid)) return null;
+    if (room.category === "single" || room.category === "my cloud") {
+      const infoPartnerResult = infoPartner.find((item) => {
+        return room.members.includes(item.uid);
+      });
 
-    if (!infoPartner.length) return null;
+      const formatDate = moment(
+        room.messageLastest?.createdAt?.seconds * 1000
+      )?.fromNow();
 
-    return rooms?.map((room) => {
-      if (room.hideTemporarily?.includes(userInfo.uid)) return null;
+      const uidSelected = room.members.filter(
+        (member) => member !== userInfo.uid
+      )[0];
 
-      if (room.category === "single" || room.category === "my cloud") {
-        const infoPartnerResult = infoPartner.find((item) => {
-          return room.members.includes(item.uid);
-        });
+      let categoryData;
+      const friendData = userInfo.friends.find(
+        (item) => item.uid === uidSelected
+      );
+      if (friendData) {
+        categoryData = userInfo.categoriesTemplate.find(
+          (item) => item.name === friendData.category
+        );
+      }
 
-        const formatDate = moment(
-          room.messageLastest?.createdAt?.seconds * 1000
-        )?.fromNow();
+      const infoMyself = room.messagesViewed.find(
+        (item) => item.uid === userInfo.uid
+      );
 
-        const uidSelected = room.members.filter(
-          (member) => member !== userInfo.uid
-        )[0];
+      const unseenMessages = room.totalMessages - infoMyself.count;
 
-        let categoryData;
-        const friendData = userInfo.friends.find(
+      let keywordsName;
+
+      if (room.category === "single") {
+        keywordsName = infoPartner.find(
           (item) => item.uid === uidSelected
+        )?.keywordsName;
+      } else if (room.category === "my cloud") {
+        keywordsName = infoPartner.find(
+          (item) => item.id === "my-cloud"
+        )?.keywordsName;
+      }
+
+      if (keywords) {
+        // const isKeywords = keywordsName.includes(keywords.toLowerCase());
+
+        let ind = keywordsName.indexOf(keywords.toLowerCase());
+
+        if (ind < 0) {
+          return null;
+        }
+      }
+
+      if (categorySelected) {
+        if (!categoryData?.name) {
+          return null;
+        }
+        if (categorySelected !== categoryData?.name) {
+          return null;
+        }
+      }
+
+      if (filterOption === "unseen") {
+        if (unseenMessages <= 0) {
+          return null;
+        }
+      }
+
+      const roomItemRenderData = {
+        // key & so sánh active
+        roomId: room.id,
+        uidSelected,
+        selectedUid: selectedUserMessaging?.uidSelected,
+
+        // handlers
+        onSelectRoom: () =>
+          toogleBoxChat({
+            uidSelected: uidSelected,
+            photoURLSelected: infoPartnerResult?.photoURL,
+            displayNameSelected: infoPartnerResult?.displayName,
+          }),
+
+        onToggleDropdown: () =>
+          setIsShowDropdownOption({ id: room.id }),
+
+        onDeleteRoom: () => {
+          setIsShowDropdownOption(false);
+          setRoomDelete(room);
+          setIsShowOverlayModalConfirmDelete(true);
+        },
+
+        // user
+        currentUserUid: userInfo.uid,
+
+        // partner info
+        partner: {
+          photoURL: infoPartnerResult?.photoURL,
+          displayName: infoPartnerResult?.displayName,
+        },
+
+        // message
+        lastMessage: {
+          uid: room.messageLastest?.uid,
+          text: room.messageLastest?.text,
+          createdAtText: formatDate,
+        },
+
+        // category
+        category: categoryData
+          ? {
+            name: categoryData.name,
+            color: categoryData.color,
+          }
+          : null,
+
+        // unseen
+        unseenMessages,
+
+        // dropdown
+        isDropdownOpen: isShowDropdownOption?.id === room.id,
+
+        // refs
+        dropdownRef,
+
+        // assets
+        avatarFallback: avatarDefault,
+      };
+
+      return roomItemRenderData;
+    }
+
+    if (room.category === "group") {
+      if (room.deleted) {
+        if (room.deleted.includes(userInfo.uid)) {
+          return null;
+        }
+      }
+
+      const infoGroup = infoPartner.find((item) => item.id === room.id);
+
+      const formatDate = moment(
+        room.messageLastest?.createdAt?.seconds * 1000
+      )?.fromNow();
+
+      const infoMyself = room.messagesViewed.find(
+        (item) => item.uid === userInfo.uid
+      );
+
+      const unseenMessages = room.totalMessages - infoMyself.count;
+
+      if (keywords) {
+        const isKeywords = infoGroup.keywordsName.includes(
+          keywords.toLowerCase()
         );
-        if (friendData) {
-          categoryData = userInfo.categoriesTemplate.find(
-            (item) => item.name === friendData.category
+        if (!isKeywords) {
+          return null;
+        }
+      }
+
+      if (room.mentioned) {
+        if (room.mentioned[0] && unseenMessages === 0) {
+          const mentionIndex = room.mentioned.findIndex(
+            (item) => item === userInfo.uid
           );
-        }
+          if (mentionIndex !== -1) {
+            const newMentiond = [...room.mentioned];
+            newMentiond.splice(mentionIndex, 1);
 
-        const infoMyself = room.messagesViewed.find(
-          (item) => item.uid === userInfo.uid
-        );
-
-        const unseenMessages = room.totalMessages - infoMyself.count;
-
-        let keywordsName;
-
-        if (room.category === "single") {
-          keywordsName = infoPartner.find(
-            (item) => item.uid === uidSelected
-          )?.keywordsName;
-        } else if (room.category === "my cloud") {
-          keywordsName = infoPartner.find(
-            (item) => item.id === "my-cloud"
-          )?.keywordsName;
-        }
-
-        if (keywords) {
-          // const isKeywords = keywordsName.includes(keywords.toLowerCase());
-
-          let ind = keywordsName.indexOf(keywords.toLowerCase());
-
-          if (ind < 0) {
-            return null;
+            const updateMentionRoom = async () => {
+              const docRef = doc(db, "rooms", room.id);
+              await setDoc(
+                docRef,
+                {
+                  mentioned: newMentiond,
+                },
+                {
+                  merge: true,
+                }
+              );
+            };
+            updateMentionRoom();
           }
         }
+      }
 
-        if (categorySelected) {
-          if (!categoryData?.name) {
-            return null;
-          }
-          if (categorySelected !== categoryData?.name) {
-            return null;
-          }
-        }
+      let categoryData;
+      const groupData = userInfo?.groups?.find(
+        (item) => item.id === infoGroup?.id
+      );
 
-        if (filterOption === "unseen") {
-          if (unseenMessages <= 0) {
-            return null;
-          }
-        }
-
-        return (
-          <div className="container-room-item " key={room.id}>
-            <div
-              className={
-                uidSelected === selectedUserMessaging.uidSelected
-                  ? "room-item room-item--active"
-                  : "room-item"
-              }
-              onClick={() =>
-                toogleBoxChat({
-                  uidSelected: uidSelected,
-                  photoURLSelected: infoPartnerResult?.photoURL,
-                  displayNameSelected: infoPartnerResult?.displayName,
-                })
-              }
-            >
-              <div className="room-item__left">
-                <img
-                  // className="image-with-replacement"
-                  src={infoPartnerResult?.photoURL}
-                  alt=""
-                  onError={(e) => {
-                    e.target.src = avatarDefault;
-                  }}
-                />
-
-                <div className="info">
-                  <div className="room-name">
-                    {infoPartnerResult?.displayName}
-                  </div>
-                  <div className="new-message">
-                    {categoryData && (
-                      <i
-                        className="fa-solid fa-bookmark category-icon"
-                        style={{
-                          color: categoryData.color,
-                          marginRight: "8px",
-                        }}
-                        title={categoryData.name}
-                      ></i>
-                    )}
-                    <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid && "Bạn: "}
-                    </span>
-                    <span className="new-message__text">
-                      {room.messageLastest?.text}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="room-item__right">
-                <div className="date">
-                  {formatDate !== "Invalid date" ? formatDate : "..."}
-                </div>
-
-                {!!unseenMessages && (
-                  <div className="unseen">
-                    {unseenMessages < 5 ? unseenMessages : "N"}
-                  </div>
-                )}
-              </div>
-            </div>
-            {isShowDropdownOption?.id === room.id && (
-              <div className="dropdown-menu" ref={dropdownRef}>
-                <div
-                  className="menu-item"
-                  style={{ color: "#d91b1b" }}
-                  onClick={() => {
-                    setIsShowDropdownOption(false);
-                    setRoomDelete(room);
-                    setIsShowOverlayModalConfirmDelete(true);
-                  }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ color: "#d91b1b" }}
-                  ></i>
-                  Xoá hội thoại
-                </div>
-              </div>
-            )}
-
-            <div
-              className={
-                uidSelected === selectedUserMessaging.uidSelected
-                  ? "btn-show-option btn-show-option--active"
-                  : "btn-show-option"
-              }
-              onClick={() => setIsShowDropdownOption({ id: room.id })}
-            >
-              <i className="fa-solid fa-ellipsis"></i>
-            </div>
-          </div>
+      if (groupData) {
+        categoryData = userInfo.categoriesTemplate.find(
+          (item) => item.name === groupData.category
         );
       }
-      if (room.category === "group") {
-        if (room.deleted) {
-          if (room.deleted.includes(userInfo.uid)) {
-            return;
-          }
+
+      if (categorySelected) {
+        if (!categoryData?.name) {
+          return null;
         }
-
-        const infoGroup = infoPartner.find((item) => item.id === room.id);
-
-        const formatDate = moment(
-          room.messageLastest?.createdAt?.seconds * 1000
-        )?.fromNow();
-
-        const infoMyself = room.messagesViewed.find(
-          (item) => item.uid === userInfo.uid
-        );
-
-        const unseenMessages = room.totalMessages - infoMyself.count;
-
-        if (keywords) {
-          const isKeywords = infoGroup.keywordsName.includes(
-            keywords.toLowerCase()
-          );
-          if (!isKeywords) {
-            return;
-          }
+        if (categorySelected !== categoryData?.name) {
+          return null;
         }
+      }
 
-        if (room.mentioned) {
-          if (room.mentioned[0] && unseenMessages === 0) {
-            const mentionIndex = room.mentioned.findIndex(
-              (item) => item === userInfo.uid
-            );
-            if (mentionIndex !== -1) {
-              const newMentiond = [...room.mentioned];
-              newMentiond.splice(mentionIndex, 1);
-
-              const updateMentionRoom = async () => {
-                const docRef = doc(db, "rooms", room.id);
-                await setDoc(
-                  docRef,
-                  {
-                    mentioned: newMentiond,
-                  },
-                  {
-                    merge: true,
-                  }
-                );
-              };
-              updateMentionRoom();
-            }
-          }
+      if (filterOption === "unseen") {
+        if (unseenMessages <= 0) {
+          return null;
         }
+      }
 
-        let categoryData;
-        const groupData = userInfo?.groups?.find(
-          (item) => item.id === infoGroup?.id
-        );
+      const handleImageError = () => {
+        // Xử lý khi hình ảnh không tải được (ví dụ: hiển thị biểu tượng thay thế)
+        const iconImage = document.querySelector(".icon-image");
+        iconImage.style.display = "block";
+      };
 
-        if (groupData) {
-          categoryData = userInfo.categoriesTemplate.find(
-            (item) => item.name === groupData.category
-          );
-        }
+      const roomItemRenderProps = {
+        // ===== DATA =====
+        room, // object room hiện tại
+        userInfo, // thông tin user đang đăng nhập
+        infoGroup, // thông tin group (photoURL, displayName)
+        categoryData, // category của room (color, name)
+        unseenMessages, // số tin nhắn chưa đọc
+        formatDate, // string ngày đã format
 
-        if (categorySelected) {
-          if (!categoryData?.name) {
-            return;
+        // ===== STATE =====
+        selectedGroupMessaging, // room đang được chọn
+        isShowDropdownOption, // { id } hoặc false
+        roomDelete, // room cần xoá
+        isShowOverlayModalConfirmDelete, // boolean
+
+        // ===== HANDLERS =====
+        toogleBoxChatGroup, // function click chọn room
+        setIsShowDropdownOption, // set dropdown option
+        setRoomDelete, // set room delete
+        setIsShowOverlayModalConfirmDelete, // show modal confirm delete
+
+        // ===== REFS =====
+        dropdownRef, // ref dropdown menu
+
+        // ===== COMPONENT / ASSET =====
+        AvatarGroup, // component avatar group
+        avatarDefault, // ảnh fallback
+      };
+
+      return roomItemRenderProps;
+    }
+
+  }).filter((room) => room !== null) : [];
+
+
+  const roomlist = filterRoom.map(({
+    roomId,
+    uidSelected,
+    partner,
+    category,
+    lastMessage,
+    unseenMessages,
+    onDeleteRoom,
+    room,
+    infoGroup,
+    formatDate,
+    categoryData,
+  }) => {
+
+    let roomItem = <div />;
+
+    if (roomId) {
+      roomItem = <div className="container-room-item " key={roomId}>
+        <div
+          className={
+            uidSelected === selectedUserMessaging.uidSelected
+              ? "room-item room-item--active"
+              : "room-item"
           }
-          if (categorySelected !== categoryData?.name) {
-            return;
+          onClick={() =>
+            toogleBoxChat({
+              uidSelected: uidSelected,
+              photoURLSelected: partner?.photoURL,
+              displayNameSelected: partner?.displayName,
+            })
           }
-        }
+        >
+          <div className="room-item__left">
+            <img
+              // className="image-with-replacement"
+              src={partner?.photoURL}
+              alt=""
+              onError={(e) => {
+                e.target.src = avatarDefault;
+              }}
+            />
 
-        if (filterOption === "unseen") {
-          if (unseenMessages <= 0) {
-            return;
-          }
-        }
-
-        const handleImageError = () => {
-          // Xử lý khi hình ảnh không tải được (ví dụ: hiển thị biểu tượng thay thế)
-          const iconImage = document.querySelector(".icon-image");
-          iconImage.style.display = "block";
-        };
-
-        return (
-          <div className="container-room-item " key={room.id}>
-            <div
-              className={
-                room.id === selectedGroupMessaging?.room?.id
-                  ? "room-item room-item--active"
-                  : "room-item"
-              }
-              onClick={() =>
-                toogleBoxChatGroup({
-                  room,
-                  avatars: infoGroup.photoURL,
-                  name: infoGroup.displayName,
-                })
-              }
-            >
-              <div className="room-item__left">
-                {room.avatar?.url && (
-                  <img
-                    // className="image-with-replacement"
-                    src={room.avatar?.url}
-                    alt=""
-                    onError={(e) => {
-                      e.target.src = avatarDefault;
-                    }}
-                  />
-                )}
-
-                {!room.avatar?.url && infoGroup?.photoURL && (
-                  <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
-                )}
-
-                <div className="info">
-                  <div className="room-name">
-                    {room.name || infoGroup?.displayName}
-                  </div>
-                  <div className="new-message">
-                    {categoryData && (
-                      <i
-                        className="fa-solid fa-bookmark category-icon"
-                        style={{
-                          color: categoryData.color,
-                          marginRight: "8px",
-                        }}
-                        title={categoryData.name}
-                      ></i>
-                    )}
-                    <span className="new-message__author">
-                      {room.messageLastest?.uid === userInfo.uid
-                        ? "Bạn: "
-                        : room?.messageLastest?.displayName &&
-                        `${room?.messageLastest?.displayName}: `}
-                    </span>
-                    <span className="new-message__text">
-                      {room?.messageLastest?.text}
-                    </span>
-                  </div>
-                </div>
+            <div className="info">
+              <div className="room-name">
+                {partner?.displayName}
               </div>
-              <div className="room-item__right">
-                <div className="date">
-                  {formatDate !== "Invalid date" ? formatDate : "..."}
-                </div>
-                {!!unseenMessages && (
-                  <div
+              <div className="new-message">
+                {category && (
+                  <i
+                    className="fa-solid fa-bookmark category-icon"
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
+                      color: category.color,
+                      marginRight: "8px",
                     }}
-                  >
-                    {room?.mentioned?.includes(userInfo.uid) && (
-                      <div className="icon-tagname">@</div>
-                    )}
-                    <div className="unseen">
-                      {unseenMessages < 5 ? unseenMessages : "N"}
-                    </div>
-                  </div>
+                    title={category.name}
+                  ></i>
                 )}
+                <span className="new-message__author">
+                  {lastMessage.uid === userInfo.uid && "Bạn: "}
+                </span>
+                <span className="new-message__text">
+                  {lastMessage.text}
+                </span>
               </div>
             </div>
-            {isShowDropdownOption?.id === room.id && (
-              <div className="dropdown-menu" ref={dropdownRef}>
-                <div
-                  className="menu-item"
-                  style={{ color: "#d91b1b" }}
-                  onClick={() => {
-                    setIsShowDropdownOption(false);
-                    setRoomDelete(room);
-                    setIsShowOverlayModalConfirmDelete(true);
-                  }}
-                >
+          </div>
+          <div className="room-item__right">
+            <div className="date">
+              {lastMessage.createdAtText !== "Invalid date" ? lastMessage.createdAtText : "..."}
+            </div>
+
+            {!!unseenMessages && (
+              <div className="unseen">
+                {unseenMessages < 5 ? unseenMessages : "N"}
+              </div>
+            )}
+          </div>
+        </div>
+        {isShowDropdownOption?.id === roomId && (
+          <div className="dropdown-menu" ref={dropdownRef}>
+            <div
+              className="menu-item"
+              style={{ color: "#d91b1b" }}
+              onClick={onDeleteRoom}
+            >
+              <i
+                className="fa-regular fa-trash-can"
+                style={{ color: "#d91b1b" }}
+              ></i>
+              Xoá hội thoại
+            </div>
+          </div>
+        )}
+
+        <div
+          className={
+            uidSelected === selectedUserMessaging.uidSelected
+              ? "btn-show-option btn-show-option--active"
+              : "btn-show-option"
+          }
+          onClick={() => setIsShowDropdownOption({ id: roomId })}
+        >
+          <i className="fa-solid fa-ellipsis"></i>
+        </div>
+      </div>
+
+    } else {
+      roomItem = <div className="container-room-item " key={room.id}>
+        <div
+          className={
+            room.id === selectedGroupMessaging?.room?.id
+              ? "room-item room-item--active"
+              : "room-item"
+          }
+          onClick={() =>
+            toogleBoxChatGroup({
+              room,
+              avatars: infoGroup.photoURL,
+              name: infoGroup.displayName,
+            })
+          }
+        >
+          <div className="room-item__left">
+            {room.avatar?.url && (
+              <img
+                // className="image-with-replacement"
+                src={room.avatar?.url}
+                alt=""
+                onError={(e) => {
+                  e.target.src = avatarDefault;
+                }}
+              />
+            )}
+
+            {!room.avatar?.url && infoGroup?.photoURL && (
+              <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
+            )}
+
+            <div className="info">
+              <div className="room-name">
+                {room.name || infoGroup?.displayName}
+              </div>
+              <div className="new-message">
+                {categoryData && (
                   <i
-                    className="fa-regular fa-trash-can"
-                    style={{ color: "#d91b1b" }}
+                    className="fa-solid fa-bookmark category-icon"
+                    style={{
+                      color: categoryData.color,
+                      marginRight: "8px",
+                    }}
+                    title={categoryData.name}
                   ></i>
-                  Xoá hội thoại
+                )}
+                <span className="new-message__author">
+                  {room.messageLastest?.uid === userInfo.uid
+                    ? "Bạn: "
+                    : room?.messageLastest?.displayName &&
+                    `${room?.messageLastest?.displayName}: `}
+                </span>
+                <span className="new-message__text">
+                  {room?.messageLastest?.text}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="room-item__right">
+            <div className="date">
+              {formatDate !== "Invalid date" ? formatDate : "..."}
+            </div>
+            {!!unseenMessages && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                {room?.mentioned?.includes(userInfo.uid) && (
+                  <div className="icon-tagname">@</div>
+                )}
+                <div className="unseen">
+                  {unseenMessages < 5 ? unseenMessages : "N"}
                 </div>
               </div>
             )}
+          </div>
+        </div>
+        {isShowDropdownOption?.id === room.id && (
+          <div className="dropdown-menu" ref={dropdownRef}>
             <div
-              className={
-                room.id === selectedGroupMessaging?.room?.id
-                  ? "btn-show-option btn-show-option--active"
-                  : "btn-show-option"
-              }
-              onClick={() => setIsShowDropdownOption({ id: room.id })}
+              className="menu-item"
+              style={{ color: "#d91b1b" }}
+              onClick={() => {
+                setIsShowDropdownOption(false);
+                setRoomDelete(room);
+                setIsShowOverlayModalConfirmDelete(true);
+              }}
             >
-              <i className="fa-solid fa-ellipsis"></i>
+              <i
+                className="fa-regular fa-trash-can"
+                style={{ color: "#d91b1b" }}
+              ></i>
+              Xoá hội thoại
             </div>
           </div>
-        );
-      }
-    });
-  }, [
-    filterOption,
-    infoPartner,
-    keywords,
-    categorySelected,
-    selectedUserMessaging,
-    selectedGroupMessaging,
-    isShowDropdownOption,
-    rooms,
-    userInfo,
-    toogleBoxChat,
-    toogleBoxChatGroup,
-  ]);
+        )}
+        <div
+          className={
+            room.id === selectedGroupMessaging?.room?.id
+              ? "btn-show-option btn-show-option--active"
+              : "btn-show-option"
+          }
+          onClick={() => setIsShowDropdownOption({ id: room.id })}
+        >
+          <i className="fa-solid fa-ellipsis"></i>
+        </div>
+      </div>
+    }
+
+    return roomItem;
+  });
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
@@ -767,14 +852,14 @@ const MessagePage = () => {
                 <div className="menu__left">
                   <div
                     className="menu-left__item menu-left__item--all"
-                    onClick={() => handleFilterOption("all")}
+                    onClick={() => setFilterOption("all")}
                     style={filterOption === "all" ? { color: "#005ae0" } : {}}
                   >
                     Tất cả
                   </div>
                   <div
                     className="menu-left__item menu-left__item--unseen"
-                    onClick={() => handleFilterOption("unseen")}
+                    onClick={() => setFilterOption("unseen")}
                     style={
                       filterOption === "unseen" ? { color: "#005ae0" } : {}
                     }
@@ -859,11 +944,12 @@ const MessagePage = () => {
                 )} */}
 
                 {/*  */}
-                {!loading ? renderRooms : "Loading..."}
-                {renderRooms?.length > 0 &&
-                  renderRooms?.every((item) => item === undefined) &&
-                  filterOption === "unseen" &&
-                  !categorySelected && (
+                {roomlist}
+
+                {/* {!loading ? roomlist : "Loading..."} */}
+                {
+                  !filterRoom[0] &&
+                  filterOption === "unseen" && !categorySelected && (
                     <div className="empty-message">
                       <img
                         src={emptyMessageUnssenImage}
@@ -872,9 +958,11 @@ const MessagePage = () => {
                       />
                       <span>Không có tin nhắn chưa đọc</span>
                     </div>
-                  )}
-                {renderRooms?.length > 0 &&
-                  renderRooms?.every((item) => item === undefined) &&
+                  )
+                }
+
+
+                {!filterRoom[0] &&
                   (!categorySelected ? (
                     filterOption === "all" && (
                       <div className="empty-message">
@@ -923,7 +1011,6 @@ const MessagePage = () => {
                       </div>
                     </div>
                   ))}
-
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">

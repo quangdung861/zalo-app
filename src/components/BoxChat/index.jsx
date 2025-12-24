@@ -938,8 +938,8 @@ const BoxChat = () => {
 
       let total = 0;
 
-      item.emojiList.forEach((element) => {
-        element.uids.forEach((item) => {
+      item?.emojiList?.forEach((element) => {
+        element?.uids?.forEach((item) => {
           total = total + item.quantity;
         });
       });
