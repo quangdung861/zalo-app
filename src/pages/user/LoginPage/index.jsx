@@ -103,6 +103,7 @@ const LoginPage = () => {
             ],
             messageLastest: {
               createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
             messagesViewed: [{ uid: data.user.uid, count: 0 }],
@@ -195,6 +196,7 @@ const LoginPage = () => {
             ],
             messageLastest: {
               createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
             messagesViewed: [{ uid: data.user.uid, count: 0 }],

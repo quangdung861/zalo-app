@@ -154,8 +154,7 @@ export const Container = styled.div`
       position: relative;
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) =>
-        props.isCloud ? cloudBg : messageBg});
+      background-image: url(${(props) =>(props.isCloud ? cloudBg : messageBg)});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}

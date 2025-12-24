@@ -330,6 +330,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       members: [userInfo.uid, ...members],
       messageLastest: {
         createdAt: serverTimestamp(),
+        clientCreatedAt: Date.now(),
       },
       messagesViewed: [{ uid: userInfo.uid, count: 0 }, ...messagesViewed],
       totalMessages: 0,
@@ -364,22 +365,22 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
           {
             ...(allUserGroup[i]?.groups
               ? {
-                  groups: [
-                    ...allUserGroup[i]?.groups,
-                    {
-                      id: room.id,
-                      category: "",
-                    },
-                  ],
-                }
+                groups: [
+                  ...allUserGroup[i]?.groups,
+                  {
+                    id: room.id,
+                    category: "",
+                  },
+                ],
+              }
               : {
-                  groups: [
-                    {
-                      id: room.id,
-                      category: "",
-                    },
-                  ],
-                }),
+                groups: [
+                  {
+                    id: room.id,
+                    category: "",
+                  },
+                ],
+              }),
           },
           {
             merge: true,

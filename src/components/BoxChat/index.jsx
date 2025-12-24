@@ -104,8 +104,8 @@ const BoxChat = () => {
     if (chatWindow) {
       const isNearBottom =
         chatWindow.scrollHeight -
-          chatWindow.scrollTop -
-          chatWindow.clientHeight <
+        chatWindow.scrollTop -
+        chatWindow.clientHeight <
         50;
       const isNearTop = chatWindow.scrollTop < 200;
       setShowBtnUpToTop(!isNearBottom && !isNearTop);
@@ -300,6 +300,7 @@ const BoxChat = () => {
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
@@ -353,8 +354,10 @@ const BoxChat = () => {
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                 },
                 createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
                 totalMessages: 1,
                 messagesViewed: [
                   { uid: userInfo.uid, count: 1 },
@@ -459,6 +462,8 @@ const BoxChat = () => {
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
                 createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
+                clientCreatedAt: Date.now(),
               },
               totalMessages: room.totalMessages + 1,
               messagesViewed: newMessageViewed,
@@ -512,8 +517,10 @@ const BoxChat = () => {
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
                 createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
               },
               createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               totalMessages: 1,
               messagesViewed: [
                 { uid: userInfo.uid, count: 1 },
@@ -1092,25 +1099,22 @@ const BoxChat = () => {
                   <div className="modal-content__content">
                     <div className="filter-category-list">
                       <div
-                        className={`filter-category-item ${
-                          clicked === "all" ? "clicked" : ""
-                        }`}
+                        className={`filter-category-item ${clicked === "all" ? "clicked" : ""
+                          }`}
                         onClick={() => setClicked("all")}
                       >
                         Tất cả {total}
                         <div
-                          className={`dividing-bottom ${
-                            clicked === "all" ? "clicked" : ""
-                          }`}
+                          className={`dividing-bottom ${clicked === "all" ? "clicked" : ""
+                            }`}
                         ></div>
                       </div>
                       {sortedEmojiList.map(
                         (emoji) =>
                           emoji.uids[0] && (
                             <div
-                              className={`filter-category-item ${
-                                clicked === emoji.id ? "clicked" : ""
-                              }`}
+                              className={`filter-category-item ${clicked === emoji.id ? "clicked" : ""
+                                }`}
                               key={emoji.id}
                               onClick={() => setClicked(emoji.id)}
                             >
@@ -1128,9 +1132,8 @@ const BoxChat = () => {
                                 0
                               )}
                               <div
-                                className={`dividing-bottom ${
-                                  clicked === emoji.id ? "clicked" : ""
-                                }`}
+                                className={`dividing-bottom ${clicked === emoji.id ? "clicked" : ""
+                                  }`}
                               ></div>
                             </div>
                           )
@@ -1932,14 +1935,14 @@ const BoxChat = () => {
             }
             style={
               item.id === messageSelected.MESSAGE_ID &&
-              index === messageSelected.IMAGE_INDEX
+                index === messageSelected.IMAGE_INDEX
                 ? {
-                    minWidth: "100px",
-                    minHeight: "100px",
-                    filter: "none",
-                    border: "2px solid #fff",
-                    transition: "all .3s ease",
-                  }
+                  minWidth: "100px",
+                  minHeight: "100px",
+                  filter: "none",
+                  border: "2px solid #fff",
+                  transition: "all .3s ease",
+                }
                 : {}
             }
           />
@@ -2143,9 +2146,9 @@ const BoxChat = () => {
               </div>
             )}
             {isFriend === -1 &&
-            !isSent &&
-            !isReceive &&
-            selectedUserMessaging.uidSelected !== "my-cloud" ? (
+              !isSent &&
+              !isReceive &&
+              selectedUserMessaging.uidSelected !== "my-cloud" ? (
               <div
                 className="suggest-add-friend"
                 style={{ userSelect: "none" }}
@@ -2330,14 +2333,13 @@ const BoxChat = () => {
                   // style={{ textTransform: "capitalize" }}z
                   autoComplete="off"
                   spellCheck="false"
-                  placeholder={`Nhắn tin tới ${
-                    selectedUserMessaging.displayNameSelected?.length < 40
-                      ? selectedUserMessaging?.displayNameSelected
-                      : selectedUserMessaging?.displayNameSelected?.slice(
-                          0,
-                          39
-                        ) + "..."
-                  }`}
+                  placeholder={`Nhắn tin tới ${selectedUserMessaging.displayNameSelected?.length < 40
+                    ? selectedUserMessaging?.displayNameSelected
+                    : selectedUserMessaging?.displayNameSelected?.slice(
+                      0,
+                      39
+                    ) + "..."
+                    }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}

@@ -313,6 +313,8 @@ const BoxChatGroup = () => {
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
+                  clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
@@ -424,6 +426,8 @@ const BoxChatGroup = () => {
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
+                  clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
@@ -623,10 +627,10 @@ const BoxChatGroup = () => {
     if (chatWindow) {
       const isNearBottom =
         chatWindow.scrollHeight -
-          chatWindow.scrollTop -
-          chatWindow.clientHeight <
+        chatWindow.scrollTop -
+        chatWindow.clientHeight <
         50;
-        const isNearTop = chatWindow.scrollTop < 200;
+      const isNearTop = chatWindow.scrollTop < 200;
       setShowBtnUpToTop(!isNearBottom && !isNearTop);
     }
   };
@@ -1065,25 +1069,22 @@ const BoxChatGroup = () => {
                   <div className="modal-content__content">
                     <div className="filter-category-list">
                       <div
-                        className={`filter-category-item ${
-                          clicked === "all" ? "clicked" : ""
-                        }`}
+                        className={`filter-category-item ${clicked === "all" ? "clicked" : ""
+                          }`}
                         onClick={() => setClicked("all")}
                       >
                         Tất cả {total}
                         <div
-                          className={`dividing-bottom ${
-                            clicked === "all" ? "clicked" : ""
-                          }`}
+                          className={`dividing-bottom ${clicked === "all" ? "clicked" : ""
+                            }`}
                         ></div>
                       </div>
                       {sortedEmojiList.map(
                         (emoji) =>
                           emoji.uids[0] && (
                             <div
-                              className={`filter-category-item ${
-                                clicked === emoji.id ? "clicked" : ""
-                              }`}
+                              className={`filter-category-item ${clicked === emoji.id ? "clicked" : ""
+                                }`}
                               key={emoji.id}
                               onClick={() => setClicked(emoji.id)}
                             >
@@ -1101,9 +1102,8 @@ const BoxChatGroup = () => {
                                 0
                               )}
                               <div
-                                className={`dividing-bottom ${
-                                  clicked === emoji.id ? "clicked" : ""
-                                }`}
+                                className={`dividing-bottom ${clicked === emoji.id ? "clicked" : ""
+                                  }`}
                               ></div>
                             </div>
                           )
@@ -1861,14 +1861,14 @@ const BoxChatGroup = () => {
             }
             style={
               item.id === messageSelected.MESSAGE_ID &&
-              index === messageSelected.IMAGE_INDEX
+                index === messageSelected.IMAGE_INDEX
                 ? {
-                    minWidth: "100px",
-                    minHeight: "100px",
-                    filter: "none",
-                    border: "2px solid #fff",
-                    transition: "all .3s ease",
-                  }
+                  minWidth: "100px",
+                  minHeight: "100px",
+                  filter: "none",
+                  border: "2px solid #fff",
+                  transition: "all .3s ease",
+                }
                 : {}
             }
           />
@@ -2175,8 +2175,7 @@ const BoxChatGroup = () => {
                   autoComplete="off"
                   spellCheck="false"
                   // style={{ textTransform: "capitalize" }}
-                  placeholder={`Nhập @, tin nhắn tới ${
-                    (room?.name &&
+                  placeholder={`Nhập @, tin nhắn tới ${(room?.name &&
                       (room?.name?.length < 40
                         ? room?.name
                         : room?.name?.slice(0, 39) + "...")) ||
@@ -2184,7 +2183,7 @@ const BoxChatGroup = () => {
                       (selectedGroupMessaging?.name.length < 40
                         ? selectedGroupMessaging?.name
                         : selectedGroupMessaging?.name?.slice(0, 39) + "..."))
-                  }`}
+                    }`}
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}

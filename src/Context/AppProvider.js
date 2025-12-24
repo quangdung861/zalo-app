@@ -214,11 +214,21 @@ const AppProvider = ({ children }) => {
           };
         });
 
-        let newDocuments = documents.sort(
-          (a, b) => b.messageLastest.createdAt - a.messageLastest.createdAt
-        );
+        const sortedRooms = documents.sort((a, b) => {
+          const aTime =
+            a.messageLastest?.clientCreatedAt ??
+            a.messageLastest?.createdAt?.seconds * 1000 ??
+            0;
 
-        setRooms(newDocuments);
+          const bTime =
+            b.messageLastest?.clientCreatedAt ??
+            b.messageLastest?.createdAt?.seconds * 1000 ??
+            0;
+
+          return bTime - aTime;
+        });
+
+        setRooms(sortedRooms);
       });
     }
     return () => unSubcribe && unSubcribe();
