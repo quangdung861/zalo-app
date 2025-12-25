@@ -47,7 +47,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
           formData.password.value
         );
       } catch (error) {
-        if (error.code === "auth/wrong-password") {
+        if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
           setFormData((preven) => ({
             ...preven,
             error: "Email hoặc mật khẩu không chính xác",
