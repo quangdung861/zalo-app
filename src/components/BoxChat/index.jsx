@@ -941,19 +941,19 @@ const BoxChat = () => {
 
       let total = 0;
 
-      item?.emojiList.forEach((element) => {
+      item?.emojiList?.forEach((element) => {
         element.uids.forEach((uidItem) => {
           total = total + uidItem.quantity;
         });
       });
 
-      const isNewest = item.emojiList.find((emoji) =>
+      const isNewest = item?.emojiList?.find((emoji) =>
         emoji.uids.find((item) => item.uid === userInfo.uid && item.isNewest)
       );
 
       //
 
-      const sortedEmojiList = item.emojiList.sort((a, b) => {
+      const sortedEmojiList = item?.emojiList?.sort((a, b) => {
         const sumQuantityA = a.uids.reduce(
           (total, uid) => total + uid.quantity,
           0
