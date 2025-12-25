@@ -18,14 +18,16 @@ export const Container = styled.div`
     flex-direction: column;
     user-select: none;
     .login-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
       max-width: 640px;
       width: 100%;
       padding: 48px 16px;
       background-color: white;
       min-height: 600px;
       border-radius: 10px;
-      text-align: center;
-      justify-content: center;
       position: relative;
       .login-header {
         margin-bottom: 40px;
@@ -58,6 +60,9 @@ export const Container = styled.div`
                 background-color: #dce0e3;
               }
               > img {
+                height: 20px;
+                object-fit: cover;
+                width: 20px;
               }
               > span {
                 flex: 1;

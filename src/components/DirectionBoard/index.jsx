@@ -12,11 +12,19 @@ const DirectionBoard = () => {
             <h2>Hướng dẫn sử dụng</h2>
             <div className="content">
               <div className="content__item">
-                <div style={{ color: " rgb(240, 81, 35)" }}>
+                <div style={{ color: " rgb(240, 81, 35)", marginBottom: 8 }}>
                   Tài khoản Demo đã kết bạn và tạo nhóm sẵn
                 </div>
+                 <div style={{ color: "#7d7b7b", fontWeight: 500, fontSize: 13}}>Tài khoản 1</div>
                 <div>
                   <b>Email: </b> phanquangdung@gmail.com
+                </div>
+                <div>
+                  <b>Password: </b> abcd1234
+                </div>
+                <div style={{marginTop: "4px", color: "#7d7b7b", fontWeight: 500, fontSize: 13}}>Tài khoản 2</div>
+                <div>
+                  <b>Email: </b> huynhthithaonguyen@gmail.com
                 </div>
                 <div>
                   <b>Password: </b> abcd1234

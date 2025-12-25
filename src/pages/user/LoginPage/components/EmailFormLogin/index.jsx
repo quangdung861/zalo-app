@@ -41,23 +41,19 @@ const EmailFormLogin = ({ setLoginWay }) => {
       formData.error === null
     ) {
       try {
-        const data = await signInWithEmailAndPassword(
+         await signInWithEmailAndPassword(
           auth,
           formData.email.value,
           formData.password.value
         );
-        if (data) {
-        }
       } catch (error) {
-        if (error.code === "auth/user-not-found") {
-          console.log(error.code);
+        if (error.code === "auth/wrong-password") {
           setFormData((preven) => ({
             ...preven,
             error: "Email hoặc mật khẩu không chính xác",
           }));
         }
         if (error.code === "auth/invalid-email") {
-          console.log(error.code);
           setFormData((preven) => ({
             ...preven,
             error: "Email của bạn không đúng định dạng",
@@ -128,15 +124,6 @@ const EmailFormLogin = ({ setLoginWay }) => {
           </div>
           <div className="error-fullname"></div>
           <div style={{ color: "#f33a58" }}>{formData.error}</div>
-          <div
-            style={{
-              margin: "8px 0px 20px 8px",
-              fontSize: "12px",
-              color: "#6b6f74",
-            }}
-          >
-            Gợi ý: Mật khẩu cần có ít nhất 8 ký tự
-          </div>
 
           <div className="box-confirm">
             <input

@@ -371,7 +371,7 @@ const FormEmail = ({ setRegisterWay }) => {
               Bạn đã có tài khoản?{" "}
               <Link
                 style={{ color: "#f05123", fontWeight: 500 }}
-                to={ROUTES.USER.LOGIN}
+                to={ROUTES.LOGIN}
               >
                 Đăng nhập
               </Link>
@@ -383,7 +383,7 @@ const FormEmail = ({ setRegisterWay }) => {
             <div className="register-success-title">
               Đăng ký tài khoản thành công{" "}
               <span>
-                <Link to={ROUTES.USER.LOGIN}>Đăng nhập</Link>
+                <Link to={ROUTES.LOGIN}>Đăng nhập</Link>
               </span>
             </div>
           </div>

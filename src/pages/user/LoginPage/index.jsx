@@ -241,7 +241,7 @@ const LoginPage = () => {
                         onClick={() => setLoginWay("email")}
                       >
                         <img
-                          src="https://accounts.fullstack.edu.vn/assets/images/signin/personal-18px.svg"
+                          src={require("assets/logo/Sample_User_Icon.png")}
                           alt=""
                         />
                         <span>Sử dụng email/ số điện thoại</span>
@@ -253,7 +253,7 @@ const LoginPage = () => {
                         onClick={() => handleGoogleSignIn()}
                       >
                         <img
-                          src="https://accounts.fullstack.edu.vn/assets/images/signin/google-18px.svg"
+                          src={require("assets/logo/Google_Icons-09-512.webp")}
                           alt=""
                         />
                         <span>Tiếp tục với Google</span>
@@ -265,7 +265,7 @@ const LoginPage = () => {
                         onClick={() => handleGithubSignIn()}
                       >
                         <img
-                          src="https://accounts.fullstack.edu.vn/assets/images/signin/github-18px.svg"
+                          src={require("assets/logo/25231.png")}
                           alt=""
                         />
                         <span>Tiếp tục với Github</span>
