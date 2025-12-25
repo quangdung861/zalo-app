@@ -21,7 +21,7 @@ export const Container = styled.div`
         animation-name: zoom;
         animation-duration: 0.5s;
         position: absolute;
-        height: 97vh;
+        height: 97dvh;
         width: 520px;
         max-width: 100%;
         top: 10px;

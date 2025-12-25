@@ -15,7 +15,7 @@ export const Container = styled.div`
     width: 100%;
     .section-left {
       min-width: var(--section-left-width);
-      height: 100vh;
+      height: 100dvh;
       border-right: 1px solid var(--boder-dividing-color);
       transition: min-width 0.3s ease;
       &__header {
@@ -394,7 +394,7 @@ export const Container = styled.div`
       flex: 1;
       .content-welcome {
         padding: 0 16px;
-        height: 100vh;
+        height: 100dvh;
         display: flex;
         flex-direction: column;
         align-items: center;

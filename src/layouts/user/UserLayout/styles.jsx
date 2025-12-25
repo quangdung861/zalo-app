@@ -6,6 +6,4 @@ export const Container = styled.div`
   width: 100%;
   max-width: 1380px;
   margin: 0 auto;
-  max-height: 100vh;
-  height: 100vh;
 `;

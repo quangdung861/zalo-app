@@ -12,7 +12,7 @@ export const Container = styled.div`
     .section-left {
       user-select: none;
       min-width: var(--section-left-width);
-      height: 100vh;
+      height: 100dvh;
       border-right: 1px solid var(--boder-dividing-color);
       transition: min-width 0.3s ease;
       &__header {

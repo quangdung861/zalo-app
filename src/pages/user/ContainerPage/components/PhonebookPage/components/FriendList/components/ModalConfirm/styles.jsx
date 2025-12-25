@@ -20,7 +20,7 @@ export const Container = styled.div`
         animation-name: zoom;
         animation-duration: 0.5s;
         position: absolute;
-        /* height: 97vh; */
+        /* height: 97dvh; */
         /* min-height: 60px; */
         width: 374px;
         max-width: 100%;

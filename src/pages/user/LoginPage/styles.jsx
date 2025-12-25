@@ -11,7 +11,7 @@ export const Wrapper = styled.div`
 export const Container = styled.div`
   padding: 0px 12px;
   .login {
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;

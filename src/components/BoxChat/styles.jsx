@@ -282,7 +282,7 @@ export const Container = styled.div`
               animation-name: zoom;
               animation-duration: 0.5s;
               position: absolute;
-              /* height: 97vh; */
+              /* height: 97dvh; */
               /* min-height: 60px; */
               width: 450px;
               max-width: 100%;
@@ -1233,7 +1233,7 @@ export const Container = styled.div`
     position: fixed;
     z-index: 999;
     inset: 0 0 0 0;
-    height: 100vh;
+    height: 100dvh;
     background-color: #3e4041;
     user-select: none;
 
@@ -1288,7 +1288,7 @@ export const Container = styled.div`
           margin-right: 12px;
           cursor: pointer;
           .dividing-line {
-            height: 100vh;
+            height: 100dvh;
             width: 2px;
             background-color: #fff;
           }

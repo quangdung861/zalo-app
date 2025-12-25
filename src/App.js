@@ -13,7 +13,7 @@ import AuthProvider from "Context/AuthProvider";
 import "moment/locale/vi";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import 'react-loading-skeleton/dist/skeleton.css'
+import "react-loading-skeleton/dist/skeleton.css";
 
 export const DropdownContext = createContext();
 
@@ -55,23 +55,25 @@ function App() {
   // }, []);
 
   return (
-    <AuthProvider>
-      <AppProvider>
-        <DropdownContext.Provider
-          value={{ setIsShowDropdown, isShowDropdown, dropdownRef }}
-        >
-          <Routes>
-            <Route element={<UserLayout />}>
-              <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
-            </Route>
-            <Route element={<LoginRegisterLayout />}>
-              <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-            </Route>
-          </Routes>
-        </DropdownContext.Provider>
-      </AppProvider>
-    </AuthProvider>
+    <div className="app">
+      <AuthProvider>
+        <AppProvider>
+          <DropdownContext.Provider
+            value={{ setIsShowDropdown, isShowDropdown, dropdownRef }}
+          >
+            <Routes>
+              <Route element={<UserLayout />}>
+                <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
+              </Route>
+              <Route element={<LoginRegisterLayout />}>
+                <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+                <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+              </Route>
+            </Routes>
+          </DropdownContext.Provider>
+        </AppProvider>
+      </AuthProvider>
+    </div>
   );
 }
 
