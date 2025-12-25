@@ -754,7 +754,16 @@ const BoxChatGroup = () => {
   };
 
   const handleAddEmoji = async ({ id, message }) => {
-    const emojiList = message.emojiList;
+    let emojiList = message.emojiList.map((emojiItem) => {
+      const updatedUids = emojiItem.uids.map((uidItem) => {
+        if (uidItem.uid === userInfo.uid) {
+          return { ...uidItem, isNewest: false };
+        }
+        return uidItem;
+      });
+
+      return { ...emojiItem, uids: updatedUids };
+    })
 
     const myData = emojiList.find((item) => item.id === id);
 
@@ -763,16 +772,7 @@ const BoxChatGroup = () => {
     );
 
     if (myDataIndex !== -1) {
-      const updatedEmojiList = emojiList.map((emoji) => {
-        const updatedUids = emoji.uids.map((uid) => {
-          if (uid.uid === userInfo.uid) {
-            return { ...uid, isNewest: false };
-          }
-          return uid; // Giữ nguyên các phần tử khác trong mảng uids
-        });
-
-        return { ...emoji, uids: updatedUids };
-      });
+      const updatedEmojiList = emojiList;
 
       updatedEmojiList
         .find((item) => item.id === id)
@@ -783,6 +783,7 @@ const BoxChatGroup = () => {
             updatedEmojiList.find((item) => item.id === id).uids[myDataIndex]
               ?.quantity + 1,
         });
+
 
       const messagesRef = doc(db, "messages", message.id);
 
@@ -828,6 +829,7 @@ const BoxChatGroup = () => {
           if (uid.uid !== userInfo.uid) {
             return uid;
           }
+          return null;
         })
         .filter((uid) => uid !== undefined);
 
@@ -860,7 +862,7 @@ const BoxChatGroup = () => {
         const formatDate = moment(item.createdAt)._i.seconds * 1000;
 
         if (formatDate < infoDeleted?.createdAt) {
-          return;
+          return null;
         }
       }
 
@@ -968,6 +970,7 @@ const BoxChatGroup = () => {
               </div>
             );
           }
+          return null;
         });
       };
 
@@ -983,7 +986,7 @@ const BoxChatGroup = () => {
 
           const data = infoUsers?.find((user) => user.uid === uid2);
 
-          if (clicked !== "all" && !categoriesId.includes(clicked)) return;
+          if (clicked !== "all" && !categoriesId.includes(clicked)) return null;
 
           let total = 0;
           sortedEmojiList.forEach((element) => {
@@ -1041,6 +1044,7 @@ const BoxChatGroup = () => {
               </div>
             );
           }
+          return null;
         });
       };
 
@@ -2176,9 +2180,9 @@ const BoxChatGroup = () => {
                   spellCheck="false"
                   // style={{ textTransform: "capitalize" }}
                   placeholder={`Nhập @, tin nhắn tới ${(room?.name &&
-                      (room?.name?.length < 40
-                        ? room?.name
-                        : room?.name?.slice(0, 39) + "...")) ||
+                    (room?.name?.length < 40
+                      ? room?.name
+                      : room?.name?.slice(0, 39) + "...")) ||
                     (selectedGroupMessaging?.name &&
                       (selectedGroupMessaging?.name.length < 40
                         ? selectedGroupMessaging?.name

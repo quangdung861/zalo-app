@@ -61,6 +61,10 @@ const BoxChat = () => {
     useState(false);
   const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
+  const [messages, setMessages] = useState([]);
+  const [messageLength, setMessageLength] = useState(messages.length);
+  const [infoUsers, setInfoUsers] = useState();
+  const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -69,8 +73,6 @@ const BoxChat = () => {
   const dropdownRef = useRef();
   const dropdownSelectEmoji = useRef();
   const emotionModal = useRef();
-
-  const [inputValue, setInputValue] = useState("");
 
   const audio = new Audio(messageSend);
 
@@ -463,7 +465,6 @@ const BoxChat = () => {
                 uid: userInfo.uid,
                 createdAt: serverTimestamp(),
                 clientCreatedAt: Date.now(),
-                clientCreatedAt: Date.now(),
               },
               totalMessages: room.totalMessages + 1,
               messagesViewed: newMessageViewed,
@@ -629,8 +630,6 @@ const BoxChat = () => {
     }
   }, []);
 
-  const [messages, setMessages] = useState([]);
-
   useEffect(() => {
     return () => setMessages([]);
   }, []);
@@ -670,8 +669,6 @@ const BoxChat = () => {
     return () => unSubcribe && unSubcribe();
   }, [room.id]);
 
-  const [messageLength, setMessageLength] = useState(messages.length);
-
   useEffect(() => {
     if (messages.length !== messageLength) {
       const chatWindow = boxChatRef?.current;
@@ -685,7 +682,6 @@ const BoxChat = () => {
     }
   }, [messages, messageLength]);
 
-  const [infoUsers, setInfoUsers] = useState();
 
   useEffect(() => {
     if (messages[0]) {
@@ -798,7 +794,16 @@ const BoxChat = () => {
   };
 
   const handleAddEmoji = async ({ id, message }) => {
-    const emojiList = message.emojiList;
+    let emojiList = message.emojiList.map((emojiItem) => {
+      const updatedUids = emojiItem.uids.map((uidItem) => {
+        if (uidItem.uid === userInfo.uid) {
+          return { ...uidItem, isNewest: false };
+        }
+        return uidItem;
+      });
+
+      return { ...emojiItem, uids: updatedUids };
+    })
 
     const myData = emojiList.find((item) => item.id === id);
 
@@ -807,16 +812,7 @@ const BoxChat = () => {
     );
 
     if (myDataIndex !== -1) {
-      const updatedEmojiList = emojiList.map((emoji) => {
-        const updatedUids = emoji.uids.map((uid) => {
-          if (uid.uid === userInfo.uid) {
-            return { ...uid, isNewest: false };
-          }
-          return uid; // Giữ nguyên các phần tử khác trong mảng uids
-        });
-
-        return { ...emoji, uids: updatedUids };
-      });
+      const updatedEmojiList = emojiList;
 
       updatedEmojiList
         .find((item) => item.id === id)
@@ -904,7 +900,7 @@ const BoxChat = () => {
         const formatDate = moment(item.createdAt)._i.seconds * 1000;
 
         if (formatDate < infoDeleted?.createdAt) {
-          return;
+          return null;
         }
       }
 
@@ -945,9 +941,9 @@ const BoxChat = () => {
 
       let total = 0;
 
-      item?.emojiList?.forEach((element) => {
-        element?.uids?.forEach((item) => {
-          total = total + item.quantity;
+      item?.emojiList.forEach((element) => {
+        element.uids.forEach((uidItem) => {
+          total = total + uidItem.quantity;
         });
       });
 
@@ -1366,7 +1362,6 @@ const BoxChat = () => {
                       </div>
                     </div>
                   )}
-
                   <div className="box-emoji">
                     {!isNewest && (
                       <div
@@ -1729,6 +1724,8 @@ const BoxChat = () => {
     isRenderUserNameInEmojiList,
     isShowOverlayModalEmotion,
     clicked,
+    dataIconEmoji,
+    userInfo.uid
   ]);
 
   const renderCreatedAt = () => {
