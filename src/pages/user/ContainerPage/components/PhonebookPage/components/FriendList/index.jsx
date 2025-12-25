@@ -290,7 +290,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
               justifyContent: "center",
               alignItems: "center",
               padding: "62px 0px",
-              minHeight: `calc(100vh - 65px - 64px - 68px)`,
+              minHeight: `calc(100dvh - 65px - 64px - 68px)`,
               backgroundColor: "#fff",
             }}
           >

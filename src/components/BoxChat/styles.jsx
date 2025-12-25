@@ -161,10 +161,10 @@ export const Container = styled.div`
       );
       background-size: cover;
       background-repeat: no-repeat;
-      height: calc(100vh - var(--header-height) - var(--footer-height));
+      height: calc(100dvh - var(--header-height) - var(--footer-height));
       .message-view-blur-overlay {
       }
-      max-height: calc(100vh - var(--header-height) - var(--footer-height));
+      max-height: calc(100dvh - var(--header-height) - var(--footer-height));
       .message-view-blur-overlay {
       }
       /* overflow: hidden; */
@@ -1260,7 +1260,7 @@ export const Container = styled.div`
     }
 
     .image-show__center {
-      height: calc(100vh - 24px - 55px);
+      height: calc(100dvh - 24px - 55px);
       padding: 4px;
       display: flex;
       .main-image {

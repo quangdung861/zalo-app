@@ -41,7 +41,7 @@
         }
       }
       .box-account-info {
-        max-height: calc(95vh - 48px);
+        max-height: calc(95dvh - 48px);
         overflow: hidden;
         overflow-y: auto;
         &::-webkit-scrollbar {

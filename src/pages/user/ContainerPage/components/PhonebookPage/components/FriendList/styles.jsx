@@ -36,8 +36,8 @@ export const Container = styled.div`
     }
     .friendlist-content {
       padding: 0 12px;
-      min-height: calc(100vh - var(--headerHeight));
-      max-height: calc(100vh - var(--headerHeight));
+      min-height: calc(100dvh - var(--headerHeight));
+      max-height: calc(100dvh - var(--headerHeight));
       background-color: #f1f1f1;
       overflow: hidden;
       overflow-y: auto;

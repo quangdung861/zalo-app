@@ -32,8 +32,8 @@ export const Container = styled.div`
       }
     }
     .content {
-      max-height: calc(100vh - 65px);
-      min-height: calc(100vh - 65px);
+      max-height: calc(100dvh - 65px);
+      min-height: calc(100dvh - 65px);
       padding: 0 16px;
       background-color: #f1f1f1;
       overflow: hidden;

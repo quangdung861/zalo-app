@@ -22,7 +22,7 @@ export const Wrapper = styled.div`
       }
     }
     .action-list {
-      height: calc(100vh - var(--header-height));
+      height: calc(100dvh - var(--header-height));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
