@@ -979,7 +979,7 @@ const BoxChat = () => {
 
       const userInEmojiList = [];
 
-      sortedEmojiList.forEach((item) =>
+      sortedEmojiList?.forEach((item) =>
         item.uids.forEach((uid) => userInEmojiList.push(uid.uid))
       );
 
