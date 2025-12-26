@@ -134,7 +134,7 @@ export const Container = styled.div`
           }
         }
         .room-list {
-          height: calc(100vh - 64px - 32px);
+          height: calc(100dvh - 64px - 32px);
           position: relative;
           overflow-y: scroll;
           overflow-x: visible;
@@ -304,16 +304,10 @@ export const Container = styled.div`
           }
 
           .notification-compatible {
-            user-select: none;
-            width: 93%;
+            position: fixed;
+            inset: auto auto 12px calc(var(--sidebar-width) + 12px);         
             max-width: 324px;
-            position: sticky;
             z-index: 98;
-            margin: 0 auto;
-            top: 436px;
-            bottom: 16px;
-            left: 0;
-            right: 0;
             background-color: #fff;
             border-radius: 6px;
             overflow: hidden;
@@ -364,6 +358,10 @@ export const Container = styled.div`
                   }
                 }
               }
+            }
+            
+            @media only screen and (max-width: 992px) {
+              inset: auto 12px 12px auto;
             }
           }
           .empty-message {
@@ -490,7 +488,7 @@ export const Container = styled.div`
     @media only screen and (max-width: 768px) {
       .section-left {
         display: ${({ isShowBoxChatGroup, isShowBoxChat }) =>
-          isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
+    isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
       }
       .section-right {
         display: none;
@@ -503,16 +501,7 @@ export const Container = styled.div`
       .section-left {
         min-width: 100%;
         display: ${({ isShowBoxChatGroup, isShowBoxChat }) =>
-          isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
-
-        &__content {
-          .room-list {
-            .notification-compatible {
-              margin: 0 0 0 auto;
-              right: 12px;
-            }
-          }
-        }
+    isShowBoxChat || isShowBoxChatGroup ? "none" : "block"};
       }
     }
   }

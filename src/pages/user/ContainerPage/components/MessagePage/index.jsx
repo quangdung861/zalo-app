@@ -943,7 +943,43 @@ const MessagePage = () => {
                   </div>
                 )} */}
 
+                   {userInfo?.notificationDowloadZaloPc.value && (
+                  <div className="notification-compatible">
+                    <div className="notification-compatible__header">
+                      <img src={notificationDowloadZaloPc} alt="" />
+                    </div>
+                    <div className="notification-compatible__content">
+                      <div className="title">
+                        Tải và cài đặt ngay ứng dụng Zalo PC
+                      </div>
+                      <div className="description">
+                        Tăng khả năng bảo mật thông tin và trải nghiệm nhiều
+                        tính năng độc quyền chỉ có trên Zalo PC
+                      </div>
+                      <div className="footer">
+                        <div
+                          className="remind-me-later-btn"
+                          onClick={() => handleRemindLater()}
+                        >
+                          Nhắc tôi sau
+                        </div>
+                        <div className="dowload-now">
+                          <span>Tải ngay</span>
+                          <i className="fa-solid fa-download"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/*  */}
+                {roomlist}
+                {roomlist}
+                {roomlist}
+                {roomlist}
+                {roomlist}
+                {roomlist}
+                {roomlist}
                 {roomlist}
 
                 {/* {!loading ? roomlist : "Loading..."} */}
@@ -1011,34 +1047,7 @@ const MessagePage = () => {
                       </div>
                     </div>
                   ))}
-                {userInfo?.notificationDowloadZaloPc.value && (
-                  <div className="notification-compatible">
-                    <div className="notification-compatible__header">
-                      <img src={notificationDowloadZaloPc} alt="" />
-                    </div>
-                    <div className="notification-compatible__content">
-                      <div className="title">
-                        Tải và cài đặt ngay ứng dụng Zalo PC
-                      </div>
-                      <div className="description">
-                        Tăng khả năng bảo mật thông tin và trải nghiệm nhiều
-                        tính năng độc quyền chỉ có trên Zalo PC
-                      </div>
-                      <div className="footer">
-                        <div
-                          className="remind-me-later-btn"
-                          onClick={() => handleRemindLater()}
-                        >
-                          Nhắc tôi sau
-                        </div>
-                        <div className="dowload-now">
-                          <span>Tải ngay</span>
-                          <i className="fa-solid fa-download"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+             
               </div>
             </div>
           </div>
