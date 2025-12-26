@@ -2159,7 +2159,6 @@ const BoxChat = () => {
                     className="btn-add-friend"
                     onClick={() => handleOpenModalAddFriend()}
                   >
-                    Gửi kết bạn
                   </div>
                   <div className="btn-more"></div>
                 </div>

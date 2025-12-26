@@ -215,9 +215,18 @@ export const Container = styled.div`
             line-height: 24px;
             padding: 0 16px;
             border-radius: 3px;
+            white-space: nowrap;
             cursor: pointer;
             &:hover {
               background-color: #dfe2e7;
+            }
+            ::after {
+              content: "Gửi kết bạn"
+            }
+            @media only screen and (max-width: 992px) {
+              ::after {
+                content: "Kết bạn"
+              }
             }
           }
         }

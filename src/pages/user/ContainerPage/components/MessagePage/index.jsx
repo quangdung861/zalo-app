@@ -974,13 +974,6 @@ const MessagePage = () => {
 
                 {/*  */}
                 {roomlist}
-                {roomlist}
-                {roomlist}
-                {roomlist}
-                {roomlist}
-                {roomlist}
-                {roomlist}
-                {roomlist}
 
                 {/* {!loading ? roomlist : "Loading..."} */}
                 {
