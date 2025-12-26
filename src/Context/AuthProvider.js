@@ -39,7 +39,7 @@ const AuthProvider = ({ children }) => {
         return navigate("/");
       }
       setIsLoading(false);
-      // navigate("/login");
+      navigate("/login");
     });
 
     return () => {
