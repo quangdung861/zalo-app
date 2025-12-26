@@ -42,7 +42,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
     useContext(UserLayoutContext);
 
   const {
@@ -255,12 +255,6 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const handleSearch = async (value) => {
     // const usersResult = await fetchUserList(value);
     setKeywords(value);
-  };
-
-  const handleComeBack = () => {
-    setIsShowBoxChat(false);
-    setIsShowSectionRight(false);
-    setIsShowSectionLeft(true);
   };
 
   return (

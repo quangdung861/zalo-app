@@ -20,7 +20,7 @@ import ModalConfirm from "./components/ModalConfirm";
 const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
-  const { setIsShowBoxChat, setIsShowBoxChatGroup } =
+  const { setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
     useContext(UserLayoutContext);
   const [keywords, setKeywords] = useState("");
 
@@ -348,11 +348,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setDropdownCategorySecond(false);
   };
 
-  const handleComeBack = () => {
-    setIsShowBoxChat(false);
-    setIsShowSectionRight(false);
-    setIsShowSectionLeft(true);
-  };
+
 
   return (
     <S.Wrapper>

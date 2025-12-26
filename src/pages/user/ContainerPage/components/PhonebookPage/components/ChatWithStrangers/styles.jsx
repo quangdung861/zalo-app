@@ -3,9 +3,7 @@ import styled from "styled-components";
 export const Wrapper = styled.div``;
 
 export const Container = styled.div`
-  user-select: none;
   .strangerlist {
-    user-select: none;
     .strangerlist-header {
       height: 65px;
       padding: 0 19px;
@@ -166,7 +164,6 @@ export const Container = styled.div`
             align-items: center;
             flex: 1;
             gap: 12px;
-            width: 380px;
             overflow: hidden;
             text-overflow: ellipsis;
             > img {

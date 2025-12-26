@@ -1,14 +1,15 @@
 import React, { useEffect, createContext, useState, useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
 
-import * as S from "./styles";
-import Sidebar from "../Sidebar";
 import { auth } from "firebaseConfig";
 import { ROUTES } from "routes";
-import BoxChat from "components/BoxChat";
 import { AuthContext } from "Context/AuthProvider";
 import { TITLE_BAR } from "constants/public";
+import Sidebar from "../Sidebar";
 import BoxChatGroup from "components/BoxChatGroup";
+import BoxChat from "components/BoxChat";
+import * as S from "./styles";
 
 export const UserLayoutContext = createContext();
 
@@ -40,7 +41,15 @@ const UserLayout = () => {
 
   const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
 
-  const [sectionSelected, setSectionSelected] = useState("friend-list");
+  const isMobile = useMediaQuery({ maxWidth: 991 });
+  const [sectionSelected, setSectionSelected] = useState("");
+
+  useEffect(() => {
+    setSectionSelected((prev) => {
+      if (isMobile && sectionSelected === "") return "";
+      return prev || "friend-list";
+    });
+  }, [isMobile]);
 
   useEffect(() => {
     if (window.location.hostname === "localhost") {
@@ -69,6 +78,13 @@ const UserLayout = () => {
   const [isShowSectionLeft, setIsShowSectionLeft] = useState(true);
   const [isShowSectionRight, setIsShowSectionRight] = useState(true);
 
+  const handleComeBack = () => {
+    setIsShowBoxChat(false);
+    setIsShowSectionRight(false);
+    setIsShowSectionLeft(true);
+    setSectionSelected("");
+  };
+
   return (
     <UserLayoutContext.Provider
       value={{
@@ -86,6 +102,7 @@ const UserLayout = () => {
         setIsShowSectionLeft,
         isShowSectionRight,
         setIsShowSectionRight,
+        handleComeBack,
       }}
     >
       <S.Wrapper>

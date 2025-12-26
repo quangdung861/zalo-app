@@ -11,6 +11,7 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const {
     setIsShowBoxChat,
     setIsShowBoxChatGroup,
+    handleComeBack,
   } = useContext(UserLayoutContext);
   const {
     rooms,
@@ -172,12 +173,6 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       </div>
     );
   }, [infoPartner, keywords, newRooms, orderBy]);
-
-  const handleComeBack = () => {
-    setIsShowBoxChatGroup(false);
-    setIsShowSectionRight(false);
-    setIsShowSectionLeft(true);
-  };
 
   return (
     <S.Wrapper>

@@ -21,7 +21,7 @@ import moment from "moment";
 
 const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup } =
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
     useContext(UserLayoutContext);
 
   const [invitationSent, setInvitationSent] = useState([]);
@@ -371,12 +371,6 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       photoURLSelected,
       displayNameSelected,
     });
-  };
-
-  const handleComeBack = () => {
-    setIsShowBoxChat(false);
-    setIsShowSectionRight(false);
-    setIsShowSectionLeft(true);
   };
 
   return (
