@@ -1,10 +1,12 @@
 .user-manual {
-  width: 380px;
+  max-width: 380px;
   height: 175px;
-  background-color: hsla(0, 0%, 100%, 0.8);
-  border-radius: 8px;
   padding: 14px;
   margin-bottom: 40px;
+  margin-left: 12px;
+  margin-right: 12px;
+  background-color: hsla(0, 0%, 100%, 0.8);
+  border-radius: 8px;
   &__item {
     height: 42px;
     margin-bottom: 12px;

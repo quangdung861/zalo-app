@@ -55,6 +55,8 @@ export const Container = styled.div`
           }
         }
         .user-info {
+          margin-left: 12px;
+          margin-right: 12px;
           white-space: nowrap;
           .display-name {
             width: 300px;
@@ -142,6 +144,8 @@ export const Container = styled.div`
     }
     &__content {
       position: relative;
+      max-width: 100%;
+      overflow-x: hidden;
       padding-top: 20px;
       background-color: #eef0f1;
       background-repeat: no-repeat;
@@ -186,17 +190,22 @@ export const Container = styled.div`
           }
         }
         &__name {
-          width: 330px;
+          width: 100%;
+          max-width: 300px;
           text-align: center;
           font-size: 20px;
           font-weight: 500;
+          padding-left: 4px;
+          padding-right: 4px;
           margin-bottom: 2px;
           text-overflow: ellipsis;
-          white-space: nowrap;
           overflow: hidden;
+          white-space: nowrap;
         }
         &__description {
           margin-bottom: 10px;
+          margin-left:12px;
+          margin-right: 12px;
         }
       }
 

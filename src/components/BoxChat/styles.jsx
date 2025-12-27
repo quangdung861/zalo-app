@@ -152,6 +152,8 @@ export const Container = styled.div`
     }
     &__content {
       position: relative;
+      max-width: 100%;
+      overflow-x: hidden;
       width: 100%;
       padding-top: 20px;
       background-image: url(${(props) =>(props.isCloud ? cloudBg : messageBg)});
