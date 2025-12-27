@@ -38,6 +38,9 @@ const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
     useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
+  const [mentions, setMentions] = useState([]);
+  console.log("🚀 ~ BoxChatGroup ~ mentions:", mentions)
+  console.log("🚀 ~ BoxChatGroup ~ inputValue:", inputValue)
 
   const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
   const [infoUsers, setInfoUsers] = useState();
@@ -66,6 +69,8 @@ const BoxChatGroup = () => {
     useState(false);
   const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
+  const [avatars, setAvatars] = useState();
+  const [name, setName] = useState();
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -295,34 +300,25 @@ const BoxChatGroup = () => {
               count: messagesViewed.count + 1,
             });
 
-            const regex = /@user:([^:]+):user/g;
-            const mentions = [];
-
-            let mention;
-            while ((mention = regex.exec(inputValue)) !== null) {
-              mentions.push(mention[1]);
-            }
-
-            // Hợp nhất hai mảng và gộp các giá trị trùng nhau thành một
+            const mentionsOnlyId = mentions.map((mention) => mention.id);
 
             await setDoc(
               roomRef,
               {
                 messageLastest: {
-                  text: displayedText || (imageBase64FullInfo && "Hình ảnh"),
+                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
-                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
                 ...(room.mentioned && {
-                  mentioned: [...new Set([...room.mentioned, ...mentions])],
+                  mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
                 }),
                 ...(!room.mentioned && {
-                  mentioned: mentions,
+                  mentioned: mentionsOnlyId,
                 }),
                 hideTemporarily: [],
               },
@@ -410,32 +406,25 @@ const BoxChatGroup = () => {
               count: messagesViewed.count + 1,
             });
 
-            const regex = /@user:([^:]+):user/g;
-            const mentions = [];
-
-            let mention;
-            while ((mention = regex.exec(inputValue)) !== null) {
-              mentions.push(mention[1]);
-            }
+            const mentionsOnlyId = mentions.map((mention) => mention.id);
 
             await setDoc(
               roomRef,
               {
                 messageLastest: {
-                  text: displayedText,
+                  text: inputValue,
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   createdAt: serverTimestamp(),
-                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 messagesViewed: newMessageViewed,
                 ...(room.mentioned && {
-                  mentioned: [...new Set([...room.mentioned, ...mentions])],
+                  mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
                 }),
                 ...(!room.mentioned && {
-                  mentioned: mentions,
+                  mentioned: mentionsOnlyId,
                 }),
                 hideTemporarily: [],
               },
@@ -451,6 +440,9 @@ const BoxChatGroup = () => {
               displayName: userInfo.displayName,
               photoURL: userInfo.photoURL,
               text: inputValue,
+              // mentions: [
+              //   { name: "Dung", id: "2xClxXTkcbK8PuWGpw3KcqlIC5OQ" }
+              // ],
               images: [],
               infoReply: infoReply,
               emojiList: [
@@ -1742,29 +1734,25 @@ const BoxChatGroup = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleInputChange = (value) => {
-    let valueInput = value;
-    if (
-      valueInput.slice(-2) === " @" ||
-      (valueInput.slice(-2) === "@" && valueInput.length === 1)
-    ) {
-      setIsShowDropdownTagName(true);
-    } else {
-      setIsShowDropdownTagName(false);
-    }
+    setInputValue(value);
 
-    setInputValue(valueInput);
+    const match = value.match(/(^|\s)@([^\s@]*)$/);
+    setIsShowDropdownTagName(!!match);
+
+    const hasMention = (text, name) => {
+      const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(^|\\s)@${escapedName}(\\s|$)`);
+      return regex.test(text);
+    };
+
+    setMentions((prevMentions) =>
+      prevMentions.filter((mention) =>
+        hasMention(value, mention.name)
+      )
+    );
   };
-
-  const replaceUsernames = (text) => {
-    for (const [user, name] of Object.entries(usernames)) {
-      const searchPattern = new RegExp(`@user:${user}:user`, "g");
-      text = text.replace(searchPattern, `@${name}`);
-    }
-    return text;
-  };
-
-  const displayedText = replaceUsernames(inputValue);
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
   const handleToggleEmojiPicker = () => {
@@ -1775,9 +1763,6 @@ const BoxChatGroup = () => {
   const handleSelectEmoji = (emoji) => {
     setInputValue(inputValue + emoji.native);
   };
-
-  const [avatars, setAvatars] = useState();
-  const [name, setName] = useState();
 
   useEffect(() => {
     if (room.id) {
@@ -1904,17 +1889,44 @@ const BoxChatGroup = () => {
     document.body.removeChild(link);
   };
 
-  const handleSelectTagname = (memberId) => {
-    handleInputChange(inputValue + memberId);
+  const handleSelectTagname = (member = null) => {
+    if (!member) {
+      let tagAll = infoUsers
+        .map((member) => `${member.displayName}`)
+        .join(" @")
+      handleInputChange(inputValue + tagAll + " ");
+      setMentions((prev) => [
+        ...infoUsers.map(member => ({
+          id: member.id,
+          name: member.displayName,
+        }))
+      ]);
+
+    } else {
+      handleInputChange(inputValue + member.displayName + " ");
+      const isExist = mentions.some((mention) => mention.id === member.id)
+      if (isExist) return;
+      setMentions((prev) => [
+        ...prev,
+        {
+          id: member.id,
+          name: member.displayName,
+        },
+      ]);
+    }
+
+    setIsShowDropdownTagName(false);
   };
 
   const renderMemberList = () => {
     return infoUsers?.map((member, index) => {
+      console.log(infoUsers);
+
       return (
         <div
           className="member-item"
           key={member.uid}
-          onClick={() => handleSelectTagname(`user:${member.uid}:user`)}
+          onClick={() => handleSelectTagname(member)}
         >
           <img src={member.photoURL} alt="" className="member-item__avatar" />
           <div className="member-item__name">{member.displayName}</div>
@@ -2150,13 +2162,10 @@ const BoxChatGroup = () => {
                       <div
                         className="member-item"
                         onClick={() =>
-                          handleSelectTagname(
-                            selectedGroupMessaging.room.members
-                              .map((memberId) => `user:${memberId}:user`)
-                              .join(" @")
-                          )
+                          handleSelectTagname()
                         }
                       >
+                        {console.log(selectedGroupMessaging.room)}
                         <div>
                           <div className="left left--tag">
                             <span>@</span>
@@ -2171,7 +2180,6 @@ const BoxChatGroup = () => {
                     </div>
                   </div>
                 )}
-                {/* {displayedText} */}
                 <textarea
                   id="input-message-text"
                   className="input-message-text"
@@ -2191,7 +2199,7 @@ const BoxChatGroup = () => {
                   ref={inputRef}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}
-                  value={displayedText}
+                  value={inputValue}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}
                 />
