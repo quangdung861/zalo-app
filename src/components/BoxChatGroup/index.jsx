@@ -1,5 +1,4 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-import * as S from "./styles";
 import {
   collection,
   query,
@@ -33,6 +32,7 @@ import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAccount from "components/ModalAccount";
 import ModalAddFriend from "components/ModalAddFriend";
+import * as S from "./styles";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -334,6 +334,7 @@ const BoxChatGroup = () => {
               displayName: userInfo.displayName,
               photoURL: userInfo.photoURL,
               text: inputValue,
+              mentions: mentions,
               images: imageBase64FullInfo || [],
               infoReply: infoReply,
               emojiList: [
@@ -386,91 +387,87 @@ const BoxChatGroup = () => {
 
   const handleClickSentMessage = () => {
     if (inputValue) {
-      if (inputValue) {
-        if (room.id) {
-          audio.play();
-          const createMes = async () => {
-            const roomRef = doc(db, "rooms", room.id);
+      if (room.id) {
+        audio.play();
+        const createMes = async () => {
+          const roomRef = doc(db, "rooms", room.id);
 
-            const messagesViewedIndex = room.messagesViewed.findIndex(
-              (item) => item.uid === userInfo.uid
-            );
-            const messagesViewed = room.messagesViewed.find(
-              (item) => item.uid === userInfo.uid
-            );
+          const messagesViewedIndex = room.messagesViewed.findIndex(
+            (item) => item.uid === userInfo.uid
+          );
+          const messagesViewed = room.messagesViewed.find(
+            (item) => item.uid === userInfo.uid
+          );
 
-            const newMessageViewed = [...room.messagesViewed];
+          const newMessageViewed = [...room.messagesViewed];
 
-            newMessageViewed.splice(messagesViewedIndex, 1, {
-              ...messagesViewed,
-              count: messagesViewed.count + 1,
-            });
+          newMessageViewed.splice(messagesViewedIndex, 1, {
+            ...messagesViewed,
+            count: messagesViewed.count + 1,
+          });
 
-            const mentionsOnlyId = mentions.map((mention) => mention.id);
+          const mentionsOnlyId = mentions.map((mention) => mention.id);
 
-            await setDoc(
-              roomRef,
+          await setDoc(
+            roomRef,
+            {
+              messageLastest: {
+                text: inputValue,
+                displayName: userInfo.displayName,
+                uid: userInfo.uid,
+                createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
+              },
+              totalMessages: room.totalMessages + 1,
+              messagesViewed: newMessageViewed,
+              ...(room.mentioned && {
+                mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
+              }),
+              ...(!room.mentioned && {
+                mentioned: mentionsOnlyId,
+              }),
+              hideTemporarily: [],
+            },
+            {
+              merge: true,
+            }
+          );
+
+          addDocument("messages", {
+            category: "group",
+            roomId: room.id,
+            uid: userInfo.uid,
+            displayName: userInfo.displayName,
+            photoURL: userInfo.photoURL,
+            text: inputValue,
+            mentions: mentions,
+            images: [],
+            infoReply: infoReply,
+            emojiList: [
               {
-                messageLastest: {
-                  text: inputValue,
-                  displayName: userInfo.displayName,
-                  uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
-                  clientCreatedAt: Date.now(),
-                },
-                totalMessages: room.totalMessages + 1,
-                messagesViewed: newMessageViewed,
-                ...(room.mentioned && {
-                  mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
-                }),
-                ...(!room.mentioned && {
-                  mentioned: mentionsOnlyId,
-                }),
-                hideTemporarily: [],
+                id: "smile",
+                uids: [],
               },
               {
-                merge: true,
-              }
-            );
-
-            addDocument("messages", {
-              category: "group",
-              roomId: room.id,
-              uid: userInfo.uid,
-              displayName: userInfo.displayName,
-              photoURL: userInfo.photoURL,
-              text: inputValue,
-              // mentions: [
-              //   { name: "Dung", id: "2xClxXTkcbK8PuWGpw3KcqlIC5OQ" }
-              // ],
-              images: [],
-              infoReply: infoReply,
-              emojiList: [
-                {
-                  id: "smile",
-                  uids: [],
-                },
-                {
-                  id: "heart",
-                  uids: [],
-                },
-                {
-                  id: "surprise",
-                  uids: [],
-                },
-                {
-                  id: "cry",
-                  uids: [],
-                },
-                {
-                  id: "angry",
-                  uids: [],
-                },
-              ],
-            });
-          };
-          createMes();
-        }
+                id: "heart",
+                uids: [],
+              },
+              {
+                id: "surprise",
+                uids: [],
+              },
+              {
+                id: "cry",
+                uids: [],
+              },
+              {
+                id: "angry",
+                uids: [],
+              },
+            ],
+          });
+        };
+        createMes();
       }
       // focus to input again after submit
       setIsReplyMessage(false);
@@ -586,14 +583,11 @@ const BoxChatGroup = () => {
   }, [messages, messageLength]);
 
   useEffect(() => {
-    if (messages[0]) {
-      const allUser = messages.map((item) => item.uid);
-      var uniqueArr = [...new Set([...allUser, ...room.members])];
-
+    if (room.members) {
       const fetchData = async () => {
         const docRef = query(
           collection(db, "users"),
-          where("uid", "in", uniqueArr)
+          where("uid", "in", room.members)
         );
         const reponse = await getDocs(docRef);
         const documents = reponse.docs.map((doc) => {
@@ -604,13 +598,13 @@ const BoxChatGroup = () => {
         });
         setInfoUsers(documents);
 
-        documents.forEach((member, index) => {
+        documents.forEach((member) => {
           setUsernames((cur) => ({ ...cur, [member.uid]: member.displayName }));
         });
       };
       fetchData();
     }
-  }, [messages, userInfo]);
+  }, [room]);
 
   const [showBtnUpToTop, setShowBtnUpToTop] = useState(true);
 
@@ -897,14 +891,18 @@ const BoxChatGroup = () => {
 
       const renderText = () => {
         let text = item.text;
-        infoUsers?.forEach((member, index) => {
-          const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
-          const replacement = `@${member.displayName}`;
+
+        item.mentions?.forEach((mention) => {
+          const escapedName = mention.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+          const regex = new RegExp(`@${escapedName}(\\b)`, "g");
+
           text = text.replace(
-            searchPattern,
-            `<span style="color: #0068ff; cursor: pointer">${replacement}</span>`
+            regex,
+            `<span class="mention" data-id="${mention.id}">@${mention.name}</span>`
           );
         });
+
         return <div dangerouslySetInnerHTML={{ __html: text }} />;
       };
 
@@ -1691,6 +1689,35 @@ const BoxChatGroup = () => {
       );
     });
   };
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    inputRef.current.innerHTML =
+      renderInputWithMentions(inputValue, mentions);
+  }, [mentions]); // ❗ KHÔNG depend inputValue
+
+  const renderInputWithMentions = (text, mentions) => {
+    if (!text) return "";
+
+    let result = text;
+
+    mentions.forEach((mention) => {
+      const escapedName = mention.name.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      // match @Name đứng độc lập (không dính chữ khác)
+      const regex = new RegExp(`(^|\\s)@${escapedName}(\\b)`, "g");
+
+      result = result.replace(
+        regex,
+        `$1<span class="mention" data-id="${mention.id}">@${mention.name}</span>`
+      );
+    });
+
+    return result;
+  };
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
@@ -1889,8 +1916,17 @@ const BoxChatGroup = () => {
     document.body.removeChild(link);
   };
 
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    inputRef.current.innerHTML =
+      renderInputWithMentions(inputValue, mentions);
+  }, [mentions]);
+
   const handleSelectTagname = (member = null) => {
     if (!member) {
+      console.log(infoUsers);
+
       let tagAll = infoUsers
         .map((member) => `${member.displayName}`)
         .join(" @")
@@ -2180,7 +2216,7 @@ const BoxChatGroup = () => {
                     </div>
                   </div>
                 )}
-                <textarea
+                {/* <textarea
                   id="input-message-text"
                   className="input-message-text"
                   type="text"
@@ -2202,6 +2238,25 @@ const BoxChatGroup = () => {
                   value={inputValue}
                   onFocus={() => handleFocus()}
                   onBlur={() => handleBlur()}
+                /> */}
+                <div
+                  id="input-message-text"
+                  className="input-message-text"
+                  contentEditable
+                  ref={inputRef}
+                  placeholder={`Nhập @, tin nhắn tới ${(room?.name &&
+                    (room?.name?.length < 40
+                      ? room?.name
+                      : room?.name?.slice(0, 39) + "...")) ||
+                    (selectedGroupMessaging?.name &&
+                      (selectedGroupMessaging?.name.length < 40
+                        ? selectedGroupMessaging?.name
+                        : selectedGroupMessaging?.name?.slice(0, 39) + "..."))
+                    }`}
+                  onInput={(e) => handleInputChange(e.target.innerText)}
+                  onKeyDown={(e) => handleKeyDown([], e)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
               </div>
               <div className="box-chat-input__right">

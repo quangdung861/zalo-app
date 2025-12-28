@@ -1185,6 +1185,9 @@ export const Container = styled.div`
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
             outline: none;
             resize: none;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
               "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
               "Helvetica Neue", sans-serif;
@@ -1283,6 +1286,11 @@ export const Container = styled.div`
       animation-name: fadeIn, zoom;
       animation-duration: 0.4s;
     }
+  }
+
+  .mention {
+    color: #0068ff;
+    cursor: pointer;
   }
 
   .images-container {
