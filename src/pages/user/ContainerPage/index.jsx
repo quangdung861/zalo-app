@@ -5,7 +5,7 @@ import MessagePage from "./components/MessagePage";
 import PhonebookPage from "./components/PhonebookPage";
 
 const ContainerPage = () => {
-  const { sidebarSelected, setSidebarSelected } = useContext(UserLayoutContext);
+  const { sidebarSelected } = useContext(UserLayoutContext);
 
   const renderContent = () => {
     switch (sidebarSelected) {
