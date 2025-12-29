@@ -1,0 +1,11 @@
+name: Lint Commit Messages
+on: [pull_request]
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check Commit Standard
+        run: |
+          # Kiểm tra tiêu đề PR có đúng chuẩn feat/fix/chore không
+          echo "${{ github.event.pull_request.title }}" | grep -E '^(feat|fix|chore|docs|style|refactor|test)(\(.+\))?: .+'
