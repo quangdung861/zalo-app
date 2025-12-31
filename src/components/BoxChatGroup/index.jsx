@@ -19,6 +19,8 @@ import moment from "moment";
 import messageSend from "assets/audio/messageSend.wav";
 import data from "@emoji-mart/data/sets/14/facebook.json";
 import Picker from "@emoji-mart/react";
+import { RichTextarea } from "rich-textarea";
+
 import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
@@ -39,8 +41,6 @@ const BoxChatGroup = () => {
     useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
   const [mentions, setMentions] = useState([]);
-  console.log("🚀 ~ BoxChatGroup ~ mentions:", mentions)
-  console.log("🚀 ~ BoxChatGroup ~ inputValue:", inputValue)
 
   const { setIsShowBoxChatGroup } = useContext(UserLayoutContext);
   const [infoUsers, setInfoUsers] = useState();
@@ -71,6 +71,10 @@ const BoxChatGroup = () => {
     useState(false);
   const [avatars, setAvatars] = useState();
   const [name, setName] = useState();
+  const [infoMessageSharing, setInfoMessageSharing] = useState({});
+  const [isShowContainerImageList, setIsShowContainerImageList] =
+    useState(true);
+  const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
 
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -106,10 +110,6 @@ const BoxChatGroup = () => {
     },
   ];
 
-  const [isShowContainerImageList, setIsShowContainerImageList] =
-    useState(true);
-  const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -140,12 +140,6 @@ const BoxChatGroup = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    if (inputRef) {
-      inputRef.current.focus();
-    }
-  }, [room.id]);
 
   useEffect(() => {
     if (room.id) {
@@ -259,7 +253,6 @@ const BoxChatGroup = () => {
     });
   };
 
-  const [infoMessageSharing, setInfoMessageSharing] = useState({});
   const handleSharingMessage = ({ infoMessage }) => {
     let text = infoMessage.text;
     infoUsers.forEach((member, index) => {
@@ -276,12 +269,12 @@ const BoxChatGroup = () => {
   };
 
   const handleKeyDown = (imageBase64FullInfo, e) => {
-    if (e?.key === "Enter") {
-      if (!e?.isPreventDefault) {
-        e.preventDefault();
-      }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // ⛔ chặn xuống dòng
       if (inputValue || imageBase64FullInfo[0]) {
         if (room.id) {
+          // 2. Lấy giá trị trực tiếp từ DOM (không đợi State)
+
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
@@ -1688,35 +1681,9 @@ const BoxChatGroup = () => {
       );
     });
   };
-  useEffect(() => {
-    if (!inputRef.current) return;
 
-    inputRef.current.innerHTML =
-      renderInputWithMentions(inputValue, mentions);
-  }, [mentions]); // ❗ KHÔNG depend inputValue
 
-  const renderInputWithMentions = (text, mentions) => {
-    if (!text) return "";
 
-    let result = text;
-
-    mentions.forEach((mention) => {
-      const escapedName = mention.name.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
-      );
-
-      // match @Name đứng độc lập (không dính chữ khác)
-      const regex = new RegExp(`(^|\\s)@${escapedName}(\\b)`, "g");
-
-      result = result.replace(
-        regex,
-        `$1<span class="mention" data-id="${mention.id}">@${mention.name}</span>`
-      );
-    });
-
-    return result;
-  };
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
@@ -1761,18 +1728,32 @@ const BoxChatGroup = () => {
     };
   }, []);
 
-  const handleInputChange = (value) => {
-    setInputValue(value);
+  const stripHtml = (html) => {
+    if (!html) return "";
 
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    return temp.textContent || temp.innerText || "";
+  };
+
+  const handleInputChange = (value) => {
+
+    setInputValue(value);
+    inputRef.current.focus()
+
+    // 4. Detect gõ @ để show dropdown
     const match = value.match(/(^|\s)@([^\s@]*)$/);
     setIsShowDropdownTagName(!!match);
 
+    // 5. Helper check mention còn tồn tại
     const hasMention = (text, name) => {
       const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const regex = new RegExp(`(^|\\s)@${escapedName}(\\s|$)`);
       return regex.test(text);
     };
 
+    // 6. Remove mention đã bị user xóa
     setMentions((prevMentions) =>
       prevMentions.filter((mention) =>
         hasMention(value, mention.name)
@@ -1915,17 +1896,8 @@ const BoxChatGroup = () => {
     document.body.removeChild(link);
   };
 
-  useEffect(() => {
-    if (!inputRef.current) return;
-
-    inputRef.current.innerHTML =
-      renderInputWithMentions(inputValue, mentions);
-  }, [mentions]);
-
   const handleSelectTagname = (member = null) => {
     if (!member) {
-      console.log(infoUsers);
-
       let tagAll = infoUsers
         .map((member) => `${member.displayName}`)
         .join(" @")
@@ -1950,12 +1922,17 @@ const BoxChatGroup = () => {
       ]);
     }
 
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      });
+    }
+
     setIsShowDropdownTagName(false);
   };
 
   const renderMemberList = () => {
     return infoUsers?.map((member, index) => {
-      console.log(infoUsers);
 
       return (
         <div
@@ -1968,6 +1945,12 @@ const BoxChatGroup = () => {
         </div>
       );
     });
+  };
+
+  const formatPlaceholderName = (room, group) => {
+    const name = room?.name || group?.name;
+    if (!name) return "";
+    return name.length <= 40 ? name : `${name.slice(0, 39)}...`;
   };
 
   return (
@@ -2215,48 +2198,58 @@ const BoxChatGroup = () => {
                     </div>
                   </div>
                 )}
-                {/* <textarea
+
+                <RichTextarea
                   id="input-message-text"
-                  className="input-message-text"
-                  type="text"
                   autoComplete="off"
                   spellCheck="false"
-                  // style={{ textTransform: "capitalize" }}
-                  placeholder={`Nhập @, tin nhắn tới ${(room?.name &&
-                    (room?.name?.length < 40
-                      ? room?.name
-                      : room?.name?.slice(0, 39) + "...")) ||
-                    (selectedGroupMessaging?.name &&
-                      (selectedGroupMessaging?.name.length < 40
-                        ? selectedGroupMessaging?.name
-                        : selectedGroupMessaging?.name?.slice(0, 39) + "..."))
-                    }`}
                   ref={inputRef}
+                  value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}
-                  value={inputValue}
-                  onFocus={() => handleFocus()}
+                  onFocus={(e) => handleFocus()}
                   onBlur={() => handleBlur()}
-                /> */}
-                <div
-                  id="input-message-text"
-                  className="input-message-text"
-                  contentEditable
-                  ref={inputRef}
-                  placeholder={`Nhập @, tin nhắn tới ${(room?.name &&
-                    (room?.name?.length < 40
-                      ? room?.name
-                      : room?.name?.slice(0, 39) + "...")) ||
-                    (selectedGroupMessaging?.name &&
-                      (selectedGroupMessaging?.name.length < 40
-                        ? selectedGroupMessaging?.name
-                        : selectedGroupMessaging?.name?.slice(0, 39) + "..."))
-                    }`}
-                  onInput={(e) => handleInputChange(e.target.innerText)}
-                  onKeyDown={(e) => handleKeyDown([], e)}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
+                  style={{ width: "100%", height: "58px", textShadow: "none", wordBreak: "break-word" }}
+                  placeholder={`Nhập @, tin nhắn tới ${formatPlaceholderName(
+                    room,
+                    selectedGroupMessaging
+                  )}`}
+                >
+                  {(text) => {
+                    if (!mentions || mentions.length === 0) return text;
+
+                    let result = [text];
+
+                    mentions.forEach((mention) => {
+                      const escapedName = mention.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                      const regex = new RegExp(`(@${escapedName})`, "g");
+
+                      result = result.flatMap((chunk) => { // [["Chào "], <span></span>, ["nhé "], [<span>@Dung]</span>]
+                        if (typeof chunk !== "string") return chunk;
+
+                        return chunk.split(regex).map((part, i) => {
+                          if (part === `@${mention.name}`) {
+                            return (
+                              <span
+                                key={`${mention.id}-${i}`}
+                                className="mention"
+                                data-id={mention.id}
+                              >
+                                {part}
+                              </span>
+                            );
+                          }
+                          return part;
+                        });
+                      });
+                    });
+
+                    return result;
+                  }}
+
+                </RichTextarea>
+
+
               </div>
               <div className="box-chat-input__right">
                 {inputValue.length > 0 && (

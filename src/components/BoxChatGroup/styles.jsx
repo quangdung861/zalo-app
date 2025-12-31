@@ -1176,7 +1176,7 @@ export const Container = styled.div`
               }
             }
           }
-          .input-message-text {
+          #input-message-text {
             width: 100%;
             padding: 18px 10px 18px 16px;
             border: none;
@@ -1289,8 +1289,7 @@ export const Container = styled.div`
   }
 
   .mention {
-    color: #0068ff;
-    cursor: pointer;
+    color: rgb(0, 104, 255);
   }
 
   .images-container {
