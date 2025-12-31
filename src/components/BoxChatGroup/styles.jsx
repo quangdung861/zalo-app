@@ -1176,7 +1176,7 @@ export const Container = styled.div`
               }
             }
           }
-          .input-message-text {
+          #input-message-text {
             width: 100%;
             padding: 18px 10px 18px 16px;
             border: none;
@@ -1185,6 +1185,9 @@ export const Container = styled.div`
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
             outline: none;
             resize: none;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
               "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
               "Helvetica Neue", sans-serif;
@@ -1283,6 +1286,10 @@ export const Container = styled.div`
       animation-name: fadeIn, zoom;
       animation-duration: 0.4s;
     }
+  }
+
+  .mention {
+    color: rgb(0, 104, 255);
   }
 
   .images-container {
