@@ -672,22 +672,21 @@ const BoxChatGroup = () => {
     }
   };
 
-  const handleCopyText = (text) => {
-    if (text) {
-      let textResult = text;
-      let arrName = selectedGroupMessaging.name.split(", ");
-      selectedGroupMessaging.room.members.forEach((memberId, index) => {
-        const searchPattern = new RegExp(`@user:${memberId}:user`, "g"); // Biểu thức chính quy với biến
-        const replacement = `@${arrName[index]}`;
-        textResult = textResult.replace(searchPattern, replacement);
-      });
-
-      navigator.clipboard
-        .writeText(textResult)
-        .then(() => true)
-        .catch((err) => console.log("ERROR>>>", err));
+  const handleCopyText = async (text) => {
+    if (!text) {
+      setIsShowDropdownOption(false);
+      return;
     }
-    setIsShowDropdownOption(false);
+
+    try {
+      await navigator.clipboard.writeText(text);
+      // showToast("Copied!");
+    } catch (err) {
+      console.error("COPY_FAILED:", err);
+      // showToast("Copy failed");
+    } finally {
+      setIsShowDropdownOption(false);
+    }
   };
 
   const handleRecallMessage = async ({ id, createdAt }) => {
