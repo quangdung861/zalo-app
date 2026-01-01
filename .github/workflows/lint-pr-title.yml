@@ -1,11 +1,11 @@
-name: Lint Commit Messages
+name: Lint PR Title
 on: [pull_request]
 jobs:
-  check-commit:
+  lint-pr-title:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check Commit Standard
+      - name: Check PR Title convention
         run: |
           # Kiểm tra tiêu đề PR có đúng chuẩn feat/fix/chore không
           echo "${{ github.event.pull_request.title }}" | grep -E '^(feat|fix|chore|docs|style|refactor|test)(\(.+\))?: .+'
