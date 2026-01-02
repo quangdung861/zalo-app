@@ -84,6 +84,7 @@ const BoxChatGroup = () => {
   const dropdownTagnameRef = useRef();
   const dropdownSelectEmoji = useRef();
   const emotionModal = useRef();
+  const prevValueRef = useRef("");
 
   const audio = new Audio(messageSend);
 
@@ -361,6 +362,7 @@ const BoxChatGroup = () => {
       setIsReplyMessage(false);
       setInfoReply({});
       setInputValue("");
+      setMentions([])
 
       if (inputRef?.current) {
         setTimeout(() => {
@@ -376,6 +378,13 @@ const BoxChatGroup = () => {
         });
       }, 200);
     }
+    const input = inputRef?.current;
+    if (!input) return;
+
+    selectionRef.current = {
+      start: input.selectionStart,
+      end: input.selectionEnd,
+    };
   };
 
   const handleClickSentMessage = () => {
@@ -466,6 +475,7 @@ const BoxChatGroup = () => {
       setIsReplyMessage(false);
       setInfoReply({});
       setInputValue("");
+      setMentions([])
 
       if (inputRef?.current) {
         setTimeout(() => {
@@ -1728,37 +1738,113 @@ const BoxChatGroup = () => {
     };
   }, []);
 
-  const stripHtml = (html) => {
-    if (!html) return "";
+  const findDiffIndex = (a, b) => {
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) {
+      i++;
+    }
+    return i;
+  };
 
-    const temp = document.createElement("div");
-    temp.innerHTML = html;
+  const isOverlap = (aStart, aEnd, bStart, bEnd) => {
+    return aStart < bEnd && aEnd > bStart;
+  };
 
-    return temp.textContent || temp.innerText || "";
+  const syncMentionsWithText = (prevText, nextText, mentions) => {
+    const { start, end } = selectionRef.current;
+    const diff = nextText.length - prevText.length;
+
+    const isRangeDelete = start !== end;
+
+    return mentions
+      .map((m) => {
+        // ============================
+        // CASE 1: CÓ BÔI ĐEN (range)
+        // ============================
+        if (isRangeDelete) {
+          // 🔥 bôi đen đụng mention (dù 1 phần hay toàn bộ) → remove
+          if (isOverlap(start, end, m.start, m.end)) {
+            return null;
+          }
+
+          // mention nằm sau vùng delete → shift
+          if (m.start >= end) {
+            return {
+              ...m,
+              start: m.start + diff,
+              end: m.end + diff,
+            };
+          }
+
+          // mention trước vùng delete → giữ
+          return m;
+        }
+
+        // ============================
+        // CASE 2: KHÔNG BÔI ĐEN (caret)
+        // ============================
+        const caret = start;
+
+        // caret nằm TRONG mention → remove
+        if (caret > m.start && caret <= m.end) {
+          return null;
+        }
+
+        // mention nằm sau caret → shift
+        if (m.start >= caret) {
+          return {
+            ...m,
+            start: m.start + diff,
+            end: m.end + diff,
+          };
+        }
+
+        return m;
+      })
+      .filter(Boolean);
+  };
+
+  const selectionRef = useRef({ start: 0, end: 0 });
+
+  const handleBeforeInput = () => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    selectionRef.current = {
+      start: input.selectionStart,
+      end: input.selectionEnd,
+    };
   };
 
   const handleInputChange = (value) => {
+    const prevText = prevValueRef.current ?? "";
 
     setInputValue(value);
-    inputRef.current.focus()
 
-    // 4. Detect gõ @ để show dropdown
-    const match = value.match(/(^|\s)@([^\s@]*)$/);
-    setIsShowDropdownTagName(!!match);
-
-    // 5. Helper check mention còn tồn tại
-    const hasMention = (text, name) => {
-      const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`(^|\\s)@${escapedName}(\\s|$)`);
-      return regex.test(text);
-    };
-
-    // 6. Remove mention đã bị user xóa
-    setMentions((prevMentions) =>
-      prevMentions.filter((mention) =>
-        hasMention(value, mention.name)
-      )
+    setMentions((prev) =>
+      syncMentionsWithText(prevText, value, prev)
     );
+
+    let shouldOpenDropdown = false;
+
+    // chỉ xét khi vừa gõ thêm 1 ký tự
+    if (value.length === prevText.length + 1) {
+      const lastChar = value[value.length - 1];
+
+      if (lastChar === "@") {
+        // CASE 1: '@' là ký tự đầu tiên
+        if (value.length === 1) {
+          shouldOpenDropdown = true;
+        }
+        // CASE 2: trước '@' là khoảng trắng
+        else if (value[value.length - 2] === " ") {
+          shouldOpenDropdown = true;
+        }
+      }
+    }
+
+    setIsShowDropdownTagName(shouldOpenDropdown);
+    prevValueRef.current = value;
   };
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
@@ -1896,40 +1982,105 @@ const BoxChatGroup = () => {
     document.body.removeChild(link);
   };
 
-  const handleSelectTagname = (member = null) => {
-    if (!member) {
-      let tagAll = infoUsers
-        .map((member) => `${member.displayName}`)
-        .join(" @")
-      handleInputChange(inputValue + tagAll + " ");
-      setMentions((prev) => [
-        ...infoUsers.map(member => ({
-          id: member.id,
-          name: member.displayName,
-        }))
-      ]);
+  const getMentionTriggerRange = (text, caretPos) => {
+    const before = text.slice(0, caretPos);
+    const match = before.match(/(^|\s)@([^\s@]*)$/);
+    if (!match) return null;
 
-    } else {
-      handleInputChange(inputValue + member.displayName + " ");
-      const isExist = mentions.some((mention) => mention.id === member.id)
-      if (isExist) return;
+    return {
+      start: caretPos - match[0].length + match[1].length,
+      end: caretPos,
+    };
+  };
+
+  const handleSelectTagname = (member) => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const caret = input.selectionStart;
+    const range = getMentionTriggerRange(inputValue, caret);
+    if (!range) return;
+
+    // ===== CASE: @all =====
+    if (!member) {
+      let offset = range.start;
+
+      const mentionsToInsert = infoUsers.map((m) => {
+        const text = `@${m.displayName} `;
+        const start = offset;
+        const end = start + text.length - 1;
+        offset += text.length;
+
+        return {
+          text,
+          mention: {
+            id: m.id,
+            name: m.displayName,
+            start,
+            end,
+          },
+        };
+      });
+
+      const allText = mentionsToInsert.map((m) => m.text).join("");
+
+      const nextText =
+        inputValue.slice(0, range.start) +
+        allText +
+        inputValue.slice(range.end);
+
+      setInputValue(nextText);
+      prevValueRef.current = nextText;
+
       setMentions((prev) => [
         ...prev,
-        {
-          id: member.id,
-          name: member.displayName,
-        },
+        ...mentionsToInsert.map((m) => m.mention),
       ]);
+
+      setIsShowDropdownTagName(false);
+
+      // requestAnimationFrame(() => {
+      //   input.selectionStart = input.selectionEnd = range.start + allText.length;
+      // });
+      inputRef.current.focus();
+
+
+      return;
     }
 
-    if (inputRef?.current) {
-      setTimeout(() => {
-        inputRef.current.focus();
-      });
-    }
+    // ===== CASE: single member =====
+    const mentionText = `@${member.displayName} `;
+    const start = range.start;
+    const end = start + mentionText.length - 1;
+
+    const nextText =
+      inputValue.slice(0, start) +
+      mentionText +
+      inputValue.slice(range.end);
+
+    setInputValue(nextText);
+    prevValueRef.current = nextText;
+
+    setMentions((prev) => [
+      ...prev,
+      {
+        id: member.id,
+        name: member.displayName,
+        start,
+        end,
+      },
+    ]);
 
     setIsShowDropdownTagName(false);
+
+    // requestAnimationFrame(() => {
+    //   input.selectionStart = input.selectionEnd =
+    //     start + mentionText.length;
+    // });
+    inputRef.current.focus();
+
   };
+
 
   const renderMemberList = () => {
     return infoUsers?.map((member, index) => {
@@ -2198,13 +2349,13 @@ const BoxChatGroup = () => {
                     </div>
                   </div>
                 )}
-
                 <RichTextarea
                   id="input-message-text"
                   autoComplete="off"
                   spellCheck="false"
                   ref={inputRef}
                   value={inputValue}
+                  onSelect={handleBeforeInput}
                   onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => handleKeyDown([], e)}
                   onFocus={(e) => handleFocus()}
@@ -2216,40 +2367,40 @@ const BoxChatGroup = () => {
                   )}`}
                 >
                   {(text) => {
-                    if (!mentions || mentions.length === 0) return text;
+                    if (!mentions?.length) return text;
 
-                    let result = [text];
+                    const result = [];
+                    let lastIndex = 0;
 
-                    mentions.forEach((mention) => {
-                      const escapedName = mention.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-                      const regex = new RegExp(`(@${escapedName})`, "g");
+                    const sortedMentions = [...mentions].sort(
+                      (a, b) => a.start - b.start
+                    );
 
-                      result = result.flatMap((chunk) => { // [["Chào "], <span></span>, ["nhé "], [<span>@Dung]</span>]
-                        if (typeof chunk !== "string") return chunk;
+                    sortedMentions.forEach((m) => {
+                      // guard CHỈ để tránh crash, KHÔNG validate text
+                      if (m.start < lastIndex || m.start < 0 || m.end > text.length) {
+                        return;
+                      }
 
-                        return chunk.split(regex).map((part, i) => {
-                          if (part === `@${mention.name}`) {
-                            return (
-                              <span
-                                key={`${mention.id}-${i}`}
-                                className="mention"
-                                data-id={mention.id}
-                              >
-                                {part}
-                              </span>
-                            );
-                          }
-                          return part;
-                        });
-                      });
+                      result.push(text.slice(lastIndex, m.start));
+
+                      result.push(
+                        <span
+                          key={m.key}              // ✅ identity ổn định
+                          className="mention"
+                          data-id={m.userId}
+                        >
+                          {text.slice(m.start, m.end)}
+                        </span>
+                      );
+
+                      lastIndex = m.end;
                     });
 
+                    result.push(text.slice(lastIndex));
                     return result;
                   }}
-
                 </RichTextarea>
-
-
               </div>
               <div className="box-chat-input__right">
                 {inputValue.length > 0 && (
