@@ -1,33 +1,28 @@
-/**
- * node migrateMentions.js
- */
-
 const admin = require("firebase-admin");
 
-// 🔥 BẮT BUỘC: trỏ Firestore Admin SDK sang emulator
+/* // EMULATORS TEST
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
 
 admin.initializeApp({
-  projectId: "demo-zalo-app", // tên bất kỳ
+  projectId: "zalo-app-62a93",
+}); */
+
+const serviceAccount = require("../serviceAccountKey.prod.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
 
-// 👉 kết nối emulator
-db.settings({
-  host: "localhost:8080",
-  ssl: false,
-});
-
 // FORMAT: @user:<uid>:user
-const MENTION_REGEX = /@user:([^:]+):user/g;
 
-async function migrateMessages() {
+async function migrateMentions() {
+  const MENTION_REGEX = /@user:([^:]+):user/g;
   const snapshot = await db.collection("messages").get();
 
   let batch = db.batch();
-  let batchCount = 0;
-  let totalUpdated = 0;
+  let updated = 0;
 
   for (const doc of snapshot.docs) {
     const data = doc.data();
@@ -41,19 +36,35 @@ async function migrateMessages() {
 
     let match;
     while ((match = MENTION_REGEX.exec(text)) !== null) {
-      const [full, uid, name] = match;
+      const [full, uid] = match;
 
+      // ✅ QUERY USER BẰNG FIELD uid
+      const userQuery = await db
+        .collection("users")
+        .where("uid", "==", uid)
+        .limit(1)
+        .get();
+
+      if (userQuery.empty) {
+        console.warn("User not found for uid:", uid);
+        continue;
+      }
+
+      const userData = userQuery.docs[0].data();
+      const displayName = userData.displayName || "Unknown";
+
+      // text trước mention
       newText += text.slice(lastIndex, match.index);
 
       const start = newText.length;
-      const mentionText = `@${name}`;
+      const mentionText = `@${displayName}`;
       const end = start + mentionText.length;
 
       newText += mentionText;
 
       mentions.push({
         id: uid,
-        name,
+        name: displayName,
         start,
         end,
       });
@@ -70,21 +81,93 @@ async function migrateMessages() {
       mentions,
     });
 
-    batchCount++;
-    totalUpdated++;
+    updated++;
 
-    if (batchCount === 500) {
+    if (updated % 500 === 0) {
       await batch.commit();
       batch = db.batch();
-      batchCount = 0;
     }
   }
 
-  if (batchCount > 0) {
-    await batch.commit();
-  }
-
-  console.log(`✅ Migration done. Updated ${totalUpdated} messages`);
+  await batch.commit();
+  console.log(`✅ Migrated ${updated} messages`);
 }
 
-migrateMessages().catch(console.error);
+async function migrateRoomMessageLatest() {
+  const MENTION_REGEX = /@user:([^:]+):user/g;
+  const snapshot = await db.collection("rooms").get();
+
+  let batch = db.batch();
+  let updated = 0;
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    const last = data.messageLastest;
+
+    if (!last || typeof last.text !== "string") continue;
+
+    const text = last.text;
+
+    let mentions = [];
+    let newText = "";
+    let lastIndex = 0;
+
+    let match;
+    while ((match = MENTION_REGEX.exec(text)) !== null) {
+      const [full, uid] = match;
+
+      const userSnap = await db
+        .collection("users")
+        .where("uid", "==", uid)
+        .limit(1)
+        .get();
+
+      if (userSnap.empty) {
+        console.warn("User not found:", uid);
+        continue;
+      }
+
+      const user = userSnap.docs[0].data();
+      const displayName = user.displayName || "Unknown";
+
+      newText += text.slice(lastIndex, match.index);
+
+      const start = newText.length;
+      const mentionText = `@${displayName}`;
+      const end = start + mentionText.length;
+
+      newText += mentionText;
+
+      mentions.push({
+        id: uid,
+        name: displayName,
+        start,
+        end,
+      });
+
+      lastIndex = match.index + full.length;
+    }
+
+    newText += text.slice(lastIndex);
+
+    if (mentions.length === 0) continue;
+
+    batch.update(doc.ref, {
+      "messageLastest.text": newText,
+      "messageLastest.mentions": mentions,
+    });
+
+    updated++;
+
+    if (updated % 500 === 0) {
+      await batch.commit();
+      batch = db.batch();
+    }
+  }
+
+  await batch.commit();
+  console.log(`✅ Updated messageLastest in ${updated} rooms`);
+}
+
+migrateMentions().catch(console.error);
+migrateRoomMessageLatest().catch(console.error);
