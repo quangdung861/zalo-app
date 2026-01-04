@@ -156,7 +156,7 @@ export const Container = styled.div`
       overflow-x: hidden;
       width: 100%;
       padding-top: 20px;
-      background-image: url(${(props) =>(props.isCloud ? cloudBg : messageBg)});
+      background-image: url(${(props) => (props.isCloud ? cloudBg : messageBg)});
       background-blend-mode: multiply;
       background-color: rgba(
         ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
@@ -243,6 +243,7 @@ export const Container = styled.div`
           border-radius: 50%;
           object-fit: cover;
           margin-bottom: 8px;
+          margin: 0 auto;
         }
         &__name {
           font-size: 20px;

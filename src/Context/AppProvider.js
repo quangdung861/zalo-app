@@ -18,6 +18,7 @@ import {
   setDoc,
   where,
   serverTimestamp,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import moment from "moment";
@@ -37,6 +38,11 @@ const AppProvider = ({ children }) => {
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
   const [room, setRoom] = useState({});
   const [rooms, setRooms] = useState([]);
+
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     if (userInfo?.id) {
@@ -196,42 +202,38 @@ const AppProvider = ({ children }) => {
   }, [userInfo, keywords, uid]);
 
   useEffect(() => {
-    let unSubcribe;
-    if (uid) {
-      let roomsRef;
-      roomsRef = query(
-        collection(db, "rooms"),
-        where("members", "array-contains", uid)
-      );
+    if (!uid) return;
+    const roomsRef = query(
+      collection(db, "rooms"),
+      where("members", "array-contains", uid),
+      orderBy("messageLastest.createdAt", "desc"),
+      limit(PAGE_SIZE)
+    );
 
-      unSubcribe = onSnapshot(roomsRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
+    const unsubscribe = onSnapshot(roomsRef, (snapshot) => {
+      const docs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-        const sortedRooms = documents.sort((a, b) => {
-          const aTime =
-            a.messageLastest?.clientCreatedAt ??
-            a.messageLastest?.createdAt?.seconds * 1000 ??
-            0;
+      const sortedRooms = docs.sort((a, b) => {
+        const aTime =
+          a.messageLastest?.clientCreatedAt ??
+          a.messageLastest?.createdAt?.seconds * 1000 ??
+          0;
 
-          const bTime =
-            b.messageLastest?.clientCreatedAt ??
-            b.messageLastest?.createdAt?.seconds * 1000 ??
-            0;
+        const bTime =
+          b.messageLastest?.clientCreatedAt ??
+          b.messageLastest?.createdAt?.seconds * 1000 ??
+          0;
 
-          return bTime - aTime;
-        });
-
-        setRooms(sortedRooms);
+        return bTime - aTime;
       });
-    }
-    return () => unSubcribe && unSubcribe();
+
+      setRooms(sortedRooms);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+    });
+    return () => unsubscribe();
   }, [uid, keywords, userInfo]);
 
   useEffect(() => {
@@ -271,6 +273,30 @@ const AppProvider = ({ children }) => {
     }
   }, [rooms, selectedGroupMessaging?.room?.id, userInfo]);
 
+  const loadMoreRooms = async () => {
+    if (!lastDoc) return 0;
+    
+    const roomsRef = query(
+      collection(db, "rooms"),
+      where("members", "array-contains", uid),
+      orderBy("messageLastest.createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(PAGE_SIZE)
+    );
+
+    const snap = await getDocs(roomsRef);
+
+    const newRooms = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    setRooms((prev) => [...prev, ...newRooms]);
+    setLastDoc(snap.docs[snap.docs.length - 1] || null);
+
+    // Nếu số doc trả về < PAGE_SIZE => hết dữ liệu
+    if (snap.docs.length < PAGE_SIZE) setHasMore(false);
+
+    return newRooms.length;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -285,6 +311,9 @@ const AppProvider = ({ children }) => {
         rooms,
         keywords,
         setKeywords,
+        loadMoreRooms,
+        hasMore,
+        setHasMore
       }}
     >
       {children}
