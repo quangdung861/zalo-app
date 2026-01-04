@@ -893,19 +893,38 @@ const BoxChatGroup = () => {
 
       const renderText = () => {
         let text = item.text;
+        const mentions = item.mentions;
+        if (!mentions?.length) return text;
 
-        item.mentions?.forEach((mention) => {
-          const escapedName = mention.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const result = [];
+        let lastIndex = 0;
 
-          const regex = new RegExp(`@${escapedName}(\\b)`, "g");
+        const sortedMentions = [...mentions].sort(
+          (a, b) => a.start - b.start
+        );
 
-          text = text.replace(
-            regex,
-            `<span class="mention" data-id="${mention.id}">@${mention.name}</span>`
+        sortedMentions.forEach((m) => {
+          if (m.start < lastIndex || m.start < 0 || m.end > text.length) {
+            return;
+          }
+
+          result.push(text.slice(lastIndex, m.start));
+
+          result.push(
+            <span
+              key={m.key}
+              className="mention"
+              data-id={m.userId}
+            >
+              {text.slice(m.start, m.end)}
+            </span>
           );
+
+          lastIndex = m.end;
         });
 
-        return <div dangerouslySetInnerHTML={{ __html: text }} />;
+        result.push(text.slice(lastIndex));
+        return result;
       };
 
       let total = 0;
@@ -1738,13 +1757,6 @@ const BoxChatGroup = () => {
     };
   }, []);
 
-  const findDiffIndex = (a, b) => {
-    let i = 0;
-    while (i < a.length && i < b.length && a[i] === b[i]) {
-      i++;
-    }
-    return i;
-  };
 
   const isOverlap = (aStart, aEnd, bStart, bEnd) => {
     return aStart < bEnd && aEnd > bStart;
@@ -2334,7 +2346,6 @@ const BoxChatGroup = () => {
                           handleSelectTagname()
                         }
                       >
-                        {console.log(selectedGroupMessaging.room)}
                         <div>
                           <div className="left left--tag">
                             <span>@</span>
