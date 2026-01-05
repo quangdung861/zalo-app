@@ -185,10 +185,13 @@ export const Container = styled.div`
       justify-content: flex-end; */
 
       .suggest-add-friend {
-        height: 51px;
+        position: sticky; 
+        z-index: 2; 
+        top: -20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        height: 51px;
         width: 100%;
         box-sizing: border-box;
         background-color: #fff;
