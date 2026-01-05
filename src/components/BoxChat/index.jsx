@@ -359,7 +359,6 @@ const BoxChat = () => {
                   clientCreatedAt: Date.now(),
                 },
                 createdAt: serverTimestamp(),
-                clientCreatedAt: Date.now(),
                 totalMessages: 1,
                 messagesViewed: [
                   { uid: userInfo.uid, count: 1 },
@@ -2159,6 +2158,7 @@ const BoxChat = () => {
                     className="btn-add-friend"
                     onClick={() => handleOpenModalAddFriend()}
                   >
+                    Gửi kết bạn
                   </div>
                   <div className="btn-more"></div>
                 </div>

@@ -222,9 +222,6 @@ export const Container = styled.div`
             &:hover {
               background-color: #dfe2e7;
             }
-            ::after {
-              content: "Gửi kết bạn"
-            }
             @media only screen and (max-width: 992px) {
               ::after {
                 content: "Kết bạn"
