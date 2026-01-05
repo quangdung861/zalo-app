@@ -203,20 +203,21 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (!uid) return;
-    const roomsRef = query(
+
+    const q = query(
       collection(db, "rooms"),
       where("members", "array-contains", uid),
       orderBy("messageLastest.createdAt", "desc"),
       limit(PAGE_SIZE)
     );
 
-    const unsubscribe = onSnapshot(roomsRef, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      const sortedRooms = docs.sort((a, b) => {
+      const sortedRooms = [...docs].sort((a, b) => {
         const aTime =
           a.messageLastest?.clientCreatedAt ??
           a.messageLastest?.createdAt?.seconds * 1000 ??
@@ -255,7 +256,7 @@ const AppProvider = ({ children }) => {
       };
       getRoom();
     }
-  }, [selectedUserMessaging, rooms, userInfo]);
+  }, [selectedUserMessaging.uidSelected, rooms, userInfo]);
 
   useEffect(() => {
     if (selectedGroupMessaging?.room?.id) {
@@ -275,7 +276,6 @@ const AppProvider = ({ children }) => {
 
   const loadMoreRooms = async () => {
     if (!lastDoc) return 0;
-    
     const roomsRef = query(
       collection(db, "rooms"),
       where("members", "array-contains", uid),
@@ -313,7 +313,7 @@ const AppProvider = ({ children }) => {
         setKeywords,
         loadMoreRooms,
         hasMore,
-        setHasMore
+        setHasMore,
       }}
     >
       {children}

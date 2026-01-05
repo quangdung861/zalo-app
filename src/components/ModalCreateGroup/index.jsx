@@ -339,6 +339,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       avatar: imgPreviewAvatar || "",
       deleted: [],
       hideTemporarily: [],
+      createdAt: serverTimestamp(),
     };
 
     try {
