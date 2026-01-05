@@ -243,7 +243,6 @@ export const Container = styled.div`
           border-radius: 50%;
           object-fit: cover;
           margin-bottom: 8px;
-          margin: 0 auto;
         }
         &__name {
           font-size: 20px;
