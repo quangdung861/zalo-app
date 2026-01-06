@@ -17,7 +17,7 @@ export const Container = styled.div`
       min-width: var(--section-left-width);
       height: 100dvh;
       border-right: 1px solid var(--boder-dividing-color);
-      transition: min-width 0.3s ease;
+      transition: min-width 0.2s ease;
       &__header {
         display: flex;
         align-items: center;
@@ -130,7 +130,7 @@ export const Container = styled.div`
             background-color: #005ae0;
             position: absolute;
             bottom: 0;
-            transition: all 0.3s;
+            transition: all 0.2s;
           }
         }
         .room-list {
