@@ -150,6 +150,9 @@ export const Container = styled.div`
         }
       }
     }
+    .container-content {
+      
+    }
     &__content {
       display: flex;
       flex-direction: column-reverse;
