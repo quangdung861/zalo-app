@@ -25,7 +25,6 @@ import searchEmpty2 from "assets/searchEmpty2.png";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import ModalConfirm from "components/ModalConfirm";
-import Skeleton from "react-loading-skeleton";
 import RoomItem from "./RoomItem";
 import InfiniteScroll from "react-infinite-scroll-component";
 import RoomItemSkeleton from "./RoomItemSkeleton";
@@ -34,7 +33,6 @@ const MessagePage = () => {
   const {
     isShowBoxChat,
     setIsShowBoxChat,
-    setTotalUnseenMessage,
     isShowBoxChatGroup,
     setIsShowBoxChatGroup,
     setSidebarSelected,
@@ -53,7 +51,8 @@ const MessagePage = () => {
     selectedGroupMessaging,
     loadMoreRooms,
     hasMore,
-    setLoading
+    setLoading,
+    setHasMore
   } = useContext(AppContext);
 
   var settings = {
@@ -552,6 +551,11 @@ const MessagePage = () => {
 
     return <RoomItem {...roomItemProps} />;
   });
+  console.log("🚀 ~ MessagePage ~ roomlist:", roomlist)
+
+  useEffect(() => {
+    if (roomlist.length < 1) setHasMore(false);
+  }, [roomlist?.length]);
 
   const renderSlideList = () => {
     return slideList.map((item, index) => {
