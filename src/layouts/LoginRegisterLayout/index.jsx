@@ -18,6 +18,8 @@ const LoginRegisterLayout = () => {
       unsubscribed();
     };
   }, []);
+  
+
 
   return (
     <S.Wrapper>

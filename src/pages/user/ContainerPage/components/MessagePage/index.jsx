@@ -551,7 +551,7 @@ const MessagePage = () => {
 
     return <RoomItem {...roomItemProps} />;
   });
-  console.log("🚀 ~ MessagePage ~ roomlist:", roomlist)
+  
 
   useEffect(() => {
     if (roomlist.length < 1) setHasMore(false);

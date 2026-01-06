@@ -604,6 +604,7 @@ const BoxChat = () => {
       });
     }, 200);
   };
+  
 
   // const [isOnline, setIsOnline] = useState(false);
 

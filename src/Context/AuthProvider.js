@@ -45,6 +45,7 @@ const AuthProvider = ({ children }) => {
       unsubscribed();
     };
   }, [navigate]);
+  
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>

@@ -30,6 +30,7 @@ const LoginPage = () => {
         break;
     }
   };
+  
 
   const handleGoogleSignIn = async () => {
     try {

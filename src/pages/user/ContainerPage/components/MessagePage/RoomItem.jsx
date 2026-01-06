@@ -27,6 +27,7 @@ const RoomItem = ({
     setIsShowOverlayModalConfirmDelete
 }) => {
     const dropdownRef = useRef(null);
+  
 
     useEffect(() => {
         const handleClickOutside = (event) => {

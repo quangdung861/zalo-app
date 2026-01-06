@@ -393,6 +393,7 @@ const BoxChatGroup = () => {
       end: input.selectionEnd,
     };
   };
+  
 
   const handleClickSentMessage = () => {
     if (inputValue) {

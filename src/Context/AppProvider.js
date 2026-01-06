@@ -118,7 +118,9 @@ const AppProvider = ({ children }) => {
         setUserInfo(documents[0]);
       });
     }
-    return () => unSubcribe && unSubcribe();
+    return () => {
+      unSubcribe && unSubcribe();
+    };
   }, [uid]);
 
   useEffect(() => {
@@ -246,8 +248,13 @@ const AppProvider = ({ children }) => {
       setRooms(sortedRooms);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+    };
   }, [uid, keywords, userInfo]);
+  
+
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {

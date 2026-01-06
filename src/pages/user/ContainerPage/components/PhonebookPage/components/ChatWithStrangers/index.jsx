@@ -65,6 +65,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setIsShowOverlayModalAddFriend(true);
     setIsShowDropdown(false);
   };
+  
 
   const dropdownRef = useRef(null);
   const orderByRef = useRef(null);

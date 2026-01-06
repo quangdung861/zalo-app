@@ -89,6 +89,7 @@ const ModalSharingMessage = ({
   const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingGroupList, setLoadingGroupList] = useState(false);
+  
 
   useEffect(() => {
     const getFriends = async () => {

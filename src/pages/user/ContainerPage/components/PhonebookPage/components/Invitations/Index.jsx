@@ -28,6 +28,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [invitationReceive, setInvitationReceive] = useState([]);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
   const [userInfoSelected, setUserInfoSelected] = useState();
+  
 
   useEffect(() => {
     const getInvitationSent = async () => {

@@ -31,6 +31,7 @@ const FormEmail = ({ setRegisterWay }) => {
       error: "",
     },
   });
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

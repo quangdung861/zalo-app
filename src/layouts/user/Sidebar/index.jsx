@@ -68,8 +68,10 @@ const Sidebar = () => {
       );
     });
   };
+  
 
   const handleLogout = async () => {
+    if (!userInfo?.id) return;
     const docRef = doc(db, "users", userInfo.id);
     startLoading();
     await setDoc(
@@ -104,6 +106,8 @@ const Sidebar = () => {
     if (rooms[0]) {
       getRoomCloud();
     }
+  
+
   }, [rooms]);
 
   const toogleBoxChat = () => {

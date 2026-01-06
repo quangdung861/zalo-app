@@ -21,6 +21,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useContext(AppContext);
   const [registerWay, setRegisterWay] = useState("");
+  
 
   const handleGoogleSignIn = async () => {
     try {
