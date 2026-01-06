@@ -48,7 +48,6 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
             where("uid", "in", uidFriends)
           );
         }
-
         const response = await getDocs(friendsRef);
         const documents = response.docs.map((doc) => {
           const id = doc.id;
@@ -256,7 +255,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                   <div className="divding-line" />
                   <div className="dropdown-menu__item">Chặn người này</div>
                   {userInfo.invitationSent.includes(item.uid) ||
-                  userInfo.invitationReceive.includes(item.uid) ? (
+                    userInfo.invitationReceive.includes(item.uid) ? (
                     <></>
                   ) : (
                     <>
@@ -458,8 +457,8 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                         style={
                           categorySelected !== "Tất cả"
                             ? {
-                                paddingLeft: "26px",
-                              }
+                              paddingLeft: "26px",
+                            }
                             : {}
                         }
                       >

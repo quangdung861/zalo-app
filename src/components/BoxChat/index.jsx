@@ -37,7 +37,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 
 const BoxChat = () => {
-  const { userInfo, room, selectedUserMessaging, setRoom } =
+  const { userInfo, room, selectedUserMessaging, setRoom, setLoading } =
     useContext(AppContext);
   const { setIsShowBoxChat } = useContext(UserLayoutContext);
 
@@ -294,7 +294,7 @@ const BoxChat = () => {
               ...messagesViewed,
               count: messagesViewed.count + 1,
             });
-
+            setLoading(true);
             await setDoc(
               roomRef,
               {
@@ -314,7 +314,7 @@ const BoxChat = () => {
               }
             );
 
-            addDocument("messages", {
+            await addDocument("messages", {
               category: "single",
               roomId: room.id,
               uid: userInfo.uid,
@@ -344,11 +344,13 @@ const BoxChat = () => {
                 },
               ],
             });
+            setLoading(false);
           };
           createMes();
         } else {
           const createRoomAndMes = async () => {
             try {
+              setLoading(true);
               const roomRef = await addDoc(collection(db, "rooms"), {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
@@ -372,8 +374,8 @@ const BoxChat = () => {
               const response = await getDoc(roomRef);
 
               if (roomRef && roomRef.id) {
-                setRoom({ id: response.id, ...response.data() });
-                addDocument("messages", {
+                await setRoom({ id: response.id, ...response.data() });
+                await addDocument("messages", {
                   category: "single",
                   roomId: response.id,
                   uid: userInfo.uid,
@@ -408,6 +410,8 @@ const BoxChat = () => {
               }
             } catch (error) {
               console.error("Error creating room:", error);
+            } finally {
+              setLoading(false);
             }
           };
 
@@ -456,6 +460,7 @@ const BoxChat = () => {
             count: messagesViewed.count + 1,
           });
 
+          setLoading(true);
           await setDoc(
             roomRef,
             {
@@ -505,11 +510,13 @@ const BoxChat = () => {
               },
             ],
           });
+          setLoading(false);
         };
         createMes();
       } else {
         const createRoomAndMes = async () => {
           try {
+            setLoading(true);
             const roomRef = await addDoc(collection(db, "rooms"), {
               category: "single",
               members: [userInfo.uid, selectedUserMessaging.uidSelected],
@@ -566,10 +573,12 @@ const BoxChat = () => {
                 ],
               });
             } else {
-              console.log("false");
+              console.error("Error creating room");
             }
           } catch (error) {
             console.error("Error creating room:", error);
+          } finally {
+            setLoading(false);
           }
         };
 
@@ -635,12 +644,13 @@ const BoxChat = () => {
 
   const fetchMoreData = async () => {
     if (!hasMore) return;
+    setLoading(true);
     await loadMoreMessages();
+    setLoading(false);
   };
 
   const loadMoreMessages = async () => {
     if (!lastDoc) return;
-
     const messageRef = query(
       collection(db, "messages"),
       where("roomId", "==", room.id),
@@ -666,13 +676,13 @@ const BoxChat = () => {
     setMessages([]);
     let unSubcribe;
     if (room.id) {
+      const messagesRef = query(
+        collection(db, "messages"),
+        where("roomId", "==", room.id),
+        orderBy("createdAt", "desc"),
+        limit(PAGE_SIZE_MESSAGES)
+      );
       const handleSnapShotMessage = async () => {
-        const messagesRef = query(
-          collection(db, "messages"),
-          where("roomId", "==", room.id),
-          orderBy("createdAt", "desc"),
-          limit(PAGE_SIZE_MESSAGES)
-        );
         unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
           const documents = docsSnap.docs.map((doc) => {
             const id = doc.id;
@@ -719,6 +729,7 @@ const BoxChat = () => {
       var uniqueArr = [...new Set(allUser)];
 
       const fetchData = async () => {
+        setLoading(true);
         const docRef = query(
           collection(db, "users"),
           where("uid", "in", uniqueArr)
@@ -731,6 +742,7 @@ const BoxChat = () => {
           };
         });
         setInfoUsers(documents);
+        setLoading(false);
       };
       fetchData();
     }
@@ -773,6 +785,7 @@ const BoxChat = () => {
     const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
 
     const diffSeconds = now.diff(date, "seconds");
+    setLoading(true);
     if (diffSeconds < 30) {
       const messageRef = doc(db, "messages", id);
       setIsShowDropdownOption(false);
@@ -787,6 +800,7 @@ const BoxChat = () => {
         }
       );
       setIsShowDropdownOption(false);
+      setLoading(false);
       return;
     }
 
@@ -795,6 +809,7 @@ const BoxChat = () => {
     setTimeout(function () {
       setIsShowAlertRecallRejectMessage(false);
     }, 3000);
+    setLoading(false);
     return;
   };
 
@@ -806,7 +821,7 @@ const BoxChat = () => {
 
   const handleDeleteMessage = async ({ message }) => {
     const messageRef = doc(db, "messages", message.id);
-
+    setLoading(true);
     await setDoc(
       messageRef,
       {
@@ -821,6 +836,7 @@ const BoxChat = () => {
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   const handleAddEmoji = async ({ id, message }) => {
@@ -855,7 +871,7 @@ const BoxChat = () => {
         });
 
       const messagesRef = doc(db, "messages", message.id);
-
+      setLoading(true);
       await setDoc(
         messagesRef,
         {
@@ -865,6 +881,7 @@ const BoxChat = () => {
           merge: true,
         }
       );
+      setLoading(false);
       setEmojis();
     } else {
       emojiList
@@ -876,7 +893,7 @@ const BoxChat = () => {
         });
 
       const messagesRef = doc(db, "messages", message.id);
-
+      setLoading(true);
       await setDoc(
         messagesRef,
         {
@@ -886,6 +903,7 @@ const BoxChat = () => {
           merge: true,
         }
       );
+      setLoading(false);
       setEmojis();
     }
   };
@@ -905,7 +923,7 @@ const BoxChat = () => {
     });
 
     const messagesRef = doc(db, "messages", message.id);
-
+    setLoading(true);
     await setDoc(
       messagesRef,
       {
@@ -915,6 +933,7 @@ const BoxChat = () => {
         merge: true,
       }
     );
+    setLoading(false);
     setEmojis();
   };
 
@@ -1832,7 +1851,7 @@ const BoxChat = () => {
       });
 
       const userInfoRef = doc(db, "users", userInfo.id);
-
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -1842,6 +1861,7 @@ const BoxChat = () => {
           merge: true,
         }
       );
+      setLoading(false);
       return;
     }
 
@@ -1851,7 +1871,7 @@ const BoxChat = () => {
     });
 
     const userInfoRef = doc(db, "users", userInfo.id);
-
+    setLoading(true);
     await setDoc(
       userInfoRef,
       {
@@ -1861,6 +1881,7 @@ const BoxChat = () => {
         merge: true,
       }
     );
+    setLoading(false);
     setCategoryDropdown(false);
   };
 
@@ -1888,7 +1909,9 @@ const BoxChat = () => {
         }, 3000);
         return;
       }
+      setLoading(true);
       const imageBase64FullInfo = await convertImagesToBase64(files);
+      setLoading(false);
       const e = {
         key: "Enter",
         isPreventDefault: true,
@@ -2000,6 +2023,7 @@ const BoxChat = () => {
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
+    setLoading(false);
     await setDoc(
       strangerRef,
       {
@@ -2025,6 +2049,7 @@ const BoxChat = () => {
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   return (

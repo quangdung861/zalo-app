@@ -24,6 +24,7 @@ import { db } from "firebaseConfig";
 import moment from "moment";
 import { generateKeywords } from "services";
 import { PAGE_SIZE } from "constants/public";
+import Loading from "components/Loading";
 
 export const AppContext = createContext();
 
@@ -39,6 +40,7 @@ const AppProvider = ({ children }) => {
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
   const [room, setRoom] = useState({});
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(true);
@@ -313,9 +315,11 @@ const AppProvider = ({ children }) => {
         loadMoreRooms,
         hasMore,
         setHasMore,
+        setLoading
       }}
     >
       {children}
+      {loading && <Loading />}
     </AppContext.Provider>
   );
 };

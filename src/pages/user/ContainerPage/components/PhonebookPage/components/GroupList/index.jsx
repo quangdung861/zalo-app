@@ -17,6 +17,7 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     rooms,
     setSelectedUserMessaging,
     setSelectedGroupMessaging,
+    setLoading
   } = useContext(AppContext);
 
   const [keywords, setKeywords] = useState("");
@@ -36,7 +37,9 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   useEffect(() => {
     if (rooms[0]) {
       const fetchDataAsync = async () => {
+        setLoading(true);
         const fetchedData = await fetchData();
+        setLoading(false);
         setNewRoom(fetchedData.newRooms);
         setInfoPartner(fetchedData.infoPartner);
       };
@@ -61,8 +64,9 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           collection(db, "users"),
           where("uid", "in", room.members)
         );
-
+        setLoading(true);
         const response = await getDocs(partnerRef);
+        setLoading(false);
         const documents = response.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();

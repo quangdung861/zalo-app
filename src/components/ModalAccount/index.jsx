@@ -19,7 +19,7 @@ const ModalAccount = ({
   const accountInfoRef = useRef(null);
   const dropdownResponseRef = useRef(null);
 
-  const { userInfo, setSelectedUserMessaging } = useContext(AppContext);
+  const { userInfo, setSelectedUserMessaging, setLoading } = useContext(AppContext);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
@@ -72,6 +72,7 @@ const ModalAccount = ({
   const submitUpdatePhoneNumber = async () => {
     if (inputValuePhoneNumber) {
       const userInfoRef = doc(db, "users", userInfo.id);
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -81,6 +82,7 @@ const ModalAccount = ({
           merge: true,
         }
       );
+      setLoading(false);
       toogleUpdatePhoneNumber();
       setInputValuePhoneNumber("");
     }
@@ -97,6 +99,7 @@ const ModalAccount = ({
   const submitUpdateSex = async () => {
     if (inputValueSex) {
       const userInfoRef = doc(db, "users", userInfo.id);
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -106,6 +109,7 @@ const ModalAccount = ({
           merge: true,
         }
       );
+      setLoading(false);
       toogleUpdateSex();
       setInputValueSex("");
     }
@@ -122,6 +126,7 @@ const ModalAccount = ({
   const submitUpdateDateOfBirth = async () => {
     if (inputValueDateOfBirth) {
       const userInfoRef = doc(db, "users", userInfo.id);
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -131,6 +136,7 @@ const ModalAccount = ({
           merge: true,
         }
       );
+      setLoading(false);
       toogleUpdateDateOfBirth();
       setInputValueDateOfBirth("");
     }
@@ -172,6 +178,7 @@ const ModalAccount = ({
   async function uploadImage() {
     if (imgPreviewCover) {
       const userInfoRef = doc(db, "users", userInfo.id);
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -181,6 +188,7 @@ const ModalAccount = ({
           merge: true,
         }
       );
+      setLoading(false);
       return setImgPreviewCover("");
     }
   }
@@ -229,6 +237,7 @@ const ModalAccount = ({
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
+    setLoading(true);
     await setDoc(
       strangerRef,
       {
@@ -254,6 +263,7 @@ const ModalAccount = ({
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   const handleInvitationRecall = async () => {
@@ -263,6 +273,7 @@ const ModalAccount = ({
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
+    setLoading(true);
     await setDoc(
       strangerRef,
       {
@@ -286,6 +297,7 @@ const ModalAccount = ({
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   const handleInvitationReject = async () => {
@@ -294,6 +306,7 @@ const ModalAccount = ({
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
+    setLoading(true);
     await setDoc(
       strangerRef,
       {
@@ -317,6 +330,7 @@ const ModalAccount = ({
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   return accountSelected.uid === userInfo.uid ? (

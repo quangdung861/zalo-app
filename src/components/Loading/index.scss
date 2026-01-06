@@ -1,0 +1,26 @@
+#loading {
+    position: fixed;
+    inset: 0;
+    background-color: transparent;
+    z-index: 9999;
+}
+
+.loading-bar {
+    height: 3px;
+    width: 30%;
+    background: linear-gradient(90deg,
+            transparent,
+            #0091ff,
+            transparent);
+    animation: loading-move 1.2s ease-in infinite;
+}
+
+@keyframes loading-move {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(400%);
+    }
+}
