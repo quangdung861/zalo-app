@@ -150,12 +150,8 @@ export const Container = styled.div`
         }
       }
     }
-    &__content {
-      position: relative;
-      max-width: 100%;
-      overflow-x: hidden;
-      width: 100%;
-      padding-top: 20px;
+    .container-content {
+      min-height: calc(100dvh - var(--header-height) - var(--footer-height));
       background-image: url(${(props) => (props.isCloud ? cloudBg : messageBg)});
       background-blend-mode: multiply;
       background-color: rgba(
@@ -163,44 +159,17 @@ export const Container = styled.div`
       );
       background-size: cover;
       background-repeat: no-repeat;
-      height: calc(100dvh - var(--header-height) - var(--footer-height));
-      .message-view-blur-overlay {
-      }
-      max-height: calc(100dvh - var(--header-height) - var(--footer-height));
-      .message-view-blur-overlay {
-      }
-      /* overflow: hidden; */
-      overflow-y: overlay;
-      &::-webkit-scrollbar {
-        -webkit-appearance: none;
-      }
-      &::-webkit-scrollbar:vertical {
-        width: 0px;
-      }
-      &::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-      }
-      /* display: flex;
-      flex-direction: column;
-      justify-content: flex-end; */
-
-      .suggest-add-friend {
-        position: sticky; 
-        z-index: 2; 
-        top: -20px;
+       .suggest-add-friend {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        z-index: 2; 
         height: 51px;
-        width: 100%;
-        box-sizing: border-box;
-        background-color: #fff;
-        overflow: hidden;
         padding: 8px 16px;
+        background-color: #fff;
         border-top: 1px solid var(--boder-dividing-color);
         border-bottom: 1px solid var(--boder-dividing-color);
-        margin-top: -20px;
-        margin-bottom: 20px;
+        box-sizing: border-box;
         .left {
           display: flex;
           align-items: center;
@@ -225,14 +194,41 @@ export const Container = styled.div`
             &:hover {
               background-color: #dfe2e7;
             }
-            @media only screen and (max-width: 992px) {
-              ::after {
-                content: "Kết bạn"
-              }
-            }
           }
         }
       }
+    }
+    &__content {
+      display: flex;
+      flex-direction: column-reverse;
+      max-width: 100%;
+      overflow-x: hidden;
+      width: 100%;
+      padding-bottom: 20px;
+      padding-top: 30px;
+     
+      /* height: calc(100dvh - var(--header-height) - var(--footer-height)); */
+      .message-view-blur-overlay {
+      }
+      max-height: calc(100dvh - var(--header-height) - var(--footer-height));
+      .message-view-blur-overlay {
+      }
+      /* overflow: hidden; */
+      overflow-y: overlay;
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+      }
+      &::-webkit-scrollbar:vertical {
+        width: 0px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+      }
+      /* display: flex;
+      flex-direction: column;
+      justify-content: flex-end; */
+
+     
 
       .user-info {
         text-align: center;
@@ -1043,10 +1039,10 @@ export const Container = styled.div`
         margin-bottom: 16px;
       }
       .up-to-top {
-        position: sticky;
-        top: calc(100% - 50px);
+        position: fixed;
+        bottom: 140px;
+        right: 20px;
         z-index: 99;
-        left: 100%;
         margin-right: 16px;
         display: flex;
         justify-content: center;

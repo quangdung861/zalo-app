@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
         const { displayName, email, uid, photoURL } = user;
         setUser({ displayName, email, uid, photoURL });
         setIsLoading(false);
-        return navigate("/");
+        // return navigate("/");
       }
       setIsLoading(false);
     });
