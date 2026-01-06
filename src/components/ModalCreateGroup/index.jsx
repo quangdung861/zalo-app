@@ -105,7 +105,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
             orderBy("displayName", "asc")
           );
         }
-
         const response = await getDocs(friendsRef);
         const documents = response.docs.map((doc) => {
           const id = doc.id;

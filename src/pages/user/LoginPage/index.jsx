@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import * as S from "./styles";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,9 +11,11 @@ import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import DirectionBoard from "components/DirectionBoard";
+import { AppContext } from "Context/AppProvider";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setLoading } = useContext(AppContext);
 
   const [dropdownContries, setDropdownContries] = useState(false);
 
@@ -31,6 +33,7 @@ const LoginPage = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      setLoading(true);
       const data = await signInWithPopup(auth, googleProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -119,11 +122,14 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGithubSignIn = async () => {
     try {
+      setLoading(true);
       const data = await signInWithPopup(auth, githubProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -212,6 +218,8 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
+    } finally {
+      setLoading(false);
     }
   };
 

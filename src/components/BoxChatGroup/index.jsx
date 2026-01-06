@@ -41,7 +41,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 
 const BoxChatGroup = () => {
-  const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
+  const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging, setLoading } =
     useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
   const [mentions, setMentions] = useState([]);
@@ -196,7 +196,7 @@ const BoxChatGroup = () => {
       });
 
       const userInfoRef = doc(db, "users", userInfo.id);
-
+      setLoading(true);
       await setDoc(
         userInfoRef,
         {
@@ -206,6 +206,7 @@ const BoxChatGroup = () => {
           merge: true,
         }
       );
+      setLoading(false);
       return;
     }
 
@@ -215,7 +216,7 @@ const BoxChatGroup = () => {
     });
 
     const userInfoRef = doc(db, "users", userInfo.id);
-
+    setLoading(true);
     await setDoc(
       userInfoRef,
       {
@@ -226,6 +227,7 @@ const BoxChatGroup = () => {
       }
     );
     setCategoryDropdown(false);
+    setLoading(false);
   };
 
   const updateMessageViewed = async (docRef, newMessageViewed) => {
@@ -299,7 +301,7 @@ const BoxChatGroup = () => {
             });
 
             const mentionsOnlyId = mentions.map((mention) => mention.id);
-
+            setLoading(true);
             await setDoc(
               roomRef,
               {
@@ -358,6 +360,7 @@ const BoxChatGroup = () => {
                 },
               ],
             });
+            setLoading(false);
           };
           createMes();
         }
@@ -413,7 +416,7 @@ const BoxChatGroup = () => {
           });
 
           const mentionsOnlyId = mentions.map((mention) => mention.id);
-
+          setLoading(true);
           await setDoc(
             roomRef,
             {
@@ -472,6 +475,7 @@ const BoxChatGroup = () => {
               },
             ],
           });
+          setLoading(false);
         };
         createMes();
       }
@@ -513,7 +517,9 @@ const BoxChatGroup = () => {
         }, 3000);
         return;
       }
+      setLoading(true);
       const imageBase64FullInfo = await convertImagesToBase64(files);
+      setLoading(false);
       const e = {
         key: "Enter",
         isPreventDefault: true,
@@ -593,7 +599,9 @@ const BoxChatGroup = () => {
           collection(db, "users"),
           where("uid", "in", room.members)
         );
+        setLoading(true);
         const reponse = await getDocs(docRef);
+        setLoading(false);
         const documents = reponse.docs.map((doc) => {
           return {
             id: doc.id,
@@ -691,12 +699,12 @@ const BoxChatGroup = () => {
   const handleRecallMessage = async ({ id, createdAt }) => {
     const now = moment();
     const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+    setLoading(true);
 
     const diffSeconds = now.diff(date, "seconds");
     if (diffSeconds < 30) {
       const messageRef = doc(db, "messages", id);
       setIsShowDropdownOption(false);
-
       await setDoc(
         messageRef,
         {
@@ -707,6 +715,7 @@ const BoxChatGroup = () => {
         }
       );
       setIsShowDropdownOption(false);
+      setLoading(false);
       return;
     }
 
@@ -715,12 +724,14 @@ const BoxChatGroup = () => {
     setTimeout(function () {
       setIsShowAlertRecallRejectMessage(false);
     }, 3000);
+    setLoading(false);
     return;
   };
 
   const handleDeleteMessage = async ({ message }) => {
     const messageRef = doc(db, "messages", message.id);
 
+    setLoading(true);
     await setDoc(
       messageRef,
       {
@@ -735,6 +746,7 @@ const BoxChatGroup = () => {
         merge: true,
       }
     );
+    setLoading(false);
   };
 
   const handleAddEmoji = async ({ id, message }) => {
@@ -770,7 +782,7 @@ const BoxChatGroup = () => {
 
 
       const messagesRef = doc(db, "messages", message.id);
-
+      setLoading(true);
       await setDoc(
         messagesRef,
         {
@@ -780,6 +792,7 @@ const BoxChatGroup = () => {
           merge: true,
         }
       );
+      setLoading(false);
       setEmojis();
     } else {
       emojiList
@@ -791,7 +804,7 @@ const BoxChatGroup = () => {
         });
 
       const messagesRef = doc(db, "messages", message.id);
-
+      setLoading(true);
       await setDoc(
         messagesRef,
         {
@@ -801,6 +814,7 @@ const BoxChatGroup = () => {
           merge: true,
         }
       );
+      setLoading(false);
       setEmojis();
     }
   };
@@ -821,7 +835,7 @@ const BoxChatGroup = () => {
     });
 
     const messagesRef = doc(db, "messages", message.id);
-
+    setLoading(true);
     await setDoc(
       messagesRef,
       {
@@ -831,6 +845,7 @@ const BoxChatGroup = () => {
         merge: true,
       }
     );
+    setLoading(false);
     setEmojis();
   };
 
@@ -1868,6 +1883,7 @@ const BoxChatGroup = () => {
   useEffect(() => {
     if (room.id) {
       const fetchData = async () => {
+        setLoading(true);
         const partnerRef = query(
           collection(db, "users"),
           where("uid", "in", room.members)
@@ -1890,6 +1906,7 @@ const BoxChatGroup = () => {
 
         const name = documents.map((item) => item.displayName).join(", ");
         setName(name);
+        setLoading(false);
       };
       fetchData();
     }
@@ -2117,7 +2134,9 @@ const BoxChatGroup = () => {
 
   const fetchMoreData = async () => {
     if (!hasMore) return;
+    setLoading(true);
     await loadMoreMessages();
+    setLoading(false);
   };
 
   const loadMoreMessages = async () => {

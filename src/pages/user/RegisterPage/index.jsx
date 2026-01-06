@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import * as S from "./styles";
 import { Link } from "react-router-dom";
@@ -15,18 +15,21 @@ import { addDocument, generateKeywords } from "../../../services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
+import { AppContext } from "Context/AppProvider";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setLoading } = useContext(AppContext);
   const [registerWay, setRegisterWay] = useState("");
 
   const handleGoogleSignIn = async () => {
     try {
+      setLoading(true);
       const data = await signInWithPopup(auth, googleProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
         if (isNewUser) {
-          addDocument("users", {
+          await addDocument("users", {
             displayName: data.user.displayName,
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
@@ -110,11 +113,14 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGithubSignIn = async () => {
     try {
+      setLoading(true);
       const data = await signInWithPopup(auth, githubProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -203,6 +209,8 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
+    } finally {
+      setLoading(false);
     }
   };
 

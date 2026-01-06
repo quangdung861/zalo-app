@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import * as S from "./styles";
 
@@ -7,9 +7,11 @@ import { ROUTES } from "routes";
 
 import { auth } from "firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { AppContext } from "Context/AppProvider";
 
 const EmailFormLogin = ({ setLoginWay }) => {
   const navigate = useNavigate();
+  const { setLoading } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     email: {
@@ -41,7 +43,8 @@ const EmailFormLogin = ({ setLoginWay }) => {
       formData.error === null
     ) {
       try {
-         await signInWithEmailAndPassword(
+        setLoading(true);
+        await signInWithEmailAndPassword(
           auth,
           formData.email.value,
           formData.password.value
@@ -59,8 +62,9 @@ const EmailFormLogin = ({ setLoginWay }) => {
             error: "Email của bạn không đúng định dạng",
           }));
         }
+      } finally {
+        setLoading(false);
       }
-    } else {
     }
   };
 
