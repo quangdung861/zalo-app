@@ -36,7 +36,7 @@ export const Wrapper = styled.div`
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
           position: relative;
           > i {
             font-size: 24px;
@@ -73,7 +73,7 @@ export const Wrapper = styled.div`
           display: flex;
           justify-content: center;
           align-items: center;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
           > i {
             font-size: 24px;
             color: white;
@@ -105,7 +105,7 @@ export const Wrapper = styled.div`
             border-radius: 4px;
             user-select: none;
             animation-name: moveToBottom, fadeIn;
-            animation-duration: 0.2s;
+            animation-duration: 0.3s;
             .dividing-line {
               border-bottom: 1px solid #d4d4d4;
               margin: 4px 16px;

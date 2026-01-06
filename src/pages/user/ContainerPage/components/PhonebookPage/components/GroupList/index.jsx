@@ -17,7 +17,7 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     rooms,
     setSelectedUserMessaging,
     setSelectedGroupMessaging,
-    setLoading
+    startLoading, stopLoading
   } = useContext(AppContext);
 
   const [keywords, setKeywords] = useState("");
@@ -37,9 +37,9 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   useEffect(() => {
     if (rooms[0]) {
       const fetchDataAsync = async () => {
-        setLoading(true);
+        startLoading();
         const fetchedData = await fetchData();
-        setLoading(false);
+        stopLoading();
         setNewRoom(fetchedData.newRooms);
         setInfoPartner(fetchedData.infoPartner);
       };
@@ -64,9 +64,9 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
           collection(db, "users"),
           where("uid", "in", room.members)
         );
-        setLoading(true);
+        startLoading();
         const response = await getDocs(partnerRef);
-        setLoading(false);
+        stopLoading();
         const documents = response.docs.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -160,9 +160,9 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
               <div className="item-group__right">
                 <i
                   className="fa-solid fa-ellipsis"
-                  // onClick={() => {
-                  //   setIsShowDropdown(item.id);
-                  // }}
+                // onClick={() => {
+                //   setIsShowDropdown(item.id);
+                // }}
                 ></i>
               </div>
             </div>

@@ -20,7 +20,7 @@ const Sidebar = () => {
     totalUnSeenMessage,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, setLoading } = useContext(AppContext);
+  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -71,7 +71,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     const docRef = doc(db, "users", userInfo.id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       docRef,
       {
@@ -85,7 +85,7 @@ const Sidebar = () => {
       }
     );
     await auth.signOut();
-    setLoading(false);
+    stopLoading();
     window.location.reload();
   };
 

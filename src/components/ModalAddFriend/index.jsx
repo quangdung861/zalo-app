@@ -9,7 +9,7 @@ const ModalAddFriend = ({
   fullInfoUser,
   setIsShowOverlayModal,
 }) => {
-  const { userInfo, setLoading } = useContext(AppContext);
+  const { userInfo, startLoading, stopLoading } = useContext(AppContext);
 
   const [isViewLogs, setIsViewLogs] = useState(false);
 
@@ -60,7 +60,7 @@ const ModalAddFriend = ({
     // STRANGER
     const nowDate = moment().unix() * 1000;
     const strangerRef = doc(db, "users", id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       strangerRef,
       {
@@ -93,7 +93,7 @@ const ModalAddFriend = ({
       },
       { merge: true }
     );
-    setLoading(false);
+    stopLoading();
     setIsShowOverlayModalAddFriend(false);
   };
 

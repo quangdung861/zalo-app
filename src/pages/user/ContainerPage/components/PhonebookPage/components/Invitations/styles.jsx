@@ -146,7 +146,7 @@ export const Container = styled.div`
                   font-weight: 500;
                   font-size: 16px;
                   line-height: 40px;
-                  transition: all 0.2s ease;
+                  transition: all 0.3s ease;
                   cursor: pointer;
                 }
                 .btn-reject {
@@ -249,7 +249,7 @@ export const Container = styled.div`
                   font-weight: 500;
                   font-size: 16px;
                   line-height: 40px;
-                  transition: all 0.2s ease;
+                  transition: all 0.3s ease;
                   cursor: pointer;
                 }
                 .btn-recall {

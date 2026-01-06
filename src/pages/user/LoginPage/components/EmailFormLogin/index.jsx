@@ -11,7 +11,7 @@ import { AppContext } from "Context/AppProvider";
 
 const EmailFormLogin = ({ setLoginWay }) => {
   const navigate = useNavigate();
-  const { setLoading } = useContext(AppContext);
+  const { startLoading, stopLoading } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     email: {
@@ -43,7 +43,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
       formData.error === null
     ) {
       try {
-        setLoading(true);
+        startLoading();
         await signInWithEmailAndPassword(
           auth,
           formData.email.value,
@@ -63,7 +63,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
           }));
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
   };

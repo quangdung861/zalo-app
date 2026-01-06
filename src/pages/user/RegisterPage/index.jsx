@@ -19,12 +19,12 @@ import { AppContext } from "Context/AppProvider";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { setLoading } = useContext(AppContext);
+  const { startLoading, stopLoading } = useContext(AppContext);
   const [registerWay, setRegisterWay] = useState("");
 
   const handleGoogleSignIn = async () => {
     try {
-      setLoading(true);
+      startLoading();
       const data = await signInWithPopup(auth, googleProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -114,13 +114,13 @@ const LoginPage = () => {
         // Xử lý lỗi khác
       }
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
   const handleGithubSignIn = async () => {
     try {
-      setLoading(true);
+      startLoading();
       const data = await signInWithPopup(auth, githubProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -210,7 +210,7 @@ const LoginPage = () => {
         // Xử lý lỗi khác
       }
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
