@@ -204,7 +204,6 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (!uid) return;
-
     const q = query(
       collection(db, "rooms"),
       where("members", "array-contains", uid),
@@ -217,6 +216,7 @@ const AppProvider = ({ children }) => {
         id: doc.id,
         ...doc.data(),
       }));
+      if (docs.length < 1) setHasMore(false);
 
       const sortedRooms = [...docs].sort((a, b) => {
         const aTime =
@@ -315,7 +315,7 @@ const AppProvider = ({ children }) => {
         loadMoreRooms,
         hasMore,
         setHasMore,
-        setLoading
+        setLoading,
       }}
     >
       {children}
