@@ -103,31 +103,12 @@ const BoxChat = () => {
   ];
 
   const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
-  console.log("🚀 ~ BoxChat ~ showBtnUpToTop:", showBtnUpToTop)
 
   const handleScroll = () => {
     const chatWindow = boxChatRef?.current;
     if (chatWindow) {
-
-      console.log(chatWindow.scrollHeight);
-      console.log(Math.abs(chatWindow.scrollTop));
-
-      //  const isNearTop=
-      //   chatWindow.scrollHeight -
-      //   Math.abs(chatWindow.scrollTop) -
-      //   chatWindow.clientHeight <
-      //   50;
       const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
       setShowBtnUpToTop(!isNearTop)
-      // setShowBtnUpToTop(!isNearBottom && !isNearTop);
-
-      // const isNearBottom =
-      //   chatWindow.scrollHeight -
-      //   Math.abs(chatWindow.scrollTop) -
-      //   chatWindow.clientHeight <
-      //   50;
-      // const isNearTop = chatWindow.scrollTop < 200;
-      // setShowBtnUpToTop(!isNearBottom && !isNearTop);
     }
   };
 
@@ -666,7 +647,7 @@ const BoxChat = () => {
 
     const messageRef = query(
       collection(db, "messages"),
-      where("roomId", "==", "JdupBVIqbFJynsu1Tseg"),
+      where("roomId", "==", room.id),
       orderBy("createdAt", "desc"),
       startAfter(lastDoc),
       limit(3)
@@ -728,7 +709,6 @@ const BoxChat = () => {
   useEffect(() => {
     if (room?.messageLastest?.createdAt) {
       const chatWindow = boxChatRef?.current;
-      console.log(chatWindow.scrollHeight);
       if (showBtnUpToTop) return;
       setTimeout(() => {
         chatWindow.scrollTo({
@@ -2183,6 +2163,60 @@ const BoxChat = () => {
             </div>
           </div>
           <div className="container-content" >
+            {isFriend === -1 &&
+              !isSent &&
+              !isReceive &&
+              selectedUserMessaging.uidSelected !== "my-cloud" ? (
+              <div
+                className="suggest-add-friend"
+                style={{ userSelect: "none" }}
+              >
+                <div className="left">
+                  <i className="fa-solid fa-user-plus icon"></i>
+                  <span>Gửi yêu cầu kết bạn đến người này</span>
+                </div>
+                <div className="right">
+                  <div
+                    className="btn-add-friend"
+                    onClick={() => handleOpenModalAddFriend()}
+                  >
+                    Gửi kết bạn
+                  </div>
+                  <div className="btn-more"></div>
+                </div>
+              </div>
+            ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
+              <div
+                className="suggest-add-friend"
+                style={{ justifyContent: "center", userSelect: "none" }}
+              >
+                <span style={{ color: "#7589a3", userSelect: "none" }}>
+                  Đã gửi yêu cầu kết bạn
+                </span>
+              </div>
+            ) : (
+              isReceive &&
+              selectedUserMessaging.uidSelected !== "my-cloud" && (
+                <div
+                  className="suggest-add-friend"
+                  style={{ userSelect: "none" }}
+                >
+                  <div className="left">
+                    <i className="fa-solid fa-user-plus icon"></i>
+                    <span>Đang chờ được đồng ý kết bạn</span>
+                  </div>
+                  <div className="right">
+                    <div
+                      className="btn-add-friend"
+                      style={{ color: "#005ae0", backgroundColor: "#E5EFFF" }}
+                      onClick={() => handleInvitationApprove()}
+                    >
+                      Đồng ý
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
             <div id="parentScrollDiv-boxchat" className="box-chat__content" ref={boxChatRef}>
               <InfiniteScroll
                 inverse={true}
@@ -2201,60 +2235,7 @@ const BoxChat = () => {
                     <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
                   </div>
                 )}
-                {isFriend === -1 &&
-                  !isSent &&
-                  !isReceive &&
-                  selectedUserMessaging.uidSelected !== "my-cloud" ? (
-                  <div
-                    className="suggest-add-friend"
-                    style={{ userSelect: "none" }}
-                  >
-                    <div className="left">
-                      <i className="fa-solid fa-user-plus icon"></i>
-                      <span>Gửi yêu cầu kết bạn đến người này</span>
-                    </div>
-                    <div className="right">
-                      <div
-                        className="btn-add-friend"
-                        onClick={() => handleOpenModalAddFriend()}
-                      >
-                        Gửi kết bạn
-                      </div>
-                      <div className="btn-more"></div>
-                    </div>
-                  </div>
-                ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
-                  <div
-                    className="suggest-add-friend"
-                    style={{ justifyContent: "center", userSelect: "none" }}
-                  >
-                    <span style={{ color: "#7589a3", userSelect: "none" }}>
-                      Đã gửi yêu cầu kết bạn
-                    </span>
-                  </div>
-                ) : (
-                  isReceive &&
-                  selectedUserMessaging.uidSelected !== "my-cloud" && (
-                    <div
-                      className="suggest-add-friend"
-                      style={{ userSelect: "none" }}
-                    >
-                      <div className="left">
-                        <i className="fa-solid fa-user-plus icon"></i>
-                        <span>Đang chờ được đồng ý kết bạn</span>
-                      </div>
-                      <div className="right">
-                        <div
-                          className="btn-add-friend"
-                          style={{ color: "#005ae0", backgroundColor: "#E5EFFF" }}
-                          onClick={() => handleInvitationApprove()}
-                        >
-                          Đồng ý
-                        </div>
-                      </div>
-                    </div>
-                  )
-                )}
+
                 <div className="user-info">
                   {selectedUserMessaging.uidSelected !== "my-cloud" && (
                     <>
@@ -2277,27 +2258,28 @@ const BoxChat = () => {
                       trên Zalo
                     </div>
                   ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
-                    <div
-                      style={{
-                        backgroundColor: "#F5F9FC",
-                        width: "380px",
-                        height: "275px",
-                        padding: "14px",
-                        borderRadius: "8px",
-                        margin: "20px auto 80px",
-                      }}
-                    >
-                      <img
-                        src={suggestCloudImage}
-                        alt=""
-                        style={{ width: "100%", marginBottom: "12px" }}
-                      />
+                    <div style={{ display: "flex", justifyContent: "center" }}>
                       <div
-                        className="user-info__description"
-                        style={{ padding: "0 40px", fontSize: "13px" }}
+                        style={{
+                          maxWidth: "380px",
+                          padding: "14px",
+                          borderRadius: "8px",
+                          backgroundColor: "#F5F9FC",
+                          margin: "20px 12px 20px"
+                        }}
                       >
-                        Dữ liệu trong Cloud của tôi được lưu trữ và đồng bộ giữa các
-                        thiết bị của bạn.
+                        <img
+                          src={suggestCloudImage}
+                          alt=""
+                          style={{ width: "100%", marginBottom: "12px" }}
+                        />
+                        <div
+                          className="user-info__description"
+                          style={{ padding: "0 40px", fontSize: "13px" }}
+                        >
+                          Dữ liệu trong Cloud của tôi được lưu trữ và đồng bộ giữa các
+                          thiết bị của bạn.
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -2307,6 +2289,8 @@ const BoxChat = () => {
                     </div>
                   )}
                 </div>
+
+
 
               </InfiniteScroll>
             </div>
