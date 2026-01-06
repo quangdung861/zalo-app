@@ -40,10 +40,21 @@ const AppProvider = ({ children }) => {
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
   const [room, setRoom] = useState({});
   const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+  const [loadingCount, setLoadingCount] = useState(0);
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(true);
+
+  const loading = loadingCount > 0;
+
+  const startLoading = () => {
+    setLoadingCount((c) => c + 1);
+  };
+
+  const stopLoading = () => {
+    setTimeout(() => {
+      setLoadingCount((c) => Math.max(0, c - 1));
+    }, 300);
+  };
 
   useEffect(() => {
     if (userInfo?.id) {
@@ -107,7 +118,9 @@ const AppProvider = ({ children }) => {
         setUserInfo(documents[0]);
       });
     }
-    return () => unSubcribe && unSubcribe();
+    return () => {
+      unSubcribe && unSubcribe();
+    };
   }, [uid]);
 
   useEffect(() => {
@@ -235,8 +248,13 @@ const AppProvider = ({ children }) => {
       setRooms(sortedRooms);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+    };
   }, [uid, keywords, userInfo]);
+  
+
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
@@ -315,7 +333,8 @@ const AppProvider = ({ children }) => {
         loadMoreRooms,
         hasMore,
         setHasMore,
-        setLoading,
+        startLoading,
+        stopLoading,
       }}
     >
       {children}

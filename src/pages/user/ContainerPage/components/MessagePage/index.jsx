@@ -51,8 +51,8 @@ const MessagePage = () => {
     selectedGroupMessaging,
     loadMoreRooms,
     hasMore,
-    setLoading,
-    setHasMore
+    setHasMore,
+    startLoading, stopLoading
   } = useContext(AppContext);
 
   var settings = {
@@ -130,7 +130,7 @@ const MessagePage = () => {
 
     const fetchDataAsync = async () => {
       try {
-        setLoading(true);
+        startLoading();
         const infoPartnerArray = await Promise.all(rooms.map(async (room) => {
           const uidSelected = room.members.find(m => m !== userInfo.uid);
 
@@ -177,7 +177,7 @@ const MessagePage = () => {
       } catch (error) {
         console.error("Fetch error:", error);
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     };
 
@@ -200,7 +200,7 @@ const MessagePage = () => {
       roomDelete.category === "my cloud"
     ) {
       const roomRef = doc(db, "rooms", roomDelete.id);
-      setLoading(true);
+      startLoading();
       await setDoc(
         roomRef,
         {
@@ -213,7 +213,7 @@ const MessagePage = () => {
           merge: true,
         }
       );
-      setLoading(false);
+      stopLoading();
 
       const uidDeleted = roomDelete.members.filter(
         (item) => item !== userInfo.uid
@@ -229,7 +229,7 @@ const MessagePage = () => {
 
     if (roomDelete.category === "group") {
       const roomRef = doc(db, "rooms", roomDelete.id);
-      setLoading(true);
+      startLoading();
       await setDoc(
         roomRef,
         {
@@ -242,7 +242,7 @@ const MessagePage = () => {
           merge: true,
         }
       );
-      setLoading(false);
+      stopLoading();
 
       if (roomDelete?.id === selectedGroupMessaging?.room?.id) {
         setSelectedUserMessaging({});
@@ -427,7 +427,7 @@ const MessagePage = () => {
 
             const updateMentionRoom = async () => {
               const docRef = doc(db, "rooms", room.id);
-              setLoading(true);
+              startLoading();
               await setDoc(
                 docRef,
                 {
@@ -437,7 +437,7 @@ const MessagePage = () => {
                   merge: true,
                 }
               );
-              setLoading(false);
+              stopLoading();
             };
             updateMentionRoom();
           }
@@ -551,7 +551,7 @@ const MessagePage = () => {
 
     return <RoomItem {...roomItemProps} />;
   });
-  console.log("🚀 ~ MessagePage ~ roomlist:", roomlist)
+  
 
   useEffect(() => {
     if (roomlist.length < 1) setHasMore(false);
@@ -575,7 +575,7 @@ const MessagePage = () => {
 
   const handleRemindLater = async () => {
     const docRef = doc(db, "users", userInfo.id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       docRef,
       {
@@ -588,7 +588,7 @@ const MessagePage = () => {
         merge: true,
       }
     );
-    setLoading(false);
+    stopLoading();
   };
 
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
@@ -644,9 +644,9 @@ const MessagePage = () => {
 
   const fetchMoreData = async () => {
     if (!hasMore) return;
-    setLoading(true);
+    startLoading();
     await loadMoreRooms();
-    setLoading(false);
+    stopLoading();
   };
 
   return (

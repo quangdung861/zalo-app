@@ -238,7 +238,7 @@ export const Container = styled.div`
           position: fixed;
           inset: 0 0 0 0;
           animation-name: fadeIn;
-          animation-duration: 0.2s;
+          animation-duration: 0.3s;
           user-select: none;
           .modal-container {
             padding: 0px 12px;
@@ -372,11 +372,11 @@ export const Container = styled.div`
                       position: absolute;
                       top: 0;
                       margin-top: 33px;
-                      transition: all 0.2s;
+                      transition: all 0.3s;
                     }
                     .dividing-bottom.clicked {
                       width: 100%;
-                      transition: all 0.2s;
+                      transition: all 0.3s;
                     }
                   }
                   .filter-category-item.clicked {
@@ -1140,7 +1140,7 @@ export const Container = styled.div`
                 display: flex;
                 align-items: center;
                 padding: 0 16px;
-                transition: all 0.2s ease;
+                transition: all 0.3s ease;
                 &__avatar {
                   width: 32px;
                   height: 32px;
@@ -1345,7 +1345,7 @@ export const Container = styled.div`
           /* width: 100%; */
           max-width: 100%;
           max-height: 100%;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
         }
       }
       .container-image-list {

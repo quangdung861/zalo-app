@@ -16,7 +16,7 @@ import avatarCloud from "assets/avatarCloudjpg.jpg";
 import { AppContext } from "Context/AppProvider";
 
 const FormEmail = ({ setRegisterWay }) => {
-  const { setLoading } = useContext(AppContext);
+  const { startLoading, stopLoading } = useContext(AppContext);
   const [formData, setFormData] = useState({
     fullName: {
       value: undefined,
@@ -31,6 +31,7 @@ const FormEmail = ({ setRegisterWay }) => {
       error: "",
     },
   });
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,7 +178,7 @@ const FormEmail = ({ setRegisterWay }) => {
 
   const createRegister = async () => {
     try {
-      setLoading(true);
+      startLoading();
       const data = await createUserWithEmailAndPassword(
         auth,
         formData.email.value,
@@ -273,7 +274,7 @@ const FormEmail = ({ setRegisterWay }) => {
           },
         }));
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 

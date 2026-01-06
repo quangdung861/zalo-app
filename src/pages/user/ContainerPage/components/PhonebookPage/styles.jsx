@@ -14,7 +14,7 @@ export const Container = styled.div`
       min-width: var(--section-left-width);
       height: 100dvh;
       border-right: 1px solid var(--boder-dividing-color);
-      transition: min-width 0.2s ease;
+      transition: min-width 0.3s ease;
       &__header {
         display: flex;
         align-items: center;

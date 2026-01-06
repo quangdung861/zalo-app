@@ -20,7 +20,7 @@ const Sidebar = () => {
     totalUnSeenMessage,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, setLoading } = useContext(AppContext);
+  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -68,10 +68,12 @@ const Sidebar = () => {
       );
     });
   };
+  
 
   const handleLogout = async () => {
+    if (!userInfo?.id) return;
     const docRef = doc(db, "users", userInfo.id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       docRef,
       {
@@ -85,7 +87,7 @@ const Sidebar = () => {
       }
     );
     await auth.signOut();
-    setLoading(false);
+    stopLoading();
     window.location.reload();
   };
 
@@ -104,6 +106,8 @@ const Sidebar = () => {
     if (rooms[0]) {
       getRoomCloud();
     }
+  
+
   }, [rooms]);
 
   const toogleBoxChat = () => {

@@ -84,6 +84,8 @@ const UserLayout = () => {
     setIsShowSectionLeft(true);
     setSectionSelected("");
   };
+  
+  
 
   return (
     <UserLayoutContext.Provider

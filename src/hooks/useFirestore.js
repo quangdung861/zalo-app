@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { db } from "../firebaseConfig";
+import { useEffect, useState } from "react";
 import {
   collection,
   onSnapshot,
-  query,
   orderBy,
+  query,
   where,
 } from "firebase/firestore";
+import { db } from "firebaseConfig";
 
 const useFirestore = (collectionName, condition, params) => {
   const [documents, setDocuments] = useState([]);
+
   useEffect(() => {
+    if (!collectionName) return;
+
     let dbRef = query(
       collection(db, collectionName),
       params?.orderByName
@@ -20,6 +23,7 @@ const useFirestore = (collectionName, condition, params) => {
 
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {
+        setDocuments([]);
         return;
       }
 
@@ -29,18 +33,26 @@ const useFirestore = (collectionName, condition, params) => {
       );
     }
 
-    onSnapshot(dbRef, (docsSnap) => {
-      const documents = docsSnap.docs.map((doc) => {
-        const id = doc.id;
-        const data = doc.data();
-        return {
-          ...data,
-          id: id,
-        };
-      });
-      setDocuments(documents);
+    const unsubscribe = onSnapshot(dbRef, (docsSnap) => {
+      const docs = docsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setDocuments(docs);
     });
-  }, [collectionName, condition]);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [
+    collectionName,
+    condition,
+    condition?.fieldName,
+    condition?.operator,
+    condition?.compareValue,
+    params?.orderByName,
+    params?.orderByType,
+  ]);
 
   return documents;
 };

@@ -20,7 +20,7 @@ import ModalAccount from "components/ModalAccount";
 import moment from "moment";
 
 const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
-  const { userInfo, setSelectedUserMessaging, setLoading } = useContext(AppContext);
+  const { userInfo, setSelectedUserMessaging, startLoading, stopLoading } = useContext(AppContext);
   const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
     useContext(UserLayoutContext);
 
@@ -28,6 +28,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [invitationReceive, setInvitationReceive] = useState([]);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
   const [userInfoSelected, setUserInfoSelected] = useState();
+  
 
   useEffect(() => {
     const getInvitationSent = async () => {
@@ -40,9 +41,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
             userInfo.invitationSent.map((item) => item.uid)
           )
         );
-        setLoading(true);
+        startLoading();
         const response = await getDocs(invitationSentRef);
-        setLoading(false);
+        stopLoading();
         const documents = response.docs?.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -74,9 +75,9 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
             userInfo.invitationReceive.map((item) => item.uid)
           )
         );
-        setLoading(true);
+        startLoading();
         const response = await getDocs(invitationReceiveRef);
-        setLoading(false);
+        stopLoading();
         const documents = response.docs?.map((doc) => {
           const id = doc.id;
           const data = doc.data();
@@ -103,7 +104,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       strangerRef,
       {
@@ -127,7 +128,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
         merge: true,
       }
     );
-    setLoading(false);
+    stopLoading();
   };
 
   const renderInvitationSent = () => {
@@ -214,7 +215,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       strangerRef,
       {
@@ -240,7 +241,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
         merge: true,
       }
     );
-    setLoading(false);
+    stopLoading();
   };
 
   const handleInvitationReject = async ({ uid, invitationSent, id }) => {
@@ -248,7 +249,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
-    setLoading(true);
+    startLoading();
     await setDoc(
       strangerRef,
       {
@@ -272,7 +273,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
         merge: true,
       }
     );
-    setLoading(false);
+    stopLoading();
   };
 
   const renderInvitationReceive = () => {

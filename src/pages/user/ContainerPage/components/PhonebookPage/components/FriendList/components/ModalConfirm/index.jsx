@@ -22,6 +22,7 @@ const ModalConfirm = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  
 
   return (
     <S.Wrapper>

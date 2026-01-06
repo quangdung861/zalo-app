@@ -9,7 +9,7 @@ export const Container = styled.div`
     position: fixed;
     inset: 0 0 0 0;
     animation-name: fadeIn;
-    animation-duration: 0.2s;
+    animation-duration: 0.3s;
     user-select: none;
     .modal-container {
       padding: 0px 12px;
@@ -93,7 +93,7 @@ export const Container = styled.div`
               position: absolute;
               display: flex;
               gap: 10px;
-              transition: left 0.2s ease;
+              transition: left 0.3s ease;
               > .category-tag {
                 height: 24px;
                 padding: 0 12px;

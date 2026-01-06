@@ -81,6 +81,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     }
     setLeft((current) => current - 160);
   };
+  
 
   const [friends, setFriends] = useState([]);
   const [keywords, setKeywords] = useState("");

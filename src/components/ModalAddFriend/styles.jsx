@@ -9,7 +9,7 @@ export const Container = styled.div`
     position: fixed;
     inset: 0 0 0 0;
     animation-name: fadeIn;
-    animation-duration: 0.2s;
+    animation-duration: 0.3s;
     user-select: none;
     .modal-container {
       padding: 0px 12px;

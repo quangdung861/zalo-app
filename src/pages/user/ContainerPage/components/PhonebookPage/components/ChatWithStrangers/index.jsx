@@ -54,7 +54,6 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setSelectedGroupMessaging,
   } = useContext(AppContext);
 
-  const [loading, setLoading] = useState(false);
   const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
   const [infoAddfriend, setInfoAddFriend] = useState({});
@@ -66,6 +65,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setIsShowOverlayModalAddFriend(true);
     setIsShowDropdown(false);
   };
+  
 
   const dropdownRef = useRef(null);
   const orderByRef = useRef(null);
@@ -115,9 +115,7 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
 
   const renderStrangerList = useMemo(() => {
-    setLoading(true);
     if (strangerList[0]) {
-      setLoading(false);
       if (orderBy === "desc") {
         strangerList.sort((a, b) =>
           b.displayName?.localeCompare(a.displayName)

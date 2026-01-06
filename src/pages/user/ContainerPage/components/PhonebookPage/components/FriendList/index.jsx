@@ -66,6 +66,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     };
     getFriends();
   }, [userInfo?.friends, keywords]);
+  
 
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);

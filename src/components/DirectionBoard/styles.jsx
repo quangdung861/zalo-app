@@ -15,7 +15,7 @@ export const Container = styled.div`
     box-shadow: var(--box-shadow-default);
     z-index: 99;
     padding: 16px 16px 30px 16px;
-    /* transition: all 0.2s ease; */
+    /* transition: all 0.3s ease; */
     overflow: hidden;
     overflow-y: auto;
     &::-webkit-scrollbar {
