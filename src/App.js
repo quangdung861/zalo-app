@@ -14,6 +14,7 @@ import "moment/locale/vi";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "react-loading-skeleton/dist/skeleton.css";
+import ComponentTest from "./ComponentTest";
 
 export const DropdownContext = createContext();
 
@@ -69,6 +70,7 @@ function App() {
                 <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
                 <Route path={ROUTES.LOGIN} element={<LoginPage />} />
               </Route>
+              <Route path="/test" element={<ComponentTest />} />
             </Routes>
           </DropdownContext.Provider>
         </AppProvider>

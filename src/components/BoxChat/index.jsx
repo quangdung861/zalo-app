@@ -12,6 +12,8 @@ import {
   getDoc,
   setDoc,
   getDocs,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
@@ -31,6 +33,8 @@ import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAddFriend from "components/ModalAddFriend";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { PAGE_SIZE_MESSAGES } from "constants/public";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom } =
@@ -62,7 +66,6 @@ const BoxChat = () => {
   const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
     useState(false);
   const [messages, setMessages] = useState([]);
-  const [messageLength, setMessageLength] = useState(messages.length);
   const [infoUsers, setInfoUsers] = useState();
   const [inputValue, setInputValue] = useState("");
 
@@ -100,17 +103,31 @@ const BoxChat = () => {
   ];
 
   const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
+  console.log("🚀 ~ BoxChat ~ showBtnUpToTop:", showBtnUpToTop)
 
   const handleScroll = () => {
     const chatWindow = boxChatRef?.current;
     if (chatWindow) {
-      const isNearBottom =
-        chatWindow.scrollHeight -
-        chatWindow.scrollTop -
-        chatWindow.clientHeight <
-        50;
-      const isNearTop = chatWindow.scrollTop < 200;
-      setShowBtnUpToTop(!isNearBottom && !isNearTop);
+
+      console.log(chatWindow.scrollHeight);
+      console.log(Math.abs(chatWindow.scrollTop));
+
+      //  const isNearTop=
+      //   chatWindow.scrollHeight -
+      //   Math.abs(chatWindow.scrollTop) -
+      //   chatWindow.clientHeight <
+      //   50;
+      const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
+      setShowBtnUpToTop(!isNearTop)
+      // setShowBtnUpToTop(!isNearBottom && !isNearTop);
+
+      // const isNearBottom =
+      //   chatWindow.scrollHeight -
+      //   Math.abs(chatWindow.scrollTop) -
+      //   chatWindow.clientHeight <
+      //   50;
+      // const isNearTop = chatWindow.scrollTop < 200;
+      // setShowBtnUpToTop(!isNearBottom && !isNearTop);
     }
   };
 
@@ -151,6 +168,7 @@ const BoxChat = () => {
     if (inputRef) {
       inputRef.current.focus();
     }
+    setMessages([])
   }, [room.id]);
 
   useEffect(() => {
@@ -633,6 +651,41 @@ const BoxChat = () => {
     return () => setMessages([]);
   }, []);
 
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchMoreData = async () => {
+    if (!hasMore) return;
+    await loadMoreMessages();
+  };
+
+  const loadMoreMessages = async () => {
+    if (!lastDoc) return;
+
+    const messageRef = query(
+      collection(db, "messages"),
+      where("roomId", "==", "JdupBVIqbFJynsu1Tseg"),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(3)
+    );
+
+    const snap = await getDocs(messageRef);
+    if (snap.empty) {
+      setHasMore(false);
+      return;
+    }
+
+    // Lấy docs mới, giữ nguyên desc rồi reverse để khớp với mảng hiện tại
+    let newMessages = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    // QUAN TRỌNG: Tin cũ tải thêm phải đưa lên ĐẦU mảng
+    setMessages((prev) => [...prev, ...newMessages]);
+
+    // Cập nhật lastDoc là cái cũ nhất vừa lấy được (cái cuối cùng trong snap)
+    setLastDoc(snap.docs[snap.docs.length - 1]);
+  };
+
   useEffect(() => {
     setMessages([]);
     let unSubcribe;
@@ -641,7 +694,8 @@ const BoxChat = () => {
         const messagesRef = query(
           collection(db, "messages"),
           where("roomId", "==", room.id),
-          orderBy("createdAt", "asc")
+          orderBy("createdAt", "desc"),
+          limit(PAGE_SIZE_MESSAGES)
         );
         unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
           const documents = docsSnap.docs.map((doc) => {
@@ -653,6 +707,7 @@ const BoxChat = () => {
             };
           });
           setMessages(documents);
+          setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
         });
       };
       handleSnapShotMessage();
@@ -669,17 +724,18 @@ const BoxChat = () => {
   }, [room.id]);
 
   useEffect(() => {
-    if (messages.length !== messageLength) {
+    if (room?.messageLastest?.createdAt) {
       const chatWindow = boxChatRef?.current;
+      console.log(chatWindow.scrollHeight);
+      if (showBtnUpToTop) return;
       setTimeout(() => {
         chatWindow.scrollTo({
           top: chatWindow.scrollHeight,
           behavior: "auto",
         });
       }, 100);
-      setMessageLength(messages.length);
     }
-  }, [messages, messageLength]);
+  }, [room?.messageLastest?.createdAt]);
 
 
   useEffect(() => {
@@ -889,7 +945,7 @@ const BoxChat = () => {
 
   const [clicked, setClicked] = useState("all");
 
-  const renderMessages = useMemo(() => {
+  const renderMessages = () => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
         (item) => item.uid === userInfo.uid
@@ -1714,18 +1770,7 @@ const BoxChat = () => {
         </div>
       );
     });
-  }, [
-    messages,
-    infoUsers,
-    isShowDropdownOption,
-    room.deleted,
-    emojis,
-    isRenderUserNameInEmojiList,
-    isShowOverlayModalEmotion,
-    clicked,
-    dataIconEmoji,
-    userInfo.uid
-  ]);
+  };
 
   const renderCreatedAt = () => {
     if (room.createdAt) {
@@ -2135,121 +2180,132 @@ const BoxChat = () => {
               </div>
             </div>
           </div>
-          <div className="box-chat__content" ref={boxChatRef}>
-            {showBtnUpToTop && (
-              <div className="up-to-top" onClick={() => handleUpToBottom()}>
-                <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
-              </div>
-            )}
-            {isFriend === -1 &&
-              !isSent &&
-              !isReceive &&
-              selectedUserMessaging.uidSelected !== "my-cloud" ? (
-              <div
-                className="suggest-add-friend"
-                style={{ userSelect: "none" }}
-              >
-                <div className="left">
-                  <i className="fa-solid fa-user-plus icon"></i>
-                  <span>Gửi yêu cầu kết bạn đến người này</span>
+          <div id="parentScrollDiv-boxchat" className="box-chat__content" ref={boxChatRef}>
+            <InfiniteScroll
+              inverse={true}
+              dataLength={messages.length}
+              next={fetchMoreData}
+              hasMore={hasMore}
+              scrollableTarget="parentScrollDiv-boxchat"
+              style={{ display: "flex", flexDirection: "column-reverse" }}
+            >
+              {renderMessages()}
+
+              <div className="created-room">{renderCreatedAt()}</div>
+
+              {showBtnUpToTop && (
+                <div className="up-to-top" onClick={() => handleUpToBottom()}>
+                  <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
                 </div>
-                <div className="right">
-                  <div
-                    className="btn-add-friend"
-                    onClick={() => handleOpenModalAddFriend()}
-                  >
-                    Gửi kết bạn
-                  </div>
-                  <div className="btn-more"></div>
-                </div>
-              </div>
-            ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
-              <div
-                className="suggest-add-friend"
-                style={{ justifyContent: "center", userSelect: "none" }}
-              >
-                <span style={{ color: "#7589a3", userSelect: "none" }}>
-                  Đã gửi yêu cầu kết bạn
-                </span>
-              </div>
-            ) : (
-              isReceive &&
-              selectedUserMessaging.uidSelected !== "my-cloud" && (
+              )}
+              {isFriend === -1 &&
+                !isSent &&
+                !isReceive &&
+                selectedUserMessaging.uidSelected !== "my-cloud" ? (
                 <div
                   className="suggest-add-friend"
                   style={{ userSelect: "none" }}
                 >
                   <div className="left">
                     <i className="fa-solid fa-user-plus icon"></i>
-                    <span>Đang chờ được đồng ý kết bạn</span>
+                    <span>Gửi yêu cầu kết bạn đến người này</span>
                   </div>
                   <div className="right">
                     <div
                       className="btn-add-friend"
-                      style={{ color: "#005ae0", backgroundColor: "#E5EFFF" }}
-                      onClick={() => handleInvitationApprove()}
+                      onClick={() => handleOpenModalAddFriend()}
                     >
-                      Đồng ý
+                      Gửi kết bạn
                     </div>
+                    <div className="btn-more"></div>
                   </div>
                 </div>
-              )
-            )}
-            <div className="user-info">
-              {selectedUserMessaging.uidSelected !== "my-cloud" && (
-                <>
-                  <img
-                    src={selectedUserMessaging.photoURLSelected}
-                    alt=""
-                    className="user-info__avatar"
-                  />
-                  <div className="user-info__name">
-                    {selectedUserMessaging.displayNameSelected}
-                  </div>
-                </>
-              )}
-
-              {userInfo.friends.find(
-                (item) => item.uid === selectedUserMessaging.uidSelected
-              ) ? (
-                <div className="user-info__description">
-                  {selectedUserMessaging.displayNameSelected} là bạn bè của bạn
-                  trên Zalo
-                </div>
-              ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
+              ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
                 <div
-                  style={{
-                    backgroundColor: "#F5F9FC",
-                    width: "380px",
-                    height: "275px",
-                    padding: "14px",
-                    borderRadius: "8px",
-                    margin: "20px auto 80px",
-                  }}
+                  className="suggest-add-friend"
+                  style={{ justifyContent: "center", userSelect: "none" }}
                 >
-                  <img
-                    src={suggestCloudImage}
-                    alt=""
-                    style={{ width: "100%", marginBottom: "12px" }}
-                  />
-                  <div
-                    className="user-info__description"
-                    style={{ padding: "0 40px", fontSize: "13px" }}
-                  >
-                    Dữ liệu trong Cloud của tôi được lưu trữ và đồng bộ giữa các
-                    thiết bị của bạn.
-                  </div>
+                  <span style={{ color: "#7589a3", userSelect: "none" }}>
+                    Đã gửi yêu cầu kết bạn
+                  </span>
                 </div>
               ) : (
-                <div className="user-info__description">
-                  {selectedUserMessaging.displayNameSelected} không phải bạn bè
-                  của bạn trên Zalo
-                </div>
+                isReceive &&
+                selectedUserMessaging.uidSelected !== "my-cloud" && (
+                  <div
+                    className="suggest-add-friend"
+                    style={{ userSelect: "none" }}
+                  >
+                    <div className="left">
+                      <i className="fa-solid fa-user-plus icon"></i>
+                      <span>Đang chờ được đồng ý kết bạn</span>
+                    </div>
+                    <div className="right">
+                      <div
+                        className="btn-add-friend"
+                        style={{ color: "#005ae0", backgroundColor: "#E5EFFF" }}
+                        onClick={() => handleInvitationApprove()}
+                      >
+                        Đồng ý
+                      </div>
+                    </div>
+                  </div>
+                )
               )}
-            </div>
+              <div className="user-info">
+                {selectedUserMessaging.uidSelected !== "my-cloud" && (
+                  <>
+                    <img
+                      src={selectedUserMessaging.photoURLSelected}
+                      alt=""
+                      className="user-info__avatar"
+                    />
+                    <div className="user-info__name">
+                      {selectedUserMessaging.displayNameSelected}
+                    </div>
+                  </>
+                )}
 
-            <div className="created-room">{renderCreatedAt()}</div>
-            {renderMessages}
+                {userInfo.friends.find(
+                  (item) => item.uid === selectedUserMessaging.uidSelected
+                ) ? (
+                  <div className="user-info__description">
+                    {selectedUserMessaging.displayNameSelected} là bạn bè của bạn
+                    trên Zalo
+                  </div>
+                ) : selectedUserMessaging.uidSelected === "my-cloud" ? (
+                  <div
+                    style={{
+                      backgroundColor: "#F5F9FC",
+                      width: "380px",
+                      height: "275px",
+                      padding: "14px",
+                      borderRadius: "8px",
+                      margin: "20px auto 80px",
+                    }}
+                  >
+                    <img
+                      src={suggestCloudImage}
+                      alt=""
+                      style={{ width: "100%", marginBottom: "12px" }}
+                    />
+                    <div
+                      className="user-info__description"
+                      style={{ padding: "0 40px", fontSize: "13px" }}
+                    >
+                      Dữ liệu trong Cloud của tôi được lưu trữ và đồng bộ giữa các
+                      thiết bị của bạn.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="user-info__description">
+                    {selectedUserMessaging.displayNameSelected} không phải bạn bè
+                    của bạn trên Zalo
+                  </div>
+                )}
+              </div>
+
+            </InfiniteScroll>
           </div>
           <div className="box-chat__footer">
             <div className="toolbar-chat-input">

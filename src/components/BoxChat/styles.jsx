@@ -151,6 +151,8 @@ export const Container = styled.div`
       }
     }
     &__content {
+      display: flex;
+      flex-direction: column-reverse;
       position: relative;
       max-width: 100%;
       overflow-x: hidden;
@@ -1043,10 +1045,10 @@ export const Container = styled.div`
         margin-bottom: 16px;
       }
       .up-to-top {
-        position: sticky;
-        top: calc(100% - 50px);
+        position: fixed;
+        bottom: 140px;
+        right: 20px;
         z-index: 99;
-        left: 100%;
         margin-right: 16px;
         display: flex;
         justify-content: center;

@@ -23,6 +23,7 @@ import {
 import { db } from "firebaseConfig";
 import moment from "moment";
 import { generateKeywords } from "services";
+import { PAGE_SIZE } from "constants/public";
 
 export const AppContext = createContext();
 
@@ -41,8 +42,6 @@ const AppProvider = ({ children }) => {
 
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(true);
-
-  const PAGE_SIZE = 20;
 
   useEffect(() => {
     if (userInfo?.id) {
