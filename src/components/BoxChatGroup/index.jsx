@@ -11,6 +11,8 @@ import {
   getDoc,
   setDoc,
   getDocs,
+  startAfter,
+  limit,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
@@ -35,6 +37,8 @@ import angryIcon from "assets/emoji/angry.png";
 import ModalAccount from "components/ModalAccount";
 import ModalAddFriend from "components/ModalAddFriend";
 import * as S from "./styles";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { PAGE_SIZE_MESSAGES } from "constants/public";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging } =
@@ -522,28 +526,26 @@ const BoxChatGroup = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
 
   useEffect(() => {
-    // focus to input again after submit
-    if (inputRef?.current) {
-      setTimeout(() => {
-        inputRef.current.focus();
-      });
+    if (inputRef) {
+      inputRef.current.focus();
     }
-  }, []);
+    setMessages([])
+    setHasMore(true);
+    setLastDoc(null)
+  }, [room.id]);
 
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    return () => setMessages([]);
-  }, []);
-
-  useEffect(() => {
+    setMessages([]);
     let unSubcribe;
     if (room.id) {
       const handleSnapShotMessage = async () => {
         const messagesRef = query(
           collection(db, "messages"),
           where("roomId", "==", room.id),
-          orderBy("createdAt", "asc")
+          orderBy("createdAt", "desc"),
+          limit(PAGE_SIZE_MESSAGES)
         );
         unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
           const documents = docsSnap.docs.map((doc) => {
@@ -555,6 +557,7 @@ const BoxChatGroup = () => {
             };
           });
           setMessages(documents);
+          setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
         });
       };
       handleSnapShotMessage();
@@ -570,20 +573,18 @@ const BoxChatGroup = () => {
     return () => unSubcribe && unSubcribe();
   }, [room.id]);
 
-  const [messageLength, setMessageLength] = useState(messages.length);
-
   useEffect(() => {
-    if (messages.length !== messageLength) {
+    if (room?.messageLastest?.createdAt) {
       const chatWindow = boxChatRef?.current;
+      if (showBtnUpToTop) return;
       setTimeout(() => {
         chatWindow.scrollTo({
           top: chatWindow.scrollHeight,
           behavior: "auto",
         });
       }, 100);
-      setMessageLength(messages.length);
     }
-  }, [messages, messageLength]);
+  }, [room?.messageLastest?.createdAt]);
 
   useEffect(() => {
     if (room.members) {
@@ -609,18 +610,13 @@ const BoxChatGroup = () => {
     }
   }, [room]);
 
-  const [showBtnUpToTop, setShowBtnUpToTop] = useState(true);
+  const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
 
   const handleScroll = () => {
     const chatWindow = boxChatRef?.current;
     if (chatWindow) {
-      const isNearBottom =
-        chatWindow.scrollHeight -
-        chatWindow.scrollTop -
-        chatWindow.clientHeight <
-        50;
-      const isNearTop = chatWindow.scrollTop < 200;
-      setShowBtnUpToTop(!isNearBottom && !isNearTop);
+      const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
+      setShowBtnUpToTop(!isNearTop)
     }
   };
 
@@ -2116,6 +2112,39 @@ const BoxChatGroup = () => {
     return name.length <= 40 ? name : `${name.slice(0, 39)}...`;
   };
 
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchMoreData = async () => {
+    if (!hasMore) return;
+    await loadMoreMessages();
+  };
+
+  const loadMoreMessages = async () => {
+    if (!lastDoc) return;
+
+    const messageRef = query(
+      collection(db, "messages"),
+      where("roomId", "==", room.id),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(PAGE_SIZE_MESSAGES)
+    );
+
+    const snap = await getDocs(messageRef);
+    if (snap.empty) {
+      setHasMore(false);
+      return;
+    }
+
+    let newMessages = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    setMessages((prev) => [...prev, ...newMessages]);
+
+    setLastDoc(snap.docs[snap.docs.length - 1]);
+  };
+
+
   return (
     <S.Wrapper>
       <S.Container isReplyMessage={isReplyMessage}>
@@ -2217,46 +2246,57 @@ const BoxChatGroup = () => {
               </div>
             </div>
           </div>
-          <div className="box-chat__content" ref={boxChatRef}>
-            {showBtnUpToTop && (
-              <div className="up-to-top" onClick={() => handleUpToBottom()}>
-                <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
-              </div>
-            )}
-            <div className="user-info">
-              <div className="user-info__avatar">
-                {selectedGroupMessaging?.room?.avatar.url ? (
-                  <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
-                ) : (
-                  <AvatarGroup
-                    props={{
-                      room: selectedGroupMessaging?.room,
-                      avatars: avatars,
-                    }}
-                    styleBox={{
-                      width: "100px",
-                      height: "100px",
-                    }}
-                    styleIcon={{
-                      width: "54px",
-                      height: "54px",
-                      fontSize: "24px",
-                    }}
-                  />
+          <div className="container-content">
+            <div id="parentScrollDiv-boxchat" className="box-chat__content" ref={boxChatRef}>
+              <InfiniteScroll
+                inverse={true}
+                dataLength={messages.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                scrollableTarget="parentScrollDiv-boxchat"
+                style={{ display: "flex", flexDirection: "column-reverse" }}
+              >
+                {renderMessages()}
+                <div className="created-room">{renderCreatedAt()}</div>
+                {showBtnUpToTop && (
+                  <div className="up-to-top" onClick={() => handleUpToBottom()}>
+                    <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
+                  </div>
                 )}
-              </div>
-              <div className="user-info__name">
-                {selectedGroupMessaging?.room?.name
-                  ? selectedGroupMessaging?.room?.name
-                  : selectedGroupMessaging.name}
-              </div>
-              <div className="user-info__description">
-                Bắt đầu chia sẽ những câu chuyện thú vị cùng nhau
-              </div>
-              <UserManual selectedGroupMessaging={selectedGroupMessaging} />
+                <div className="user-info">
+                  <div className="user-info__avatar">
+                    {selectedGroupMessaging?.room?.avatar.url ? (
+                      <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
+                    ) : (
+                      <AvatarGroup
+                        props={{
+                          room: selectedGroupMessaging?.room,
+                          avatars: avatars,
+                        }}
+                        styleBox={{
+                          width: "100px",
+                          height: "100px",
+                        }}
+                        styleIcon={{
+                          width: "54px",
+                          height: "54px",
+                          fontSize: "24px",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="user-info__name">
+                    {selectedGroupMessaging?.room?.name
+                      ? selectedGroupMessaging?.room?.name
+                      : selectedGroupMessaging.name}
+                  </div>
+                  <div className="user-info__description">
+                    Bắt đầu chia sẽ những câu chuyện thú vị cùng nhau
+                  </div>
+                  <UserManual selectedGroupMessaging={selectedGroupMessaging} />
+                </div>
+              </InfiniteScroll>
             </div>
-            <div className="created-room">{renderCreatedAt()}</div>
-            {renderMessages()}
           </div>
           <div className="box-chat__footer">
             <div className="toolbar-chat-input">

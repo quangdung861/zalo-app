@@ -142,14 +142,18 @@ export const Container = styled.div`
         }
       }
     }
+    .container-content {
+      min-height: calc(100dvh - var(--header-height) - var(--footer-height));
+      background-color: #eef0f1;
+    }
     &__content {
-      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
       max-width: 100%;
       overflow-x: hidden;
-      padding-top: 20px;
-      background-color: #eef0f1;
-      background-repeat: no-repeat;
-      height: calc(100dvh - var(--header-height) - var(--footer-height));
+      padding-bottom: 20px;
+      padding-top: 30px;
+
       .message-view-blur-overlay {
       }
       max-height: calc(100dvh - var(--header-height) - var(--footer-height));
@@ -204,7 +208,7 @@ export const Container = styled.div`
         }
         &__description {
           margin-bottom: 10px;
-          margin-left:12px;
+          margin-left: 12px;
           margin-right: 12px;
         }
       }
@@ -368,11 +372,11 @@ export const Container = styled.div`
                       position: absolute;
                       top: 0;
                       margin-top: 33px;
-                      transition: all 0.3s;
+                      transition: all 0.2s;
                     }
                     .dividing-bottom.clicked {
                       width: 100%;
-                      transition: all 0.3s;
+                      transition: all 0.2s;
                     }
                   }
                   .filter-category-item.clicked {
@@ -985,10 +989,10 @@ export const Container = styled.div`
         margin-bottom: 16px;
       }
       .up-to-top {
-        position: sticky;
-        top: calc(100% - 50px);
+        position: fixed;
+        bottom: 140px;
+        right: 20px;
         z-index: 99;
-        left: 100%;
         margin-right: 16px;
         display: flex;
         justify-content: center;
@@ -1341,7 +1345,7 @@ export const Container = styled.div`
           /* width: 100%; */
           max-width: 100%;
           max-height: 100%;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
         }
       }
       .container-image-list {

@@ -630,10 +630,6 @@ const BoxChat = () => {
     }
   }, []);
 
-  useEffect(() => {
-    return () => setMessages([]);
-  }, []);
-
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
@@ -659,13 +655,10 @@ const BoxChat = () => {
       return;
     }
 
-    // Lấy docs mới, giữ nguyên desc rồi reverse để khớp với mảng hiện tại
     let newMessages = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-    // QUAN TRỌNG: Tin cũ tải thêm phải đưa lên ĐẦU mảng
     setMessages((prev) => [...prev, ...newMessages]);
 
-    // Cập nhật lastDoc là cái cũ nhất vừa lấy được (cái cuối cùng trong snap)
     setLastDoc(snap.docs[snap.docs.length - 1]);
   };
 

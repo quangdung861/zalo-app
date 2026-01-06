@@ -562,7 +562,6 @@ const ModalAccount = ({
                 <div className="display-name">
                   {accountSelected.myCloud.displayNameSelected}
                 </div>
-
                 <div
                   className="btn-texting"
                   onClick={() =>
@@ -582,7 +581,7 @@ const ModalAccount = ({
             <div className="content-cloud">
               <span className="name">Mô tả</span>
               <div className="value">
-                Dể dàng lưu trử và đồng bộ dữ liệu giữa các thiết bị của bạn.
+                Dễ dàng lưu trử và đồng bộ dữ liệu giữa các thiết bị của bạn.
               </div>
             </div>
           </div>

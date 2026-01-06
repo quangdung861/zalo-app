@@ -410,11 +410,11 @@ export const Container = styled.div`
                       position: absolute;
                       top: 0;
                       margin-top: 33px;
-                      transition: all 0.3s;
+                      transition: all 0.2s;
                     }
                     .dividing-bottom.clicked {
                       width: 100%;
-                      transition: all 0.3s;
+                      transition: all 0.2s;
                     }
                   }
                   .filter-category-item.clicked {
@@ -1285,7 +1285,7 @@ export const Container = styled.div`
           /* width: 100%; */
           max-width: 100%;
           max-height: 100%;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
         }
       }
       .container-image-list {
