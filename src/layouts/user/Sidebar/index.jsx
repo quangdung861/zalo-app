@@ -88,7 +88,7 @@ const Sidebar = () => {
     );
     await auth.signOut();
     stopLoading();
-    // window.location.reload();
+    // window.location.reload(); // make sure the state has been clear all (bad pratice)
   };
 
   const { setIsShowBoxChat } = useContext(UserLayoutContext);
@@ -106,8 +106,6 @@ const Sidebar = () => {
     if (rooms[0]) {
       getRoomCloud();
     }
-  
-
   }, [rooms]);
 
   const toogleBoxChat = () => {

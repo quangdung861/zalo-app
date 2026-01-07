@@ -41,8 +41,6 @@ const AuthProvider = ({ children }) => {
     });
 
     return () => {
-      console.log("dsadsa");
-      
       unsubscribed();
     };
   }, []);

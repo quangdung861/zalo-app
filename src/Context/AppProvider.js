@@ -33,16 +33,46 @@ const AppProvider = ({ children }) => {
     user: { uid },
   } = useContext(AuthContext);
 
-  const [strangerList, setStrangerList] = useState([]);
-  const [keywords, setKeywords] = useState("");
-  const [userInfo, setUserInfo] = useState();
-  const [selectedUserMessaging, setSelectedUserMessaging] = useState({});
-  const [selectedGroupMessaging, setSelectedGroupMessaging] = useState({});
-  const [room, setRoom] = useState({});
-  const [rooms, setRooms] = useState([]);
-  const [loadingCount, setLoadingCount] = useState(0);
-  const [lastDoc, setLastDoc] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
+  const initialState = {
+    strangerList: [],
+    keywords: "",
+    userInfo: null,
+    selectedUserMessaging: {},
+    selectedGroupMessaging: {},
+    room: {},
+    rooms: [],
+    loadingCount: 0,
+    lastDoc: null,
+    hasMore: true,
+  };
+
+  const [strangerList, setStrangerList] = useState(initialState.strangerList);
+  const [keywords, setKeywords] = useState(initialState.keywords);
+  const [userInfo, setUserInfo] = useState(initialState.userInfo);
+  const [selectedUserMessaging, setSelectedUserMessaging] = useState(
+    initialState.selectedUserMessaging
+  );
+  const [selectedGroupMessaging, setSelectedGroupMessaging] = useState(
+    initialState.selectedGroupMessaging
+  );
+  const [room, setRoom] = useState(initialState.room);
+  const [rooms, setRooms] = useState(initialState.rooms);
+  const [loadingCount, setLoadingCount] = useState(initialState.loadingCount);
+  const [lastDoc, setLastDoc] = useState(initialState.lastDoc);
+  const [hasMore, setHasMore] = useState(initialState.hasMore);
+
+  const resetAppState = () => {
+    setStrangerList([]);
+    setKeywords("");
+    setUserInfo(null);
+    setSelectedUserMessaging({});
+    setSelectedGroupMessaging({});
+    setRoom({});
+    setRooms([]);
+    setLoadingCount(0);
+    setLastDoc(null);
+    setHasMore(true);
+  };
 
   const loading = loadingCount > 0;
 
@@ -102,8 +132,6 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     let unSubcribe;
     if (uid) {
-      console.log("scribe");
-      
       const userInfoRef = query(
         collection(db, "users"),
         where("uid", "==", uid)
@@ -119,10 +147,10 @@ const AppProvider = ({ children }) => {
         });
         setUserInfo(documents[0]);
       });
+    } else {
+      resetAppState();
     }
     return () => {
-      console.log("unscribe");
-      
       unSubcribe && unSubcribe();
     };
   }, [uid]);
@@ -257,8 +285,6 @@ const AppProvider = ({ children }) => {
       unsubscribe();
     };
   }, [uid, keywords, userInfo]);
-  
-
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
