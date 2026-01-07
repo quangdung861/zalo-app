@@ -75,6 +75,7 @@ export const Container = styled.div`
                     align-items: center;
                     flex: 1;
                     > img {
+                      flex-shrink: 0;
                       width: 48px;
                       height: 48px;
                       object-fit: cover;
