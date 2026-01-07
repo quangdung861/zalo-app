@@ -11,11 +11,9 @@ import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import DirectionBoard from "components/DirectionBoard";
-import { AppContext } from "Context/AppProvider";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { startLoading, stopLoading } = useContext(AppContext);
 
   const [dropdownContries, setDropdownContries] = useState(false);
 
@@ -34,7 +32,6 @@ const LoginPage = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      startLoading();
       const data = await signInWithPopup(auth, googleProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -123,14 +120,11 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } finally {
-      stopLoading();
-    }
+    } 
   };
 
   const handleGithubSignIn = async () => {
     try {
-      startLoading();
       const data = await signInWithPopup(auth, githubProvider);
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
@@ -219,9 +213,7 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } finally {
-      stopLoading();
-    }
+    } 
   };
 
   return (

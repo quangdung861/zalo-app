@@ -13,10 +13,8 @@ import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
-import { AppContext } from "Context/AppProvider";
 
 const FormEmail = ({ setRegisterWay }) => {
-  const { startLoading, stopLoading } = useContext(AppContext);
   const [formData, setFormData] = useState({
     fullName: {
       value: undefined,
@@ -178,7 +176,6 @@ const FormEmail = ({ setRegisterWay }) => {
 
   const createRegister = async () => {
     try {
-      startLoading();
       const data = await createUserWithEmailAndPassword(
         auth,
         formData.email.value,
@@ -273,9 +270,7 @@ const FormEmail = ({ setRegisterWay }) => {
             error: "Email đã tồn tại",
           },
         }));
-    } finally {
-      stopLoading();
-    }
+    } 
   };
 
   return (

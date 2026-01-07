@@ -102,6 +102,8 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     let unSubcribe;
     if (uid) {
+      console.log("scribe");
+      
       const userInfoRef = query(
         collection(db, "users"),
         where("uid", "==", uid)
@@ -119,6 +121,8 @@ const AppProvider = ({ children }) => {
       });
     }
     return () => {
+      console.log("unscribe");
+      
       unSubcribe && unSubcribe();
     };
   }, [uid]);

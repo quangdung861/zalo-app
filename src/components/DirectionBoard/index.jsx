@@ -1,8 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import * as S from "./styles";
+import { AppContext } from "Context/AppProvider";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "firebaseConfig";
 
 const DirectionBoard = () => {
+  const { startLoading, stopLoading } = useContext(AppContext)
   const [isShow, setIsshow] = useState(true);
+
+  const accounts = [
+    {
+      email: "quangdung@gmail.com",
+      password: "abcd1234"
+    },
+    {
+      email: "thaonguyen@gmail.com",
+      password: "abcd1234"
+    }
+  ]
+
+  const handleSubmit = async (index) => {
+    try {
+      startLoading();
+      await signInWithEmailAndPassword(
+        auth,
+        accounts[index].email,
+        accounts[index].password
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    };
+  }
 
   return (
     <S.Wrapper>
@@ -13,24 +43,38 @@ const DirectionBoard = () => {
             <div className="content">
               <div className="content__item">
                 <div style={{ color: " rgb(240, 81, 35)", marginBottom: 8 }}>
-                  Tài khoản Demo đã kết bạn và tạo nhóm sẵn
+                  Tài khoản đã kết bạn và tạo nhóm sẵn
                 </div>
-                 <div style={{ color: "#7d7b7b", fontWeight: 500, fontSize: 13}}>Tài khoản 1</div>
-                <div>
-                  <b>Email: </b> phanquangdung@gmail.com
+                <div style={{ color: "#7d7b7b", fontWeight: 500, fontSize: 13 }}>Tài khoản 1</div>
+                <div className="info">
+                  <div>
+                    <div>
+                      <b>Email: </b> quangdung@gmail.com
+                    </div>
+                    <div>
+                      <b>Password: </b> abcd1234
+                    </div>
+                  </div>
+                  <div>
+                    <i class="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(0)}></i>
+                  </div>
                 </div>
-                <div>
-                  <b>Password: </b> abcd1234
-                </div>
-                <div style={{marginTop: "4px", color: "#7d7b7b", fontWeight: 500, fontSize: 13}}>Tài khoản 2</div>
-                <div>
-                  <b>Email: </b> huynhthithaonguyen@gmail.com
-                </div>
-                <div>
-                  <b>Password: </b> abcd1234
+                <div style={{ marginTop: "4px", color: "#7d7b7b", fontWeight: 500, fontSize: 13 }}>Tài khoản 2</div>
+                <div className="info">
+                  <div>
+                    <div>
+                      <b>Email: </b> thaonguyen@gmail.com
+                    </div>
+                    <div>
+                      <b>Password: </b> abcd1234
+                    </div>
+                  </div>
+                  <div>
+                    <i class="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(1)}></i>
+                  </div>
                 </div>
               </div>
-{/*               ----
+              {/*               ----
               <div className="content__item">
                 <div>
                   <b style={{ color: " rgb(240, 81, 35)" }}>Lưu ý: </b> Bạn vui

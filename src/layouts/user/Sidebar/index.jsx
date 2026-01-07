@@ -88,7 +88,7 @@ const Sidebar = () => {
     );
     await auth.signOut();
     stopLoading();
-    window.location.reload();
+    // window.location.reload();
   };
 
   const { setIsShowBoxChat } = useContext(UserLayoutContext);

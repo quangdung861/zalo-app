@@ -26,26 +26,26 @@ const image = {
 };
 
 const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribed = auth.onAuthStateChanged((user) => {
-      if (user) {
-        const { displayName, email, uid, photoURL } = user;
+    const unsubscribed = auth.onAuthStateChanged((currentUser) => {
+      if (currentUser?.uid) {
+        const { displayName, email, uid, photoURL } = currentUser;
         setUser({ displayName, email, uid, photoURL });
-        setIsLoading(false);
-        // return navigate("/");
+      } else {
+        setUser({});
       }
       setIsLoading(false);
     });
 
     return () => {
+      console.log("dsadsa");
+      
       unsubscribed();
     };
-  }, [navigate]);
-  
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
