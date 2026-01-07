@@ -7,11 +7,9 @@ import { ROUTES } from "routes";
 
 import { auth } from "firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { AppContext } from "Context/AppProvider";
 
 const EmailFormLogin = ({ setLoginWay }) => {
   const navigate = useNavigate();
-  const { startLoading, stopLoading } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     email: {
@@ -22,7 +20,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
     },
     error: null,
   });
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +42,6 @@ const EmailFormLogin = ({ setLoginWay }) => {
       formData.error === null
     ) {
       try {
-        startLoading();
         await signInWithEmailAndPassword(
           auth,
           formData.email.value,
@@ -63,8 +60,6 @@ const EmailFormLogin = ({ setLoginWay }) => {
             error: "Email của bạn không đúng định dạng",
           }));
         }
-      } finally {
-        stopLoading();
       }
     }
   };

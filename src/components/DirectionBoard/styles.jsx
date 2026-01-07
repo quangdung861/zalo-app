@@ -38,6 +38,19 @@ export const Container = styled.div`
       position: relative;
       &__item {
         margin-bottom: 8px;
+        .info {
+          display: flex;
+          align-items: flex-start;
+          gap: 4px;
+          i {
+            font-size: 20px;
+            margin: 0 16px;
+            cursor: pointer;
+            :hover {
+              color:  rgb(240, 81, 35);
+            }
+          }
+        }
       }
       .btn-close {
         position: absolute;
