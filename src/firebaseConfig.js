@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import {
+  getFirestore,
+  connectFirestoreEmulator,
+  initializeFirestore,
+} from "firebase/firestore";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -19,7 +23,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// const db = getFirestore(app); // By default, firebase uses persistent cache for offline support
+const db = initializeFirestore(app, {
+  localCache: {
+    kind: "memory",
+    cacheSizeBytes: 50 * 1024 * 1024, // 50MB
+  },
+});
+
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
