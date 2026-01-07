@@ -419,7 +419,7 @@ const MessagePage = () => {
       if (room.mentioned) {
         if (room.mentioned[0] && unseenMessages === 0) {
           const mentionIndex = room.mentioned.findIndex(
-            (item) => item === userInfo.uid
+            (item) => item === userInfo.id 
           );
           if (mentionIndex !== -1) {
             const newMentiond = [...room.mentioned];
