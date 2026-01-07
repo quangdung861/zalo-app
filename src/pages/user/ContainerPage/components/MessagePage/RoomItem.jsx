@@ -28,7 +28,6 @@ const RoomItem = ({
 }) => {
     const dropdownRef = useRef(null);
   
-
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -203,7 +202,7 @@ const RoomItem = ({
                                 gap: "4px",
                             }}
                         >
-                            {room?.mentioned?.includes(userInfo.uid) && (
+                            {room?.mentioned?.includes(userInfo.id) && (
                                 <div className="icon-tagname">@</div>
                             )}
                             <div className="unseen">
