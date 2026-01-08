@@ -151,8 +151,6 @@ export const Container = styled.div`
       flex-direction: column-reverse;
       max-width: 100%;
       overflow-x: hidden;
-      padding-bottom: 20px;
-      padding-top: 30px;
 
       .message-view-blur-overlay {
       }
@@ -175,6 +173,7 @@ export const Container = styled.div`
       justify-content: flex-end; */
 
       .user-info {
+        margin-top: 60px;
         user-select: none;
         display: flex;
         flex-direction: column;
@@ -679,6 +678,9 @@ export const Container = styled.div`
               visibility: visible;
             }
           }
+        }
+        &:first-child {
+          margin-bottom: 20px;
         }
         &__other {
           display: flex;
