@@ -119,6 +119,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
               placeholder="Mật khẩu"
               name="password"
               className="password"
+              autoComplete="current-password"
               onChange={(e) => handleChange(e)}
             />
           </div>
