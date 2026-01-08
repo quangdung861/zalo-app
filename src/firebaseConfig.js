@@ -14,11 +14,11 @@ import {
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: "zalo-app-62a93",
-  storageBucket: "zalo-app-62a93.appspot.com",
-  messagingSenderId: "553125924486",
-  appId: "1:553125924486:web:5283f82125d1c6569f8b07",
-  measurementId: "G-EBCC2X4VQ0",
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

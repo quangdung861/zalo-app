@@ -1,71 +1,167 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📌 Mô tả dự án
 
-## Available Scripts
+Dự án mô phỏng một **ứng dụng nhắn tin realtime tương tự Zalo**, tập trung vào realtime, trải nghiệm người dùng và quản lý trạng thái chính xác.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## ✨ Tính năng chính
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔐 Xác thực & tài khoản
+- Đăng nhập bằng **Email/Password**
+- Đăng nhập bằng **OAuth (Google, GitHub)**
+- Cập nhật thông tin cá nhân (avatar, tên hiển thị, …)
+- Hiển thị **trạng thái online/offline theo thời gian thực**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+### 💬 Nhắn tin
+- Nhắn tin **1-1** và **chat nhóm**
+- Nhắn tin **realtime với Firestore**
+- Hiển thị **tin nhắn mới nhất** và **thời gian gửi (x phút trước, vừa xong, …)**
+- Load thêm tin nhắn khi **cuộn lên (infinite scroll)**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+### 🧩 Tương tác trong chat
+- Trả lời **tin nhắn cụ thể trong đoạn chat**
+- Chuyển tiếp tin nhắn
+- Thu hồi tin nhắn
+- Xóa tin nhắn **phía tôi**
+- Gửi **emoji trên từng tin nhắn**
+- Xem **ai đã gửi emoji**
+- Gửi emoji **tùy biến**
+- Gửi **ảnh** trong tin nhắn
+- Tag / mention tên người dùng trong chat
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 👥 Bạn bè & người lạ
+- Chat với **người lạ**
+- Gửi lời mời kết bạn
+- Thu hồi lời mời kết bạn
+- Đồng ý / từ chối kết bạn
+- Thêm bạn vào nhóm chat
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+### 🗂️ Quản lý room & dữ liệu
+- Phân loại room (cá nhân, nhóm, cloud, …)
+- Tìm kiếm người dùng / room
+- Hiển thị **số tin nhắn chưa đọc**
+- Xóa room chat
+- Cập nhật thông tin room
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### ⚡ Realtime & hiệu năng
+- Realtime messaging với **Firebase Firestore**
+- Tối ưu tải dữ liệu
+- Quản lý trạng thái online/offline chính xác
+- Hoạt động tốt với **Firebase Emulator** trong môi trường development
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📦 Công nghệ sử dụng
 
-### Code Splitting
+| Công nghệ | Mục đích |
+|---------|----------|
+| React | Frontend UI |
+| Firebase Auth | Xác thực |
+| Firestore | Database realtime |
+| Firebase Emulator | Dev local |
+| Firebase Admin | Data migration |
+| React Context + Hooks | State management |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 🛠 Cài đặt & Chạy project
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 1. Clone repository
 
-### Making a Progressive Web App
+```bash
+git clone https://github.com/quangdung861/zalo-app.git
+cd zalo-app
+```
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 2. Cài đặt dependencies
 
-### Advanced Configuration
+~~~bash
+npm install
+# hoặc
+yarn install
+~~~
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+### 3. Cấu hình Firebase
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Tạo file `.env` ở thư mục gốc và thêm các biến môi trường:
 
-### `npm run build` fails to minify
+~~~env
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+~~~
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# zalo-app
+---
+
+
+### 4. Chạy dự án ở môi trường development (kèm Firebase Emulator)
+
+#### 4.1 Chạy Firebase Emulator
+
+Di chuyển vào thư mục chứa cấu hình emulator:
+
+~~~bash
+cd emulator
+~~~
+
+
+Chạy Firebase Emulator:
+
+~~~bash
+firebase emulators:start
+~~~
+
+Sau khi chạy thành công:
+
+- 🔥 **Firestore Emulator**: http://localhost:4000  
+- 🔐 **Auth Emulator**: http://localhost:9099  
+
+---
+
+#### 4.2 Chạy ứng dụng React
+
+Mở **terminal mới**, tại thư mục gốc project:
+
+~~~bash
+npm start
+# hoặc
+yarn start
+~~~
+
+Ứng dụng sẽ chạy tại:  
+👉 http://localhost:3000
+
+---
+
+
+
+### 5. Build production
+
+~~~bash
+npm run build
+# hoặc
+yarn build
+~~~
+
+---
