@@ -94,12 +94,25 @@ export const Wrapper = styled.div`
         border-radius: 24px;
         border: 1px solid rgba(22, 24, 35, 0.06);
         overflow: hidden;
+        position: relative;
         input.password {
           height: 44px;
           width: 100%;
-          padding: 9px 24px;
+          padding: 9px 50px 9px 24px;
           background-color: transparent;
           border: none;
+        }
+        > i {
+          position: absolute;
+          padding: 12px;
+          top: 2px;
+          right: 10px;
+          font-size: 16px;
+          color: #969696;
+          cursor: pointer;
+          &:hover {
+            color: #333;
+          }
         }
       }
 

@@ -27,6 +27,7 @@ const FormEmail = ({ setRegisterWay }) => {
     password: {
       value: undefined,
       error: "",
+      isShow: false,
     },
   });
   
@@ -270,7 +271,7 @@ const FormEmail = ({ setRegisterWay }) => {
             error: "Email đã tồn tại",
           },
         }));
-    } 
+    }
   };
 
   return (
@@ -331,12 +332,13 @@ const FormEmail = ({ setRegisterWay }) => {
 
               <div className="box-password">
                 <input
-                  type="password"
+                  type={formData.password.isShow ? "text" : "password"}
                   placeholder="Mật khẩu"
                   name="password"
                   className="password"
                   onChange={(e) => handleChange(e)}
                 />
+                <i class={formData.password.isShow ? "fa-solid fa-eye" : "fa-regular fa-eye"} onClick={() => setFormData(prev => ({ ...prev, password: { value: prev.password.value, isShow: !prev.password.isShow } }))}></i>
               </div>
               <div className="error-fullname">{formData.password.error}</div>
 
