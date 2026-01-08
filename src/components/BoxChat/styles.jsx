@@ -13,6 +13,7 @@ export const Container = styled.div`
   .box-chat {
     --header-height: 68px;
     --footer-height: ${(props) => (props.isReplyMessage ? "187px" : "105px")};
+    --suggest-height: 51px;
     position: relative;
     &__header {
       height: var(--header-height);
@@ -204,13 +205,14 @@ export const Container = styled.div`
       max-width: 100%;
       overflow-x: hidden;
       width: 100%;
-      padding-bottom: 20px;
-      padding-top: 30px;
      
-      /* height: calc(100dvh - var(--header-height) - var(--footer-height)); */
       .message-view-blur-overlay {
       }
-      max-height: calc(100dvh - var(--header-height) - var(--footer-height));
+     max-height: ${({ isSuggest }) =>
+    isSuggest
+      ? `calc(100dvh - var(--header-height) - var(--footer-height) - var(--suggest-height))`
+      : `calc(100dvh - var(--header-height) - var(--footer-height))`
+  };
       .message-view-blur-overlay {
       }
       /* overflow: hidden; */
@@ -231,6 +233,7 @@ export const Container = styled.div`
      
 
       .user-info {
+        margin-top: 60px;
         text-align: center;
         user-select: none;
         &__avatar {
@@ -725,6 +728,9 @@ export const Container = styled.div`
               visibility: visible;
             }
           }
+        }
+        &:first-child {
+          margin-bottom: 20px;
         }
         &__other {
           width: 100%;

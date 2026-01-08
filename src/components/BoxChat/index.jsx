@@ -2060,6 +2060,7 @@ const BoxChat = () => {
           selectedUserMessaging.uidSelected === "my-cloud" ? true : false
         }
         isReplyMessage={isReplyMessage}
+        isSuggest={isFriend}
       >
         <div className="box-chat">
           <div className="box-chat__header">
@@ -2204,7 +2205,7 @@ const BoxChat = () => {
                   <div className="btn-more"></div>
                 </div>
               </div>
-            ) : isSent && selectedUserMessaging.uidSelected === "my-cloud" ? (
+            ) : isSent && selectedUserMessaging.uidSelected !== "my-cloud" ? (
               <div
                 className="suggest-add-friend"
                 style={{ justifyContent: "center", userSelect: "none" }}
