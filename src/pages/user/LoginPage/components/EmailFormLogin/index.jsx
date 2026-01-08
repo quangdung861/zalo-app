@@ -17,6 +17,7 @@ const EmailFormLogin = ({ setLoginWay }) => {
     },
     password: {
       value: undefined,
+      isShow: false,
     },
     error: null,
   });
@@ -115,12 +116,14 @@ const EmailFormLogin = ({ setLoginWay }) => {
 
           <div className="box-password">
             <input
-              type="password"
+              type={formData.password.isShow ? "text" : "password"}
               placeholder="Mật khẩu"
               name="password"
               className="password"
+              autoComplete="current-password"
               onChange={(e) => handleChange(e)}
             />
+            <i class={formData.password.isShow ? "fa-solid fa-eye" : "fa-regular fa-eye"} onClick={() => setFormData(prev => ({ ...prev, password: { value: prev.password.value, isShow: !prev.password.isShow } }))}></i>
           </div>
           <div className="error-fullname"></div>
           <div style={{ color: "#f33a58" }}>{formData.error}</div>
