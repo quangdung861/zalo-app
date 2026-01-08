@@ -55,8 +55,9 @@ const DirectionBoard = () => {
                       <b>Password: </b> abcd1234
                     </div>
                   </div>
-                  <div>
+                  <div style={{ position: "relative" }}>
                     <i class="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(0)}></i>
+                    <img src={require("assets/finger4.apng")} alt="" srcset="" style={{ position: "absolute", width: 40, height: 40, right: "-30px" }} />
                   </div>
                 </div>
                 <div style={{ marginTop: "4px", color: "#7d7b7b", fontWeight: 500, fontSize: 13 }}>Tài khoản 2</div>
