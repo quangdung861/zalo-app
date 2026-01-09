@@ -55,7 +55,7 @@ This project simulates a **real-time messaging application similar to Zalo**, fo
 - Accurate online/offline state management
 - Works seamlessly with **Firebase Emulator** in development environment
 
-
+---
 ## 📦 Technologies Used
 
 | Technology | Purpose |
