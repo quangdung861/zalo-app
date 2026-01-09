@@ -126,7 +126,7 @@ After successful startup:
 
 #### 4.2 Run the React application
 
-Open a new terminal, from the project root directory:
+Open a **new terminal** (while the Firebase Emulator is still running), then from the project root directory, run:
 
 ```bash
 npm start
@@ -136,6 +136,7 @@ yarn start
 
 The application will be available at:
 http://localhost:3000
+
 
 ---
 
