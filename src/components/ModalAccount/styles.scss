@@ -181,6 +181,68 @@
               text-align: center;
             }
 
+            .status {
+              gap: 12px;
+              margin-top: 12px;
+              position: relative;
+
+              .value {
+                display: flex;
+                align-items: center;
+
+                span {
+                  color: #7589a3;
+                }
+
+                >input {
+                  width: 70%;
+                  padding: 0px 8px;
+                  border: none;
+                  border-bottom: 1px solid #ccc;
+                }
+
+                .icon-save {
+                  margin-left: 8px;
+                  margin-right: 8px;
+                  cursor: pointer;
+                  padding: 4px;
+                  border-radius: 50%;
+                  color: #1b9c85;
+
+                  &:hover {
+                    background-color: #f1f1f1;
+                  }
+                }
+
+                .icon-cancel {
+                  margin-right: 8px;
+                  cursor: pointer;
+                  padding: 4px;
+                  border-radius: 50%;
+                  color: #7589a3;
+
+                  &:hover {
+                    background-color: #f1f1f1;
+                  }
+                }
+              }
+
+              .icon-edit {
+                position: absolute;
+                right: -50px;
+                bottom: -5px;
+                margin-right: 8px;
+                cursor: pointer;
+                padding: 8px;
+                border-radius: 50%;
+                color: #7589a3;
+
+                &:hover {
+                  background-color: #f1f1f1;
+                }
+              }
+            }
+
             >.btn-texting {
               height: 32px;
               width: 90%;
@@ -196,6 +258,7 @@
               margin-top: 16px;
               margin-bottom: 0px;
               cursor: pointer;
+
               :hover {
                 filter: brightness(95%);
               }

@@ -23,20 +23,52 @@ const ModalAccount = ({
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
-  // PHONENUMBER
-  const [updatePhoneNumber, setUpdatePhoneNumber] = useState();
-  const [inputValuePhoneNumber, setInputValuePhoneNumber] = useState();
-  // SEX
-  const [updateSex, setUpdateSex] = useState();
-  const [inputValueSex, setInputValueSex] = useState();
-  // DATE OF BIRTH
-  const [updateDateOfBirth, setUpdateDateOfBirth] = useState();
-  const [inputValueDateOfBirth, setInputValueDateOfBirth] = useState();
-  // IMAGE
   const [imgPreviewCover, setImgPreviewCover] = useState(null);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
-  //
   const [isDropdownResponse, setIsDropdownResponse] = useState(false);
+
+  const [openUpdate, setOpenUpdate] = useState([]);
+  const [profile, setProfile] = useState({
+    status: accountSelected.status ?? "",
+    phoneNumber: accountSelected.phoneNumber ?? "",
+    sex: accountSelected.sex ?? "",
+    dateOfBirth: accountSelected.dateOfBirth ?? "",
+  })
+
+  const handleChange = (key, value) => {
+    setProfile(prev => ({
+      ...prev,
+      [key]: value,
+    }))
+  }
+
+  const toogleUpdate = (key) => {
+    setOpenUpdate(prev => {
+      if (prev.includes(key)) {
+        const newArr = prev.filter(item => item !== key)
+        return newArr
+      } else {
+        return [...prev, key]
+      }
+    })
+  };
+
+  const submitUpdateProfile = async (key) => {
+    const userInfoRef = doc(db, "users", userInfo.id);
+    startLoading();
+    await setDoc(
+      userInfoRef,
+      {
+        [key]: profile[key],
+      },
+      {
+        merge: true,
+      }
+    );
+    stopLoading();
+    toogleUpdate(key);
+  };
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -63,84 +95,6 @@ const ModalAccount = ({
     return <div></div>;
   }
 
-  const toogleUpdatePhoneNumber = () => {
-    setUpdatePhoneNumber(!updatePhoneNumber);
-    const predefinedValue = accountSelected.phoneNumber;
-    setInputValuePhoneNumber(predefinedValue);
-  };
-
-  const submitUpdatePhoneNumber = async () => {
-    if (inputValuePhoneNumber) {
-      const userInfoRef = doc(db, "users", userInfo.id);
-      startLoading();
-      await setDoc(
-        userInfoRef,
-        {
-          phoneNumber: parseInt(inputValuePhoneNumber),
-        },
-        {
-          merge: true,
-        }
-      );
-      stopLoading();
-      toogleUpdatePhoneNumber();
-      setInputValuePhoneNumber("");
-    }
-  };
-
-  // SEX
-
-  const toogleUpdateSex = () => {
-    setUpdateSex(!updateSex);
-    const predefinedValue = accountSelected.sex;
-    setInputValueSex(predefinedValue);
-  };
-
-  const submitUpdateSex = async () => {
-    if (inputValueSex) {
-      const userInfoRef = doc(db, "users", userInfo.id);
-      startLoading();
-      await setDoc(
-        userInfoRef,
-        {
-          sex: inputValueSex,
-        },
-        {
-          merge: true,
-        }
-      );
-      stopLoading();
-      toogleUpdateSex();
-      setInputValueSex("");
-    }
-  };
-
-  // DATE OF BIRTH
-
-  const toogleUpdateDateOfBirth = () => {
-    setUpdateDateOfBirth(!updateDateOfBirth);
-    const predefinedValue = accountSelected.dateOfBirth;
-    setInputValueDateOfBirth(predefinedValue);
-  };
-
-  const submitUpdateDateOfBirth = async () => {
-    if (inputValueDateOfBirth) {
-      const userInfoRef = doc(db, "users", userInfo.id);
-      startLoading();
-      await setDoc(
-        userInfoRef,
-        {
-          dateOfBirth: inputValueDateOfBirth,
-        },
-        {
-          merge: true,
-        }
-      );
-      stopLoading();
-      toogleUpdateDateOfBirth();
-      setInputValueDateOfBirth("");
-    }
-  };
 
   const toogleBoxChat = ({
     uidSelected,
@@ -404,10 +358,44 @@ const ModalAccount = ({
                     onChange={(e) => handleAvatarImage(e.target.files[0])}
                   />
                 </div>
-
-                {/*  */}
                 <div className="display-name">
                   {accountSelected.displayName}
+                </div>
+                <div className="status">
+                  <div className="value">
+                    {openUpdate.includes("status") ? (
+                      <>
+                        <input
+                          value={profile.status}
+                          // ref={statusRef}
+                          type="text"
+                          placeholder="Tiểu sử"
+                          onChange={(e) =>
+                            handleChange("status", e.target.value)
+                          }
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && submitUpdateProfile("status")
+                          }
+                        />
+                        <i
+                          className="fa-solid fa-check icon-save"
+                          onClick={() => submitUpdateProfile("status")}
+                        ></i>
+                        <i
+                          className="fa-solid fa-xmark icon-cancel"
+                          onClick={() => toogleUpdate("status")}
+                        ></i>
+                      </>
+                    ) : (
+                      accountSelected.status || <span>Tiểu sử</span>
+                    )}
+                  </div>
+                  {!openUpdate.includes("status") && (
+                    <i
+                      className="fa-solid fa-pen icon-edit"
+                      onClick={() => toogleUpdate("status")}
+                    ></i>
+                  )}
                 </div>
               </div>
             </div>
@@ -417,27 +405,27 @@ const ModalAccount = ({
                 <div className="content-detail__item">
                   <div className="label">Điện thoại</div>
                   <div className="value">
-                    {updatePhoneNumber ? (
+                    {openUpdate.includes("phoneNumber") ? (
                       <>
                         <input
-                          value={inputValuePhoneNumber}
+                          value={profile.phoneNumber}
                           ref={phoneNumberRef}
                           className="phone-number"
                           type="number"
                           onChange={(e) =>
-                            setInputValuePhoneNumber(e.target.value)
+                            handleChange("phoneNumber", e.target.value)
                           }
                           onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdatePhoneNumber()
+                            e.key === "Enter" && submitUpdateProfile("phoneNumber")
                           }
                         />
                         <i
                           className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdatePhoneNumber()}
+                          onClick={() => submitUpdateProfile("phoneNumber")}
                         ></i>
                         <i
                           className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdatePhoneNumber()}
+                          onClick={() => toogleUpdate("phoneNumber")}
                         ></i>
                       </>
                     ) : (
@@ -447,79 +435,82 @@ const ModalAccount = ({
                         .replace(/\./g, " ")}`
                     )}
                   </div>
-                  {!updatePhoneNumber && (
+                  {!openUpdate.includes("phoneNumber") && (
                     <i
                       className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdatePhoneNumber()}
+                      onClick={() => toogleUpdate("phoneNumber")}
                     ></i>
                   )}
                 </div>
                 <div className="content-detail__item">
                   <div className="label">Giới tính</div>
                   <div className="value">
-                    {updateSex ? (
+                    {openUpdate.includes("sex") ? (
                       <>
                         <input
-                          value={inputValueSex}
-                          className="sex"
-                          onChange={(e) => setInputValueSex(e.target.value)}
+                          value={profile.sex}
+                          ref={phoneNumberRef}
+                          className="phone-number"
+                          type="text"
+                          onChange={(e) =>
+                            handleChange("sex", e.target.value)
+                          }
                           onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateSex()
+                            e.key === "Enter" && submitUpdateProfile("sex")
                           }
                         />
                         <i
                           className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateSex()}
+                          onClick={() => submitUpdateProfile("sex")}
                         ></i>
                         <i
                           className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdateSex()}
+                          onClick={() => toogleUpdate("sex")}
                         ></i>
                       </>
-                    ) : (
-                      accountSelected.sex
-                    )}
+                    ) :
+                      accountSelected.sex}
                   </div>
-                  {!updateSex && (
+                  {!openUpdate.includes("sex") && (
                     <i
                       className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdateSex()}
+                      onClick={() => toogleUpdate("sex")}
                     ></i>
                   )}
                 </div>
                 <div className="content-detail__item">
                   <div className="label">Ngày sinh</div>
                   <div className="value">
-                    {" "}
-                    {updateDateOfBirth ? (
+                    {openUpdate.includes("dateOfBirth") ? (
                       <>
                         <input
-                          value={inputValueDateOfBirth}
-                          className="date-of-birth"
+                          value={profile.dateOfBirth}
+                          ref={phoneNumberRef}
+                          className="phone-number"
+                          type="text"
                           onChange={(e) =>
-                            setInputValueDateOfBirth(e.target.value)
+                            handleChange("dateOfBirth", e.target.value)
                           }
                           onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateDateOfBirth()
+                            e.key === "Enter" && submitUpdateProfile("dateOfBirth")
                           }
                         />
                         <i
                           className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateDateOfBirth()}
+                          onClick={() => submitUpdateProfile("dateOfBirth")}
                         ></i>
                         <i
                           className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdateDateOfBirth()}
+                          onClick={() => toogleUpdate("dateOfBirth")}
                         ></i>
                       </>
                     ) : (
-                      accountSelected.dateOfBirth
-                    )}
+                      accountSelected.dateOfBirth)}
                   </div>
-                  {!updateDateOfBirth && (
+                  {!openUpdate.includes("dateOfBirth") && (
                     <i
                       className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdateDateOfBirth()}
+                      onClick={() => toogleUpdate("dateOfBirth")}
                     ></i>
                   )}
                 </div>
@@ -652,6 +643,9 @@ const ModalAccount = ({
                 />
                 <div className="display-name">
                   {accountSelected.displayName}
+                </div>
+                <div className="status">
+                  {accountSelected.status}
                 </div>
                 {isReceive && (
                   <div style={{ fontWeight: 500, marginTop: "8px" }}>
