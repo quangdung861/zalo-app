@@ -7,6 +7,7 @@ import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
 import coverCloud from "assets/coverCloud.png";
+import { generateKeywords } from "services";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
@@ -29,6 +30,7 @@ const ModalAccount = ({
 
   const [openUpdate, setOpenUpdate] = useState([]);
   const [profile, setProfile] = useState({
+    displayName: accountSelected.displayName ?? "",
     status: accountSelected.status ?? "",
     phoneNumber: accountSelected.phoneNumber ?? "",
     sex: accountSelected.sex ?? "",
@@ -55,11 +57,16 @@ const ModalAccount = ({
 
   const submitUpdateProfile = async (key) => {
     const userInfoRef = doc(db, "users", userInfo.id);
+    let keywords;
+    if (key === "displayName") {
+      keywords = generateKeywords(profile[key]);
+    }
     startLoading();
     await setDoc(
       userInfoRef,
       {
         [key]: profile[key],
+        ...(keywords && { keywords: keywords })
       },
       {
         merge: true,
@@ -287,6 +294,32 @@ const ModalAccount = ({
     stopLoading();
   };
 
+  const MessageError = () =>
+    isShowMessageError && (
+      <div
+        className="message-error"
+        style={{
+          position: "absolute",
+          top: "80px",
+          left: "0px",
+          right: "0px",
+          margin: "0 auto",
+          backgroundColor: "#fff",
+          width: "320px",
+          height: "40px",
+          padding: "12px",
+          borderRadius: "4px",
+          boxShadow: "var(--box-shadow-default)",
+          textAlign: "center",
+          fontWeight: "500",
+          zIndex: 999,
+          userSelect: "none",
+        }}
+      >
+        Hình ảnh phải có kích thước nhỏ hơn 0.5MB
+      </div>
+    );
+
   return accountSelected.uid === userInfo.uid ? (
     <div className="modal-overlay">
       <div className="container-account-info" ref={accountInfoRef}>
@@ -359,7 +392,39 @@ const ModalAccount = ({
                   />
                 </div>
                 <div className="display-name">
-                  {accountSelected.displayName}
+                  <div className="value">
+                    {openUpdate.includes("displayName") ? (
+                      <>
+                        <input
+                          value={profile.displayName}
+                          // ref={statusRef}
+                          type="text"
+                          onChange={(e) =>
+                            handleChange("displayName", e.target.value)
+                          }
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && submitUpdateProfile("displayName")
+                          }
+                        />
+                        <i
+                          className="fa-solid fa-check icon-save"
+                          onClick={() => submitUpdateProfile("displayName")}
+                        ></i>
+                        <i
+                          className="fa-solid fa-xmark icon-cancel"
+                          onClick={() => toogleUpdate("displayName")}
+                        ></i>
+                      </>
+                    ) : (
+                      accountSelected.displayName || <span>Tiểu sử</span>
+                    )}
+                  </div>
+                  {!openUpdate.includes("displayName") && (
+                    <i
+                      className="fa-solid fa-pen icon-edit"
+                      onClick={() => toogleUpdate("displayName")}
+                    ></i>
+                  )}
                 </div>
                 <div className="status">
                   <div className="value">
@@ -516,33 +581,15 @@ const ModalAccount = ({
                 </div>
               </div>
             </div>
+            <div className="division"></div>
+            <div className="btn-edit-profile">
+              <i className="fa-solid fa-pen icon-edit"></i>
+              <span>Cập nhật</span>
+            </div>
           </div>
         </div>
       </div>
-      {isShowMessageError && (
-        <div
-          className="message-error"
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "0px",
-            right: "0px",
-            margin: "0 auto",
-            backgroundColor: "#fff",
-            width: "320px",
-            height: "40px",
-            padding: "12px",
-            borderRadius: "4px",
-            boxShadow: "var(--box-shadow-default)",
-            textAlign: "center",
-            fontWeight: "500",
-            zIndex: 99,
-            userSelect: "none",
-          }}
-        >
-          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
-        </div>
-      )}
+      <MessageError />
     </div>
   ) : accountSelected.myCloud ? (
     <div className="modal-overlay">
@@ -592,30 +639,7 @@ const ModalAccount = ({
           </div>
         </div>
       </div>
-      {isShowMessageError && (
-        <div
-          className="message-error"
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "0px",
-            right: "0px",
-            margin: "0 auto",
-            backgroundColor: "#fff",
-            width: "320px",
-            height: "40px",
-            padding: "12px",
-            borderRadius: "4px",
-            boxShadow: "var(--box-shadow-default)",
-            textAlign: "center",
-            fontWeight: "500",
-            zIndex: 999,
-            userSelect: "none",
-          }}
-        >
-          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
-        </div>
-      )}
+      <MessageError />
     </div>
   ) : (
     <div className="modal-overlay">
@@ -768,30 +792,7 @@ const ModalAccount = ({
           </div>
         </div>
       </div>
-      {isShowMessageError && (
-        <div
-          className="message-error"
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "0px",
-            right: "0px",
-            margin: "0 auto",
-            backgroundColor: "#fff",
-            width: "320px",
-            height: "40px",
-            padding: "12px",
-            borderRadius: "4px",
-            boxShadow: "var(--box-shadow-default)",
-            textAlign: "center",
-            fontWeight: "500",
-            zIndex: 999,
-            userSelect: "none",
-          }}
-        >
-          Hình ảnh phải có kích thước nhỏ hơn 0.5MB
-        </div>
-      )}
+      <MessageError />
     </div>
   );
 };
