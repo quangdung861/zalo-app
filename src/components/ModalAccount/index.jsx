@@ -41,49 +41,6 @@ const ModalAccount = ({
     dateOfBirth: accountSelected.dateOfBirth ?? "",
   });
 
-  const [openUpdate, setOpenUpdate] = useState([]);
-  const [profile, setProfile] = useState({
-    status: accountSelected.status ?? "",
-    phoneNumber: accountSelected.phoneNumber ?? "",
-    sex: accountSelected.sex ?? "",
-    dateOfBirth: accountSelected.dateOfBirth ?? "",
-  })
-
-  const handleChange = (key, value) => {
-    setProfile(prev => ({
-      ...prev,
-      [key]: value,
-    }))
-  }
-
-  const toogleUpdate = (key) => {
-    setOpenUpdate(prev => {
-      if (prev.includes(key)) {
-        const newArr = prev.filter(item => item !== key)
-        return newArr
-      } else {
-        return [...prev, key]
-      }
-    })
-  };
-
-  const submitUpdateProfile = async (key) => {
-    const userInfoRef = doc(db, "users", userInfo.id);
-    startLoading();
-    await setDoc(
-      userInfoRef,
-      {
-        [key]: profile[key],
-      },
-      {
-        merge: true,
-      }
-    );
-    stopLoading();
-    toogleUpdate(key);
-  };
-
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -414,42 +371,6 @@ const ModalAccount = ({
                       {accountSelected.status || <span>Tiểu sử</span>}
                     </div>
                   </div>
-                </div>
-                <div className="status">
-                  <div className="value">
-                    {openUpdate.includes("status") ? (
-                      <>
-                        <input
-                          value={profile.status}
-                          // ref={statusRef}
-                          type="text"
-                          placeholder="Tiểu sử"
-                          onChange={(e) =>
-                            handleChange("status", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("status")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("status")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("status")}
-                        ></i>
-                      </>
-                    ) : (
-                      accountSelected.status || <span>Tiểu sử</span>
-                    )}
-                  </div>
-                  {!openUpdate.includes("status") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("status")}
-                    ></i>
-                  )}
                 </div>
               </div>
               <div className="content">
