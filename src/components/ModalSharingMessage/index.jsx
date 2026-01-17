@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo, useContext } from "react";
-
+import { runTransaction, increment } from "firebase/firestore";
 import * as S from "./styles";
 import { AppContext } from "Context/AppProvider";
 import {
@@ -89,7 +89,7 @@ const ModalSharingMessage = ({
   const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingGroupList, setLoadingGroupList] = useState(false);
-  
+
 
   useEffect(() => {
     const getFriends = async () => {
@@ -141,45 +141,47 @@ const ModalSharingMessage = ({
           }
           if (converstation.category === "group") {
             // Trò chuyện với group
-            const createMes = async () => {
-              const roomRef = doc(db, "rooms", converstation.id);
 
-              const messagesViewedIndex =
-                converstation.messagesViewed.findIndex(
-                  (item) => item.uid === userInfo.uid
+            const createMes = async (roomId) => {
+              const roomRef = doc(db, "rooms", roomId);
+
+              await runTransaction(db, async (transaction) => {
+                const snap = await transaction.get(roomRef);
+                if (!snap.exists()) return;
+
+                const roomData = snap.data();
+                const members = roomData.members || [];
+                const unreadCount = roomData.unreadCount || {};
+
+                const newUnreadCount = { ...unreadCount };
+
+                members.forEach((uid) => {
+                  if (uid === userInfo.uid) {
+                    newUnreadCount[uid] = 0;
+                  } else {
+                    newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
+                  }
+                });
+
+                transaction.set(
+                  roomRef,
+                  {
+                    messageLastest: {
+                      text: textAreaValue,
+                      displayName: userInfo.displayName,
+                      uid: userInfo.uid,
+                      createdAt: serverTimestamp(),
+                      clientCreatedAt: Date.now(),
+                    },
+                    totalMessages: increment(1),
+                    unreadCount: newUnreadCount,
+                  },
+                  { merge: true }
                 );
-              const messagesViewed = converstation.messagesViewed.find(
-                (item) => item.uid === userInfo.uid
-              );
-
-              const newMessageViewed = [...converstation.messagesViewed];
-
-              newMessageViewed.splice(messagesViewedIndex, 1, {
-                ...messagesViewed,
-                count: messagesViewed.count + 1,
               });
 
-              await setDoc(
-                roomRef,
-                {
-                  messageLastest: {
-                    text: textAreaValue,
-                    displayName: userInfo.displayName,
-                    uid: userInfo.uid,
-                    createdAt: serverTimestamp(),
-                    clientCreatedAt: Date.now(),
-                  },
-                  totalMessages: converstation.totalMessages + 1,
-                  messagesViewed: newMessageViewed,
-                },
-                {
-                  merge: true,
-                }
-              );
-
               addDocument("messages", {
-                category: "group",
-                roomId: converstation.id,
+                roomId,
                 uid: userInfo.uid,
                 displayName: userInfo.displayName,
                 photoURL: userInfo.photoURL,
@@ -188,6 +190,7 @@ const ModalSharingMessage = ({
                 infoReply: {},
               });
             };
+
             createMes();
           }
         }
@@ -202,91 +205,86 @@ const ModalSharingMessage = ({
           )[0];
 
           if (room?.id) {
-            const createMes = async () => {
-              const roomRef = doc(db, "rooms", room.id);
+            const createMes = async (roomId) => {
+              const roomRef = doc(db, "rooms", roomId);
 
-              const messagesViewedIndex = room.messagesViewed.findIndex(
-                (item) => item.uid === userInfo.uid
-              );
-              const messagesViewed = room.messagesViewed.find(
-                (item) => item.uid === userInfo.uid
-              );
+              await runTransaction(db, async (transaction) => {
+                const snap = await transaction.get(roomRef);
+                if (!snap.exists()) return;
 
-              const newMessageViewed = [...room.messagesViewed];
+                const roomData = snap.data();
+                const members = roomData.members || [];
+                const unreadCount = roomData.unreadCount || {};
 
-              newMessageViewed.splice(messagesViewedIndex, 1, {
-                ...messagesViewed,
-                count: messagesViewed.count + 1,
+                const newUnreadCount = { ...unreadCount };
+
+                members.forEach((uid) => {
+                  if (uid === userInfo.uid) {
+                    newUnreadCount[uid] = 0;
+                  } else {
+                    newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
+                  }
+                });
+
+                transaction.set(
+                  roomRef,
+                  {
+                    messageLastest: {
+                      text: textAreaValue,
+                      displayName: userInfo.displayName,
+                      uid: userInfo.uid,
+                      createdAt: serverTimestamp(),
+                      clientCreatedAt: Date.now(),
+                    },
+                    totalMessages: increment(1),
+                    unreadCount: newUnreadCount,
+                  },
+                  { merge: true }
+                );
               });
 
-              await setDoc(
-                roomRef,
-                {
-                  messageLastest: {
-                    text: textAreaValue,
-                    displayName: userInfo.displayName,
-                    uid: userInfo.uid,
-                    createdAt: serverTimestamp(),
-                    clientCreatedAt: Date.now(),
-                  },
-                  totalMessages: room.totalMessages + 1,
-                  messagesViewed: newMessageViewed,
+              addDocument("messages", {
+                roomId,
+                uid: userInfo.uid,
+                displayName: userInfo.displayName,
+                photoURL: userInfo.photoURL,
+                text: textAreaValue,
+                images: [],
+                infoReply: {},
+              });
+            };
+
+            createMes();
+          } else {
+            const createRoomAndMes = async () => {
+              const roomRef = await addDoc(collection(db, "rooms"), {
+                category: "single",
+                members: [userInfo.uid, converstation.uid],
+                unreadCount: {
+                  [userInfo.uid]: 0,
+                  [converstation.uid]: 1,
                 },
-                {
-                  merge: true,
-                }
-              );
+                totalMessages: 1,
+                messageLastest: {
+                  text: textAreaValue,
+                  displayName: userInfo.displayName,
+                  uid: userInfo.uid,
+                  createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
+                },
+                createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
+              });
 
               addDocument("messages", {
-                category: "single",
-                roomId: room.id,
+                roomId: roomRef.id,
                 uid: userInfo.uid,
                 text: textAreaValue,
                 images: [],
                 infoReply: {},
               });
             };
-            createMes();
-          } else {
-            const createRoomAndMes = async () => {
-              try {
-                const roomRef = await addDoc(collection(db, "rooms"), {
-                  category: "single",
-                  members: [userInfo.uid, converstation.uid],
-                  messageLastest: {
-                    text: textAreaValue,
-                    displayName: userInfo.displayName,
-                    uid: userInfo.uid,
-                    createdAt: serverTimestamp(),
-                    clientCreatedAt: Date.now(),
-                  },
-                  createdAt: serverTimestamp(),
-                  clientCreatedAt: Date.now(),
-                  totalMessages: 1,
-                  messagesViewed: [
-                    { uid: userInfo.uid, count: 1 },
-                    { uid: converstation.uid, count: 0 },
-                  ],
-                });
 
-                const response = await getDoc(roomRef);
-
-                if (roomRef && roomRef.id) {
-                  addDocument("messages", {
-                    category: "single",
-                    roomId: response.id,
-                    uid: userInfo.uid,
-                    text: textAreaValue,
-                    images: [],
-                    infoReply: {},
-                  });
-                } else {
-                  console.log("false");
-                }
-              } catch (error) {
-                console.error("Error creating room:", error);
-              }
-            };
 
             createRoomAndMes();
           }

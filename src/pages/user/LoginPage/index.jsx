@@ -107,7 +107,7 @@ const LoginPage = () => {
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
-            messagesViewed: [{ uid: data.user.uid, count: 0 }],
+            unreadCount: {[data.user.uid]: 0},
             deleted: [],
             hideTemporarily: [],
           });
@@ -200,7 +200,7 @@ const LoginPage = () => {
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
-            messagesViewed: [{ uid: data.user.uid, count: 0 }],
+            unreadCount: {[data.user.uid]: 0},
             deleted: [],
             hideTemporarily: [],
           });

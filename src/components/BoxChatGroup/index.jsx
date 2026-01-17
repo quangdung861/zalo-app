@@ -13,6 +13,7 @@ import {
   getDocs,
   startAfter,
   limit,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
@@ -147,26 +148,21 @@ const BoxChatGroup = () => {
   }, []);
 
   useEffect(() => {
-    if (room.id) {
-      const messagesViewedIndex = room.messagesViewed.findIndex(
-        (item) => item.uid === userInfo.uid
-      );
-      const messagesViewed = room.messagesViewed.find(
-        (item) => item.uid === userInfo.uid
-      );
+    const clearUnreadCount = async () => {
+      if (room?.id && userInfo?.uid) {
+        try {
+          await updateDoc(doc(db, "rooms", room.id), {
+            [`unreadCount.${userInfo.uid}`]: 0,
+          });
+        } catch (error) {
+          console.error("Lỗi cập nhật unreadCount:", error);
+        }
+      }
+    };
 
-      const newMessageViewed = [...room.messagesViewed];
-
-      newMessageViewed.splice(messagesViewedIndex, 1, {
-        ...messagesViewed,
-        count: room.totalMessages,
-      });
-
-      const docRef = doc(db, "rooms", room.id);
-
-      updateMessageViewed(docRef, newMessageViewed);
-    }
-  }, [room]);
+    // 2. Gọi hàm đó
+    clearUnreadCount();
+  }, [room.id, userInfo.uid]);
 
   const [categoryGroup, setCategoryGroup] = useState({});
 
@@ -230,18 +226,6 @@ const BoxChatGroup = () => {
     stopLoading();
   };
 
-  const updateMessageViewed = async (docRef, newMessageViewed) => {
-    setDoc(
-      docRef,
-      {
-        messagesViewed: newMessageViewed,
-      },
-      {
-        merge: true,
-      }
-    );
-  };
-
   const handleFocus = () => {
     const toolbarChatInputElement = document.querySelector(
       ".toolbar-chat-input"
@@ -286,18 +270,17 @@ const BoxChatGroup = () => {
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
 
-            const messagesViewedIndex = room.messagesViewed.findIndex(
-              (item) => item.uid === userInfo.uid
-            );
-            const messagesViewed = room.messagesViewed.find(
-              (item) => item.uid === userInfo.uid
-            );
+            const members = room.members || [];
+            const unreadCount = room.unreadCount || {};
 
-            const newMessageViewed = [...room.messagesViewed];
+            const newUnreadCount = { ...unreadCount };
 
-            newMessageViewed.splice(messagesViewedIndex, 1, {
-              ...messagesViewed,
-              count: messagesViewed.count + 1,
+            members.forEach((uid) => {
+              if (uid === userInfo.uid) {
+                newUnreadCount[uid] = 0;
+              } else {
+                newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
+              }
             });
 
             const mentionsOnlyId = mentions.map((mention) => mention.id);
@@ -313,7 +296,7 @@ const BoxChatGroup = () => {
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
-                messagesViewed: newMessageViewed,
+                unreadCount: newUnreadCount,
                 ...(room.mentioned && {
                   mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
                 }),
@@ -393,7 +376,7 @@ const BoxChatGroup = () => {
       end: input.selectionEnd,
     };
   };
-  
+
 
   const handleClickSentMessage = () => {
     if (inputValue) {
@@ -402,20 +385,18 @@ const BoxChatGroup = () => {
         const createMes = async () => {
           const roomRef = doc(db, "rooms", room.id);
 
-          const messagesViewedIndex = room.messagesViewed.findIndex(
-            (item) => item.uid === userInfo.uid
-          );
-          const messagesViewed = room.messagesViewed.find(
-            (item) => item.uid === userInfo.uid
-          );
+          const members = room.members || [];
+          const unreadCount = room.unreadCount || {};
 
-          const newMessageViewed = [...room.messagesViewed];
+          const newUnreadCount = { ...unreadCount };
 
-          newMessageViewed.splice(messagesViewedIndex, 1, {
-            ...messagesViewed,
-            count: messagesViewed.count + 1,
+          members.forEach((uid) => {
+            if (uid === userInfo.uid) {
+              newUnreadCount[uid] = 0;
+            } else {
+              newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
+            }
           });
-
           const mentionsOnlyId = mentions.map((mention) => mention.id);
           startLoading();
           await setDoc(
@@ -429,7 +410,7 @@ const BoxChatGroup = () => {
                 clientCreatedAt: Date.now(),
               },
               totalMessages: room.totalMessages + 1,
-              messagesViewed: newMessageViewed,
+              unreadCount: newUnreadCount,
               ...(room.mentioned && {
                 mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
               }),

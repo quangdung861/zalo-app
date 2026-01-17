@@ -50,14 +50,12 @@ export const Wrapper = styled.div`
             position: absolute;
             top: 7px;
             right: 7px;
+            width: 16px;
+            height: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 16px;
-            height: 16px;
-            font-size: 12px;
-            line-height: 12px;
-            border-radius: 50%;
+            border-radius: 50px;
             color: #fff;
             background-color: #c31818;
           }

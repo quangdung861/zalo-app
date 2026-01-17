@@ -320,10 +320,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     }));
 
     const members = newFriendsSelected.map((item) => item.uid);
-    const messagesViewed = newFriendsSelected.map((item) => ({
-      uid: item.uid,
-      count: 0,
-    }));
 
     const data = {
       category: "group",
@@ -332,7 +328,6 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
         createdAt: serverTimestamp(),
         clientCreatedAt: Date.now(),
       },
-      messagesViewed: [{ uid: userInfo.uid, count: 0 }, ...messagesViewed],
       totalMessages: 0,
       //
       name: groupName,

@@ -1475,9 +1475,19 @@ export const Container = styled.div`
   @media only screen and (max-width: 500px) {
     .box-chat {
       &__header {
+        padding: 0 4px;
         .left {
           > .avatar {
             display: none;
+          }
+        }
+        .right {
+          padding-left: 4px;
+          .box-icon {
+            display: none;
+          }
+           .box-icon.background {
+            display: block;
           }
         }
       }
