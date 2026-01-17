@@ -306,7 +306,7 @@ const AppProvider = ({ children }) => {
       getRoom();
     }
   }, [selectedUserMessaging.uidSelected, rooms, userInfo]);
-  
+
   useEffect(() => {
     if (!uid) {
       setTotalUnread(0);
@@ -319,16 +319,19 @@ const AppProvider = ({ children }) => {
       where(`unreadCount.${uid}`, ">", 0),
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      let sum = 0;
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        sum += data.unreadCount?.[uid] || 0;
-      });
-
-      setTotalUnread(sum);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        let sum = 0;
+        snapshot.forEach((doc) => {
+          sum += doc.data().unreadCount?.[uid] || 0;
+        });
+        setTotalUnread(sum);
+      },
+      (error) => {
+        console.error("Firestore error:", error);
+      },
+    );
 
     return () => unsubscribe();
   }, [uid]);
@@ -356,7 +359,7 @@ const AppProvider = ({ children }) => {
       where("members", "array-contains", uid),
       orderBy("messageLastest.createdAt", "desc"),
       startAfter(lastDoc),
-      limit(PAGE_SIZE)
+      limit(PAGE_SIZE),
     );
 
     const snap = await getDocs(roomsRef);
@@ -391,7 +394,7 @@ const AppProvider = ({ children }) => {
         setHasMore,
         startLoading,
         stopLoading,
-        totalUnread
+        totalUnread,
       }}
     >
       {children}
