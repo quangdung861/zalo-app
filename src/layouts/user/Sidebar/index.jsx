@@ -34,7 +34,6 @@ const Sidebar = () => {
       icon: <i className="fa-solid fa-book"></i>,
     },
   ];
-  console.log(totalUnread);
   
   useEffect(() => {
     if (window.location.hostname === "localhost") {

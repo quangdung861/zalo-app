@@ -257,6 +257,7 @@ const FormEmail = ({ setRegisterWay }) => {
             },
             totalMessages: 0,
             unreadCount: {[data.user.uid]: 0},
+            unreadMembers: [],
             deleted: [],
             hideTemporarily: [],
           });

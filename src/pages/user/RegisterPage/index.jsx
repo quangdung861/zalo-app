@@ -99,6 +99,7 @@ const LoginPage = () => {
             },
             totalMessages: 0,
             unreadCount: {[data.user.uid]: 0},
+            unreadMembers: [],
             deleted: [],
             hideTemporarily: [],
           });
@@ -192,6 +193,7 @@ const LoginPage = () => {
             },
             totalMessages: 0,
             unreadCount: {[data.user.uid]: 0},
+            unreadMembers: [],
             deleted: [],
             hideTemporarily: [],
           });

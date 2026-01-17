@@ -150,9 +150,12 @@ const BoxChatGroup = () => {
   useEffect(() => {
     const clearUnreadCount = async () => {
       if (room?.id && userInfo?.uid) {
+        const newUnreadMembers = [...room.unreadMembers].filter(uid => uid !== userInfo.uid);
         try {
           await updateDoc(doc(db, "rooms", room.id), {
             [`unreadCount.${userInfo.uid}`]: 0,
+            unreadMembers: newUnreadMembers,
+
           });
         } catch (error) {
           console.error("Lỗi cập nhật unreadCount:", error);
@@ -162,7 +165,7 @@ const BoxChatGroup = () => {
 
     // 2. Gọi hàm đó
     clearUnreadCount();
-  }, [room.id, userInfo.uid]);
+  }, [room.totalMessages]);
 
   const [categoryGroup, setCategoryGroup] = useState({});
 
@@ -274,6 +277,7 @@ const BoxChatGroup = () => {
             const unreadCount = room.unreadCount || {};
 
             const newUnreadCount = { ...unreadCount };
+            const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
             members.forEach((uid) => {
               if (uid === userInfo.uid) {
@@ -297,6 +301,7 @@ const BoxChatGroup = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 unreadCount: newUnreadCount,
+                unreadMembers: newUnreadMembers,
                 ...(room.mentioned && {
                   mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
                 }),
@@ -389,6 +394,7 @@ const BoxChatGroup = () => {
           const unreadCount = room.unreadCount || {};
 
           const newUnreadCount = { ...unreadCount };
+          const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
           members.forEach((uid) => {
             if (uid === userInfo.uid) {
@@ -411,6 +417,7 @@ const BoxChatGroup = () => {
               },
               totalMessages: room.totalMessages + 1,
               unreadCount: newUnreadCount,
+              unreadMembers: newUnreadMembers,
               ...(room.mentioned && {
                 mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
               }),

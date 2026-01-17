@@ -81,7 +81,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     }
     setLeft((current) => current - 160);
   };
-  
+
 
   const [friends, setFriends] = useState([]);
   const [keywords, setKeywords] = useState("");
@@ -320,6 +320,10 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
     }));
 
     const members = newFriendsSelected.map((item) => item.uid);
+    const unreadCount = {};
+    members.forEach((uid) => {
+      unreadCount[uid] = 0;
+    })
 
     const data = {
       category: "group",
@@ -329,6 +333,8 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
         clientCreatedAt: Date.now(),
       },
       totalMessages: 0,
+      unreadCount,
+      unreadMembers: [],
       //
       name: groupName,
       avatar: imgPreviewAvatar || "",
