@@ -32,6 +32,7 @@ const ModalAccount = ({
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isDropdownResponse, setIsDropdownResponse] = useState(false);
   const [isShowUpdateProfile, setIsShowUpdateProfile] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState([]);
 
   const [profile, setProfile] = useState({
     displayName: accountSelected.displayName ?? "",
@@ -40,14 +41,6 @@ const ModalAccount = ({
     sex: accountSelected.sex ?? "",
     dateOfBirth: accountSelected.dateOfBirth ?? "",
   });
-
-  const [openUpdate, setOpenUpdate] = useState([]);
-  const [profile, setProfile] = useState({
-    status: accountSelected.status ?? "",
-    phoneNumber: accountSelected.phoneNumber ?? "",
-    sex: accountSelected.sex ?? "",
-    dateOfBirth: accountSelected.dateOfBirth ?? "",
-  })
 
   const handleChange = (key, value) => {
     setProfile(prev => ({
