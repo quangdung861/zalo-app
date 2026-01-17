@@ -406,6 +406,31 @@
           }
         }
 
+        .division {
+          margin: 0 20px;
+          border-bottom: 1px solid #eef0f1;
+        }
+
+        .btn-edit-profile {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          height: 32px;
+          margin: 14px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+
+          >span {
+            font-size: 16px;
+            font-weight: 500;
+          }
+
+          &:hover {
+            background-color: #f1f1f1;
+          }
+        }
+
         .content-cloud {
           margin-bottom: 32px;
           margin-top: 32px;
