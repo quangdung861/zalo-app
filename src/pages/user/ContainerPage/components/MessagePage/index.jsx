@@ -283,7 +283,7 @@ const MessagePage = () => {
         );
       }
 
-      const unseenMessages = room.unreadCount[userInfo.uid];
+      const unseenMessages = room.unreadCount && room.unreadCount[userInfo.uid];
 
       let keywordsName;
 
@@ -397,7 +397,7 @@ const MessagePage = () => {
         room.messageLastest?.createdAt?.seconds * 1000
       )?.fromNow();
 
-      const unseenMessages = room.unreadCount[userInfo.uid];
+      const unseenMessages = room.unreadCount && room.unreadCount[userInfo.uid];
 
       if (keywords) {
         const isKeywords = infoGroup.keywordsName.includes(
@@ -411,7 +411,7 @@ const MessagePage = () => {
       if (room.mentioned) {
         if (room.mentioned[0] && unseenMessages === 0) {
           const mentionIndex = room.mentioned.findIndex(
-            (item) => item === userInfo.id 
+            (item) => item === userInfo.id
           );
           if (mentionIndex !== -1) {
             const newMentiond = [...room.mentioned];
@@ -541,9 +541,14 @@ const MessagePage = () => {
       setIsShowOverlayModalConfirmDelete
     }
 
-    return <RoomItem {...roomItemProps} />;
+    const key =
+      type === "group"
+        ? room.id
+        : roomId;
+
+    return <RoomItem {...roomItemProps} key={key} />;
   });
-  
+
 
   useEffect(() => {
     if (roomlist.length < 1) setHasMore(false);

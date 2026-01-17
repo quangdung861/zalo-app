@@ -160,9 +160,11 @@ const BoxChat = () => {
   useEffect(() => {
     const clearUnreadCount = async () => {
       if (room?.id && userInfo?.uid) {
+        const newUnreadMembers = [...room.unreadMembers].filter(uid => uid !== userInfo.uid);
         try {
           await updateDoc(doc(db, "rooms", room.id), {
             [`unreadCount.${userInfo.uid}`]: 0,
+            unreadMembers: newUnreadMembers,
           });
         } catch (error) {
           console.error("Lỗi cập nhật unreadCount:", error);
@@ -171,7 +173,7 @@ const BoxChat = () => {
     };
 
     clearUnreadCount();
-  }, [room.id, userInfo.uid]);
+  }, [room.totalMessages]);
 
   const handleFocus = () => {
     const toolbarChatInputElement = document.querySelector(
@@ -267,9 +269,15 @@ const BoxChat = () => {
             const roomRef = doc(db, "rooms", room.id);
 
             const members = room.members || [];
+            console.log("🚀 ~ createMes ~ members:", members)
             const unreadCount = room.unreadCount || {};
 
             const newUnreadCount = { ...unreadCount };
+            console.log(userInfo.id);
+            console.log(userInfo);
+            
+            
+            const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
             members.forEach((uid) => {
               if (uid === userInfo.uid) {
@@ -292,6 +300,7 @@ const BoxChat = () => {
                 },
                 totalMessages: room.totalMessages + 1,
                 unreadCount: newUnreadCount,
+                unreadMembers: newUnreadMembers,
                 hideTemporarily: [],
               },
               {
@@ -352,6 +361,7 @@ const BoxChat = () => {
                   [userInfo.uid]: 0,
                   [selectedUserMessaging.uidSelected]: 1,
                 },
+                unreadMembers: [selectedUserMessaging.uidSelected],
                 deleted: [],
                 hideTemporarily: [],
               });
@@ -445,6 +455,7 @@ const BoxChat = () => {
           const members = roomData.members || [];
           const unreadCount = roomData.unreadCount || {};
 
+          const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
           const nextUnread = { ...unreadCount };
 
           members.forEach((uid) => {
@@ -467,6 +478,7 @@ const BoxChat = () => {
               },
               totalMessages: increment(1),
               unreadCount: nextUnread,
+              unreadMembers: newUnreadMembers,
               hideTemporarily: [],
             },
             { merge: true }
@@ -513,6 +525,7 @@ const BoxChat = () => {
             [userInfo.uid]: 0,
             [selectedUserMessaging.uidSelected]: 1,
           },
+          unreadMembers: [selectedUserMessaging.uidSelected],
           deleted: [],
           hideTemporarily: [],
         });

@@ -154,6 +154,7 @@ const ModalSharingMessage = ({
                 const unreadCount = roomData.unreadCount || {};
 
                 const newUnreadCount = { ...unreadCount };
+                const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
                 members.forEach((uid) => {
                   if (uid === userInfo.uid) {
@@ -175,6 +176,7 @@ const ModalSharingMessage = ({
                     },
                     totalMessages: increment(1),
                     unreadCount: newUnreadCount,
+                    unreadMembers: newUnreadMembers
                   },
                   { merge: true }
                 );
@@ -217,6 +219,7 @@ const ModalSharingMessage = ({
                 const unreadCount = roomData.unreadCount || {};
 
                 const newUnreadCount = { ...unreadCount };
+                const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
                 members.forEach((uid) => {
                   if (uid === userInfo.uid) {
@@ -238,6 +241,7 @@ const ModalSharingMessage = ({
                     },
                     totalMessages: increment(1),
                     unreadCount: newUnreadCount,
+                    unreadMembers: newUnreadMembers,
                   },
                   { merge: true }
                 );
@@ -264,6 +268,7 @@ const ModalSharingMessage = ({
                   [userInfo.uid]: 0,
                   [converstation.uid]: 1,
                 },
+                unreadMembers: [converstation.uid],
                 totalMessages: 1,
                 messageLastest: {
                   text: textAreaValue,

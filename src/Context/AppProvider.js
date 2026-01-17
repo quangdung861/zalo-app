@@ -315,8 +315,7 @@ const AppProvider = ({ children }) => {
 
     const q = query(
       collection(db, "rooms"),
-      where("members", "array-contains", uid),
-      where(`unreadCount.${uid}`, ">", 0),
+      where("unreadMembers", "array-contains", uid),
     );
 
     const unsubscribe = onSnapshot(
