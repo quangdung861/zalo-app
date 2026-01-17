@@ -8,6 +8,10 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
 import coverCloud from "assets/coverCloud.png";
 import { generateKeywords } from "services";
+import UpdateProfile from "./UpdateProfile";
+import { GENDER_LABEL } from "constants/backend/gender.enum";
+import { formatISOToVN } from "utils/date";
+import { formatPhoneVN } from "utils/phone";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
@@ -15,67 +19,27 @@ const ModalAccount = ({
   accountSelected,
   setIsShowOverlayModalAddFriend,
 }) => {
-  const phoneNumberRef = useRef(null);
 
   const accountInfoRef = useRef(null);
   const dropdownResponseRef = useRef(null);
 
-  const { userInfo, setSelectedUserMessaging, startLoading, stopLoading } = useContext(AppContext);
+  const { userInfo, setSelectedUserMessaging, startLoading, stopLoading } =
+    useContext(AppContext);
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
   const [imgPreviewCover, setImgPreviewCover] = useState(null);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isDropdownResponse, setIsDropdownResponse] = useState(false);
+  const [isShowUpdateProfile, setIsShowUpdateProfile] = useState(false);
 
-  const [openUpdate, setOpenUpdate] = useState([]);
   const [profile, setProfile] = useState({
     displayName: accountSelected.displayName ?? "",
     status: accountSelected.status ?? "",
     phoneNumber: accountSelected.phoneNumber ?? "",
     sex: accountSelected.sex ?? "",
     dateOfBirth: accountSelected.dateOfBirth ?? "",
-  })
-
-  const handleChange = (key, value) => {
-    setProfile(prev => ({
-      ...prev,
-      [key]: value,
-    }))
-  }
-
-  const toogleUpdate = (key) => {
-    setOpenUpdate(prev => {
-      if (prev.includes(key)) {
-        const newArr = prev.filter(item => item !== key)
-        return newArr
-      } else {
-        return [...prev, key]
-      }
-    })
-  };
-
-  const submitUpdateProfile = async (key) => {
-    const userInfoRef = doc(db, "users", userInfo.id);
-    let keywords;
-    if (key === "displayName") {
-      keywords = generateKeywords(profile[key]);
-    }
-    startLoading();
-    await setDoc(
-      userInfoRef,
-      {
-        [key]: profile[key],
-        ...(keywords && { keywords: keywords })
-      },
-      {
-        merge: true,
-      }
-    );
-    stopLoading();
-    toogleUpdate(key);
-  };
-
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -101,7 +65,6 @@ const ModalAccount = ({
   if (!accountSelected) {
     return <div></div>;
   }
-
 
   const toogleBoxChat = ({
     uidSelected,
@@ -323,271 +286,130 @@ const ModalAccount = ({
   return accountSelected.uid === userInfo.uid ? (
     <div className="modal-overlay">
       <div className="container-account-info" ref={accountInfoRef}>
-        <div className="account-info">
-          <div className="title">
-            Thông tin tài khoản
-            <i
-              className="fa-solid fa-xmark"
-              onClick={() => setIsShowOverlayModal(false)}
-            ></i>
-          </div>
-          <div className="box-account-info">
-            <div className="header">
-              <img
-                src={imgPreviewCover?.url || accountSelected.photoCover}
-                alt=""
-                className="photo-cover"
-              />
-              <div className="header-right">
-                {imgPreviewCover ? (
-                  <>
-                    <button
-                      className=" btn-default--custome"
-                      onClick={() => setImgPreviewCover("")}
+        {!isShowUpdateProfile ? (
+          <div className="account-info">
+            <div className="title">
+              Thông tin tài khoản
+              <i
+                className="fa-solid fa-xmark"
+                onClick={() => setIsShowOverlayModal(false)}
+              ></i>
+            </div>
+            <div className="box-account-info">
+              <div className="header">
+                <img
+                  src={imgPreviewCover?.url || accountSelected.photoCover}
+                  alt=""
+                  className="photo-cover"
+                />
+                <div className="header-right">
+                  {imgPreviewCover ? (
+                    <>
+                      <button
+                        className=" btn-default--custome"
+                        onClick={() => setImgPreviewCover("")}
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        className=" btn-default--custome"
+                        onClick={() => uploadImage()}
+                      >
+                        Lưu
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <label
+                        htmlFor="myFileInput"
+                        className="custom-file-label"
+                      >
+                        <i className="fa-solid fa-camera"></i>
+                      </label>
+                      <input
+                        type="file"
+                        id="myFileInput"
+                        className="custom-file-input"
+                        onClick={(e) => (e.target.value = null)}
+                        onChange={(e) =>
+                          handleCoverImagePreview(e.target.files[0])
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+                <div className="box-image">
+                  <div className="box-image__item">
+                    <img
+                      src={accountSelected.photoURL}
+                      alt=""
+                      className="photo-avatar"
+                    />
+                    <label
+                      htmlFor="inputFileAvatar"
+                      className="box-avatar__icon"
                     >
-                      Hủy
-                    </button>
-                    <button
-                      className=" btn-default--custome"
-                      onClick={() => uploadImage()}
-                    >
-                      Lưu
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <label htmlFor="myFileInput" className="custom-file-label">
                       <i className="fa-solid fa-camera"></i>
                     </label>
                     <input
                       type="file"
-                      id="myFileInput"
+                      id="inputFileAvatar"
                       className="custom-file-input"
                       onClick={(e) => (e.target.value = null)}
-                      onChange={(e) =>
-                        handleCoverImagePreview(e.target.files[0])
-                      }
+                      onChange={(e) => handleAvatarImage(e.target.files[0])}
                     />
-                  </>
-                )}
-              </div>
-
-              {/*  */}
-              <div className="box-image">
-                <div className="box-image__item">
-                  <img
-                    src={accountSelected.photoURL}
-                    alt=""
-                    className="photo-avatar"
-                  />
-                  <label htmlFor="inputFileAvatar" className="box-avatar__icon">
-                    <i className="fa-solid fa-camera"></i>
-                  </label>
-                  <input
-                    type="file"
-                    id="inputFileAvatar"
-                    className="custom-file-input"
-                    onClick={(e) => (e.target.value = null)}
-                    onChange={(e) => handleAvatarImage(e.target.files[0])}
-                  />
-                </div>
-                <div className="display-name">
-                  <div className="value">
-                    {openUpdate.includes("displayName") ? (
-                      <>
-                        <input
-                          value={profile.displayName}
-                          // ref={statusRef}
-                          type="text"
-                          onChange={(e) =>
-                            handleChange("displayName", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("displayName")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("displayName")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("displayName")}
-                        ></i>
-                      </>
-                    ) : (
-                      accountSelected.displayName || <span>Tiểu sử</span>
-                    )}
                   </div>
-                  {!openUpdate.includes("displayName") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("displayName")}
-                    ></i>
-                  )}
-                </div>
-                <div className="status">
-                  <div className="value">
-                    {openUpdate.includes("status") ? (
-                      <>
-                        <input
-                          value={profile.status}
-                          // ref={statusRef}
-                          type="text"
-                          placeholder="Tiểu sử"
-                          onChange={(e) =>
-                            handleChange("status", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("status")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("status")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("status")}
-                        ></i>
-                      </>
-                    ) : (
-                      accountSelected.status || <span>Tiểu sử</span>
-                    )}
+                  <div className="display-name">
+                    <div className="value">
+                      {
+                        accountSelected.displayName || <span>Tiểu sử</span>
+                      }
+                    </div>
                   </div>
-                  {!openUpdate.includes("status") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("status")}
-                    ></i>
-                  )}
+                  <div className="status">
+                    <div className="value">
+                      {accountSelected.status || <span>Tiểu sử</span>}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="content">
-              <div className="title">Thông tin cá nhân</div>
-              <div className="content-detail">
-                <div className="content-detail__item">
-                  <div className="label">Điện thoại</div>
-                  <div className="value">
-                    {openUpdate.includes("phoneNumber") ? (
-                      <>
-                        <input
-                          value={profile.phoneNumber}
-                          ref={phoneNumberRef}
-                          className="phone-number"
-                          type="number"
-                          onChange={(e) =>
-                            handleChange("phoneNumber", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("phoneNumber")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("phoneNumber")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("phoneNumber")}
-                        ></i>
-                      </>
-                    ) : (
-                      accountSelected.phoneNumber &&
-                      `0${accountSelected.phoneNumber
-                        .toLocaleString()
-                        .replace(/\./g, " ")}`
-                    )}
+              <div className="content">
+                <div className="title">Thông tin cá nhân</div>
+                <div className="content-detail">
+                  <div className="content-detail__item">
+                    <div className="label">Điện thoại</div>
+                    <div className="value">{formatPhoneVN(accountSelected.phoneNumber)}</div>
                   </div>
-                  {!openUpdate.includes("phoneNumber") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("phoneNumber")}
-                    ></i>
-                  )}
-                </div>
-                <div className="content-detail__item">
-                  <div className="label">Giới tính</div>
-                  <div className="value">
-                    {openUpdate.includes("sex") ? (
-                      <>
-                        <input
-                          value={profile.sex}
-                          ref={phoneNumberRef}
-                          className="phone-number"
-                          type="text"
-                          onChange={(e) =>
-                            handleChange("sex", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("sex")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("sex")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("sex")}
-                        ></i>
-                      </>
-                    ) :
-                      accountSelected.sex}
+                  <div className="content-detail__item">
+                    <div className="label">Giới tính</div>
+                    <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
                   </div>
-                  {!openUpdate.includes("sex") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("sex")}
-                    ></i>
-                  )}
-                </div>
-                <div className="content-detail__item">
-                  <div className="label">Ngày sinh</div>
-                  <div className="value">
-                    {openUpdate.includes("dateOfBirth") ? (
-                      <>
-                        <input
-                          value={profile.dateOfBirth}
-                          ref={phoneNumberRef}
-                          className="phone-number"
-                          type="text"
-                          onChange={(e) =>
-                            handleChange("dateOfBirth", e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && submitUpdateProfile("dateOfBirth")
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-check icon-save"
-                          onClick={() => submitUpdateProfile("dateOfBirth")}
-                        ></i>
-                        <i
-                          className="fa-solid fa-xmark icon-cancel"
-                          onClick={() => toogleUpdate("dateOfBirth")}
-                        ></i>
-                      </>
-                    ) : (
-                      accountSelected.dateOfBirth)}
+                  <div className="content-detail__item">
+                    <div className="label">Ngày sinh</div>
+                    <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
                   </div>
-                  {!openUpdate.includes("dateOfBirth") && (
-                    <i
-                      className="fa-solid fa-pen icon-edit"
-                      onClick={() => toogleUpdate("dateOfBirth")}
-                    ></i>
-                  )}
                 </div>
               </div>
-            </div>
-            <div className="division"></div>
-            <div className="btn-edit-profile">
-              <i className="fa-solid fa-pen icon-edit"></i>
-              <span>Cập nhật</span>
+              <div className="division"></div>
+              <div
+                className="btn-edit-profile"
+                onClick={() => setIsShowUpdateProfile(true)}
+              >
+                <i className="fa-solid fa-pen icon-edit"></i>
+                <span>Cập nhật</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <UpdateProfile
+            setIsShowUpdateProfile={setIsShowUpdateProfile}
+            setIsShowOverlayModal={setIsShowOverlayModal}
+            profile={profile}
+            setProfile={setProfile}
+            userId={userInfo.id}
+            accountSelected={accountSelected}
+          />
+        )}
       </div>
       <MessageError />
     </div>
@@ -668,9 +490,7 @@ const ModalAccount = ({
                 <div className="display-name">
                   {accountSelected.displayName}
                 </div>
-                <div className="status">
-                  {accountSelected.status}
-                </div>
+                <div className="status">{accountSelected.status}</div>
                 {isReceive && (
                   <div style={{ fontWeight: 500, marginTop: "8px" }}>
                     Đã gửi cho bạn một lời mời kết bạn
@@ -749,19 +569,16 @@ const ModalAccount = ({
                 <div className="content-detail__item">
                   <div className="label">Điện thoại</div>
                   <div className="value">
-                    {accountSelected.phoneNumber &&
-                      `0${accountSelected.phoneNumber
-                        .toLocaleString()
-                        .replace(/\./g, " ")}`}
+                    {formatPhoneVN(accountSelected.phoneNumber)}
                   </div>
                 </div>
                 <div className="content-detail__item">
                   <div className="label">Giới tính</div>
-                  <div className="value">{accountSelected.sex}</div>
+                  <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
                 </div>
                 <div className="content-detail__item">
                   <div className="label">Ngày sinh</div>
-                  <div className="value">{accountSelected.dateOfBirth}</div>
+                  <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
                 </div>
               </div>
             </div>
