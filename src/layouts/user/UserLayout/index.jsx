@@ -5,7 +5,6 @@ import { useMediaQuery } from "react-responsive";
 import { auth } from "firebaseConfig";
 import { ROUTES } from "routes";
 import { AuthContext } from "Context/AuthProvider";
-import { TITLE_BAR } from "constants/public";
 import Sidebar from "../Sidebar";
 import BoxChatGroup from "components/BoxChatGroup";
 import BoxChat from "components/BoxChat";
@@ -15,6 +14,12 @@ export const UserLayoutContext = createContext();
 
 const UserLayout = () => {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery({ maxWidth: 991 });
+  const [sectionSelected, setSectionSelected] = useState("");
+  const [sidebarSelected, setSidebarSelected] = useState("message");
+  const [isShowBoxChat, setIsShowBoxChat] = useState(false);
+  const [isShowBoxChatGroup, setIsShowBoxChatGroup] = useState(false);
+
   const {
     user: { uid },
   } = useContext(AuthContext);
@@ -23,7 +28,6 @@ const UserLayout = () => {
     navigate(ROUTES.LOGIN);
   }
 
-  const [sidebarSelected, setSidebarSelected] = useState("message");
   useEffect(() => {
     const unsubscribed = auth.onAuthStateChanged((user) => {
       if (!user) {
@@ -35,15 +39,6 @@ const UserLayout = () => {
     };
   }, []);
 
-  const [isShowBoxChat, setIsShowBoxChat] = useState(false);
-
-  const [isShowBoxChatGroup, setIsShowBoxChatGroup] = useState(false);
-
-  const [totalUnSeenMessage, setTotalUnseenMessage] = useState(0);
-
-  const isMobile = useMediaQuery({ maxWidth: 991 });
-  const [sectionSelected, setSectionSelected] = useState("");
-
   useEffect(() => {
     setSectionSelected((prev) => {
       if (isMobile && sectionSelected === "") return "";
@@ -51,29 +46,6 @@ const UserLayout = () => {
     });
   }, [isMobile]);
 
-  useEffect(() => {
-    if (window.location.hostname === "localhost") {
-      if (totalUnSeenMessage >= 1) {
-        if (totalUnSeenMessage > 99) {
-          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
-          return;
-        }
-        document.title = `(${totalUnSeenMessage}) ${TITLE_BAR.DEV}`;
-      } else {
-        document.title = TITLE_BAR.DEV;
-      }
-    } else {
-      if (totalUnSeenMessage >= 1) {
-        if (totalUnSeenMessage > 99) {
-          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
-          return;
-        }
-        document.title = `(${totalUnSeenMessage}) ${TITLE_BAR.DEPLOY}`;
-      } else {
-        document.title = TITLE_BAR.DEPLOY;
-      }
-    }
-  }, [totalUnSeenMessage]);
 
   const [isShowSectionLeft, setIsShowSectionLeft] = useState(true);
   const [isShowSectionRight, setIsShowSectionRight] = useState(true);
@@ -84,8 +56,6 @@ const UserLayout = () => {
     setIsShowSectionLeft(true);
     setSectionSelected("");
   };
-  
-  
 
   return (
     <UserLayoutContext.Provider
@@ -94,8 +64,6 @@ const UserLayout = () => {
         setSidebarSelected,
         isShowBoxChat,
         setIsShowBoxChat,
-        totalUnSeenMessage,
-        setTotalUnseenMessage,
         isShowBoxChatGroup,
         setIsShowBoxChatGroup,
         sectionSelected,

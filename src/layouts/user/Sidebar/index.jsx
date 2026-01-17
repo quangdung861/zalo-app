@@ -7,6 +7,7 @@ import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { TITLE_BAR } from "constants/public";
 
 const Sidebar = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
@@ -17,10 +18,9 @@ const Sidebar = () => {
   const {
     sidebarSelected,
     setSidebarSelected,
-    totalUnSeenMessage,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading } = useContext(AppContext);
+  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading, totalUnread } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -34,6 +34,30 @@ const Sidebar = () => {
       icon: <i className="fa-solid fa-book"></i>,
     },
   ];
+
+  useEffect(() => {
+    if (window.location.hostname === "localhost") {
+      if (totalUnread >= 1) {
+        if (totalUnread > 99) {
+          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
+          return;
+        }
+        document.title = `(${totalUnread}) ${TITLE_BAR.DEV}`;
+      } else {
+        document.title = TITLE_BAR.DEV;
+      }
+    } else {
+      if (totalUnread >= 1) {
+        if (totalUnread > 99) {
+          document.title = `(99+) ${TITLE_BAR.DEPLOY}`;
+          return;
+        }
+        document.title = `(${totalUnread}) ${TITLE_BAR.DEPLOY}`;
+      } else {
+        document.title = TITLE_BAR.DEPLOY;
+      }
+    }
+  }, [totalUnread]);
 
   const handleOpenBoxChat = (id) => {
     if (id === "phonebook") {
@@ -59,16 +83,16 @@ const Sidebar = () => {
           }}
         >
           {item.icon}
-          {totalUnSeenMessage > 0 && item.id === "message" && (
+          {totalUnread > 0 && item.id === "message" && (
             <div className="unseen-messages">
-              {totalUnSeenMessage > 5 ? "N" : totalUnSeenMessage}
+              {totalUnread <= 99 ? totalUnread : "N"}
             </div>
           )}
         </div>
       );
     });
   };
-  
+
 
   const handleLogout = async () => {
     if (!userInfo?.id) return;

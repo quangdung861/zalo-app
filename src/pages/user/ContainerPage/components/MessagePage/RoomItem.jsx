@@ -98,7 +98,7 @@ const RoomItem = ({
 
                     {!!unseenMessages && (
                         <div className="unseen">
-                            {unseenMessages < 5 ? unseenMessages : "N"}
+                            {unseenMessages <= 99 ? unseenMessages : "N"}
                         </div>
                     )}
                 </div>
@@ -206,7 +206,7 @@ const RoomItem = ({
                                 <div className="icon-tagname">@</div>
                             )}
                             <div className="unseen">
-                                {unseenMessages < 5 ? unseenMessages : "N"}
+                                {unseenMessages <= 99 ? unseenMessages : "N"}
                             </div>
                         </div>
                     )}

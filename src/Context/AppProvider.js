@@ -50,16 +50,17 @@ const AppProvider = ({ children }) => {
   const [keywords, setKeywords] = useState(initialState.keywords);
   const [userInfo, setUserInfo] = useState(initialState.userInfo);
   const [selectedUserMessaging, setSelectedUserMessaging] = useState(
-    initialState.selectedUserMessaging
+    initialState.selectedUserMessaging,
   );
   const [selectedGroupMessaging, setSelectedGroupMessaging] = useState(
-    initialState.selectedGroupMessaging
+    initialState.selectedGroupMessaging,
   );
   const [room, setRoom] = useState(initialState.room);
   const [rooms, setRooms] = useState(initialState.rooms);
   const [loadingCount, setLoadingCount] = useState(initialState.loadingCount);
   const [lastDoc, setLastDoc] = useState(initialState.lastDoc);
   const [hasMore, setHasMore] = useState(initialState.hasMore);
+  const [totalUnread, setTotalUnread] = useState(0);
 
   const resetAppState = () => {
     setStrangerList([]);
@@ -99,14 +100,14 @@ const AppProvider = ({ children }) => {
         },
         {
           merge: true,
-        }
+        },
       );
     }
 
     if (!userInfo?.notificationDowloadZaloPc?.updatedAt) return;
 
     const previousTime = moment(
-      userInfo.notificationDowloadZaloPc.updatedAt.toDate()
+      userInfo.notificationDowloadZaloPc.updatedAt.toDate(),
     );
 
     const hoursDifference = moment
@@ -125,7 +126,7 @@ const AppProvider = ({ children }) => {
           updatedAt: serverTimestamp(),
         },
       },
-      { merge: true }
+      { merge: true },
     );
   }, [userInfo?.id]);
 
@@ -134,7 +135,7 @@ const AppProvider = ({ children }) => {
     if (uid) {
       const userInfoRef = query(
         collection(db, "users"),
-        where("uid", "==", uid)
+        where("uid", "==", uid),
       );
       unSubcribe = onSnapshot(userInfoRef, (docsSnap) => {
         const documents = docsSnap.docs.map((doc) => {
@@ -215,7 +216,7 @@ const AppProvider = ({ children }) => {
         if (keywords) {
           strangerListRef = query(
             collection(db, "users"),
-            where("keywords", "array-contains", keywords.toLowerCase())
+            where("keywords", "array-contains", keywords.toLowerCase()),
           );
         } else {
           strangerListRef = query(collection(db, "users"));
@@ -237,7 +238,7 @@ const AppProvider = ({ children }) => {
         ];
 
         const result = documents.filter(
-          (item) => !uidFriends.includes(item.uid)
+          (item) => !uidFriends.includes(item.uid),
         );
         return setStrangerList(result);
       };
@@ -253,9 +254,8 @@ const AppProvider = ({ children }) => {
       collection(db, "rooms"),
       where("members", "array-contains", uid),
       orderBy("messageLastest.createdAt", "desc"),
-      limit(PAGE_SIZE)
+      limit(PAGE_SIZE),
     );
-
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -294,7 +294,7 @@ const AppProvider = ({ children }) => {
             ? item.members.includes(selectedUserMessaging.uidSelected) &&
               item.category === "my cloud"
             : item.members.includes(selectedUserMessaging.uidSelected) &&
-              item.category === "single"
+              item.category === "single",
         );
 
         if (room[0]) {
@@ -306,12 +306,38 @@ const AppProvider = ({ children }) => {
       getRoom();
     }
   }, [selectedUserMessaging.uidSelected, rooms, userInfo]);
+  
+  useEffect(() => {
+    if (!uid) {
+      setTotalUnread(0);
+      return;
+    }
+
+    const q = query(
+      collection(db, "rooms"),
+      where("members", "array-contains", uid),
+      where(`unreadCount.${uid}`, ">", 0),
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let sum = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        sum += data.unreadCount?.[uid] || 0;
+      });
+
+      setTotalUnread(sum);
+    });
+
+    return () => unsubscribe();
+  }, [uid]);
 
   useEffect(() => {
     if (selectedGroupMessaging?.room?.id) {
       const getRoom = async () => {
         const room = rooms.filter(
-          (item) => item.id === selectedGroupMessaging?.room?.id
+          (item) => item.id === selectedGroupMessaging?.room?.id,
         );
         if (room[0]) {
           setRoom(room[0]);
@@ -365,6 +391,7 @@ const AppProvider = ({ children }) => {
         setHasMore,
         startLoading,
         stopLoading,
+        totalUnread
       }}
     >
       {children}

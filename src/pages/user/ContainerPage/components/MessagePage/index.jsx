@@ -283,11 +283,7 @@ const MessagePage = () => {
         );
       }
 
-      const infoMyself = room.messagesViewed.find(
-        (item) => item.uid === userInfo.uid
-      );
-
-      const unseenMessages = room.totalMessages - infoMyself.count;
+      const unseenMessages = room.unreadCount[userInfo.uid];
 
       let keywordsName;
 
@@ -401,11 +397,7 @@ const MessagePage = () => {
         room.messageLastest?.createdAt?.seconds * 1000
       )?.fromNow();
 
-      const infoMyself = room.messagesViewed.find(
-        (item) => item.uid === userInfo.uid
-      );
-
-      const unseenMessages = room.totalMessages - infoMyself.count;
+      const unseenMessages = room.unreadCount[userInfo.uid];
 
       if (keywords) {
         const isKeywords = infoGroup.keywordsName.includes(

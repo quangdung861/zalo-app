@@ -14,6 +14,9 @@ import {
   getDocs,
   limit,
   startAfter,
+  runTransaction,
+  increment,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
@@ -155,26 +158,20 @@ const BoxChat = () => {
   }, [room.id]);
 
   useEffect(() => {
-    if (room.id) {
-      const messagesViewedIndex = room.messagesViewed.findIndex(
-        (item) => item.uid === userInfo.uid
-      );
-      const messagesViewed = room.messagesViewed.find(
-        (item) => item.uid === userInfo.uid
-      );
+    const clearUnreadCount = async () => {
+      if (room?.id && userInfo?.uid) {
+        try {
+          await updateDoc(doc(db, "rooms", room.id), {
+            [`unreadCount.${userInfo.uid}`]: 0,
+          });
+        } catch (error) {
+          console.error("Lỗi cập nhật unreadCount:", error);
+        }
+      }
+    };
 
-      const newMessageViewed = [...room.messagesViewed];
-
-      newMessageViewed.splice(messagesViewedIndex, 1, {
-        ...messagesViewed,
-        count: room.totalMessages,
-      });
-
-      const docRef = doc(db, "rooms", room.id);
-
-      updateMessageViewed(docRef, newMessageViewed);
-    }
-  }, [room]);
+    clearUnreadCount();
+  }, [room.id, userInfo.uid]);
 
   const handleFocus = () => {
     const toolbarChatInputElement = document.querySelector(
@@ -228,18 +225,6 @@ const BoxChat = () => {
   //   };
   // }, []);
 
-  const updateMessageViewed = async (docRef, newMessageViewed) => {
-    setDoc(
-      docRef,
-      {
-        messagesViewed: newMessageViewed,
-      },
-      {
-        merge: true,
-      }
-    );
-  };
-
   const isFriend = userInfo.friends.findIndex(
     (item) => item.uid === selectedUserMessaging.uidSelected
   );
@@ -281,19 +266,19 @@ const BoxChat = () => {
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
 
-            const messagesViewedIndex = room.messagesViewed.findIndex(
-              (item) => item.uid === userInfo.uid
-            );
-            const messagesViewed = room.messagesViewed.find(
-              (item) => item.uid === userInfo.uid
-            );
+            const members = room.members || [];
+            const unreadCount = room.unreadCount || {};
 
-            const newMessageViewed = [...room.messagesViewed];
+            const newUnreadCount = { ...unreadCount };
 
-            newMessageViewed.splice(messagesViewedIndex, 1, {
-              ...messagesViewed,
-              count: messagesViewed.count + 1,
+            members.forEach((uid) => {
+              if (uid === userInfo.uid) {
+                newUnreadCount[uid] = 0;
+              } else {
+                newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
+              }
             });
+
             startLoading();
             await setDoc(
               roomRef,
@@ -306,7 +291,7 @@ const BoxChat = () => {
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
-                messagesViewed: newMessageViewed,
+                unreadCount: newUnreadCount,
                 hideTemporarily: [],
               },
               {
@@ -363,10 +348,10 @@ const BoxChat = () => {
                 },
                 createdAt: serverTimestamp(),
                 totalMessages: 1,
-                messagesViewed: [
-                  { uid: userInfo.uid, count: 1 },
-                  { uid: selectedUserMessaging.uidSelected, count: 0 },
-                ],
+                unreadCount: {
+                  [userInfo.uid]: 0,
+                  [selectedUserMessaging.uidSelected]: 1,
+                },
                 deleted: [],
                 hideTemporarily: [],
               });
@@ -439,29 +424,38 @@ const BoxChat = () => {
     }
   };
 
-  const handleClickSentMessage = () => {
-    if (inputValue) {
-      if (room.id) {
-        audio.play();
-        const createMes = async () => {
-          const roomRef = doc(db, "rooms", room.id);
+  const handleClickSentMessage = async () => {
+    if (!inputValue) return;
 
-          const messagesViewedIndex = room.messagesViewed.findIndex(
-            (item) => item.uid === userInfo.uid
-          );
-          const messagesViewed = room.messagesViewed.find(
-            (item) => item.uid === userInfo.uid
-          );
+    audio.play();
+    startLoading();
 
-          const newMessageViewed = [...room.messagesViewed];
+    try {
+      // ==============================
+      // CASE 1: ROOM ĐÃ TỒN TẠI
+      // ==============================
+      if (room?.id) {
+        const roomRef = doc(db, "rooms", room.id);
 
-          newMessageViewed.splice(messagesViewedIndex, 1, {
-            ...messagesViewed,
-            count: messagesViewed.count + 1,
+        await runTransaction(db, async (transaction) => {
+          const snap = await transaction.get(roomRef);
+          if (!snap.exists()) return;
+
+          const roomData = snap.data();
+          const members = roomData.members || [];
+          const unreadCount = roomData.unreadCount || {};
+
+          const nextUnread = { ...unreadCount };
+
+          members.forEach((uid) => {
+            if (uid === userInfo.uid) {
+              nextUnread[uid] = 0;
+            } else {
+              nextUnread[uid] = (nextUnread[uid] || 0) + 1;
+            }
           });
 
-          startLoading();
-          await setDoc(
+          transaction.set(
             roomRef,
             {
               messageLastest: {
@@ -471,140 +465,104 @@ const BoxChat = () => {
                 createdAt: serverTimestamp(),
                 clientCreatedAt: Date.now(),
               },
-              totalMessages: room.totalMessages + 1,
-              messagesViewed: newMessageViewed,
+              totalMessages: increment(1),
+              unreadCount: nextUnread,
               hideTemporarily: [],
             },
-            {
-              merge: true,
-            }
+            { merge: true }
           );
+        });
 
-          addDocument("messages", {
+        await addDoc(collection(db, "messages"), {
+          category: "single",
+          roomId: room.id,
+          uid: userInfo.uid,
+          text: inputValue,
+          images: [],
+          infoReply,
+          emojiList: [
+            { id: "smile", uids: [] },
+            { id: "heart", uids: [] },
+            { id: "surprise", uids: [] },
+            { id: "cry", uids: [] },
+            { id: "angry", uids: [] },
+          ],
+        });
+      }
+
+      // ==============================
+      // CASE 2: CHƯA CÓ ROOM → TẠO MỚI
+      // ==============================
+      else {
+        const members = [userInfo.uid, selectedUserMessaging.uidSelected];
+
+        const roomRef = await addDoc(collection(db, "rooms"), {
+          category: "single",
+          members,
+          messageLastest: {
+            text: inputValue,
+            displayName: userInfo.displayName,
+            uid: userInfo.uid,
+            createdAt: serverTimestamp(),
+            clientCreatedAt: Date.now(),
+          },
+          createdAt: serverTimestamp(),
+          clientCreatedAt: Date.now(),
+          totalMessages: 1,
+          unreadCount: {
+            [userInfo.uid]: 0,
+            [selectedUserMessaging.uidSelected]: 1,
+          },
+          deleted: [],
+          hideTemporarily: [],
+        });
+
+        const response = await getDoc(roomRef);
+        if (response.exists()) {
+          setRoom({ id: response.id, ...response.data() });
+
+          await addDoc(collection(db, "messages"), {
             category: "single",
-            roomId: room.id,
+            roomId: response.id,
             uid: userInfo.uid,
             text: inputValue,
             images: [],
-            infoReply: infoReply,
+            infoReply,
             emojiList: [
-              {
-                id: "smile",
-                uids: [],
-              },
-              {
-                id: "heart",
-                uids: [],
-              },
-              {
-                id: "surprise",
-                uids: [],
-              },
-              {
-                id: "cry",
-                uids: [],
-              },
-              {
-                id: "angry",
-                uids: [],
-              },
+              { id: "smile", uids: [] },
+              { id: "heart", uids: [] },
+              { id: "surprise", uids: [] },
+              { id: "cry", uids: [] },
+              { id: "angry", uids: [] },
             ],
           });
-          stopLoading();
-        };
-        createMes();
-      } else {
-        const createRoomAndMes = async () => {
-          try {
-            startLoading();
-            const roomRef = await addDoc(collection(db, "rooms"), {
-              category: "single",
-              members: [userInfo.uid, selectedUserMessaging.uidSelected],
-              messageLastest: {
-                text: inputValue,
-                displayName: userInfo.displayName,
-                uid: userInfo.uid,
-                createdAt: serverTimestamp(),
-                clientCreatedAt: Date.now(),
-              },
-              createdAt: serverTimestamp(),
-              clientCreatedAt: Date.now(),
-              totalMessages: 1,
-              messagesViewed: [
-                { uid: userInfo.uid, count: 1 },
-                { uid: selectedUserMessaging.uidSelected, count: 0 },
-              ],
-              deleted: [],
-              hideTemporarily: [],
-            });
-
-            const response = await getDoc(roomRef);
-
-            if (roomRef && roomRef.id) {
-              setRoom({ id: response.id, ...response.data() });
-              addDocument("messages", {
-                category: "single",
-                roomId: response.id,
-                uid: userInfo.uid,
-                text: inputValue,
-                images: [],
-                infoReply: infoReply,
-                emojiList: [
-                  {
-                    id: "smile",
-                    uids: [],
-                  },
-                  {
-                    id: "heart",
-                    uids: [],
-                  },
-                  {
-                    id: "surprise",
-                    uids: [],
-                  },
-                  {
-                    id: "cry",
-                    uids: [],
-                  },
-                  {
-                    id: "angry",
-                    uids: [],
-                  },
-                ],
-              });
-            } else {
-              console.error("Error creating room");
-            }
-          } catch (error) {
-            console.error("Error creating room:", error);
-          } finally {
-            stopLoading();
-          }
-        };
-
-        createRoomAndMes();
+        }
       }
-    }
-    // focus to input again after submit
-    setIsReplyMessage(false);
-    setInfoReply({});
-    setInputValue("");
+    } catch (err) {
+      console.error("Send message error:", err);
+    } finally {
+      stopLoading();
 
-    if (inputRef?.current) {
+      // reset UI
+      setIsReplyMessage(false);
+      setInfoReply({});
+      setInputValue("");
+
+      if (inputRef?.current) {
+        setTimeout(() => inputRef.current.focus());
+      }
+
+      const chatWindow = boxChatRef?.current;
       setTimeout(() => {
-        inputRef.current.focus();
-      });
+        chatWindow?.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 200);
     }
-
-    const chatWindow = boxChatRef?.current;
-    setTimeout(() => {
-      chatWindow.scrollTo({
-        top: chatWindow.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 200);
   };
-  
+
+
 
   // const [isOnline, setIsOnline] = useState(false);
 
@@ -2177,7 +2135,7 @@ const BoxChat = () => {
               <div className="box-icon">
                 <i className="fa-solid fa-video"></i>
               </div>
-              <div className="box-icon">
+              <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
               </div>
             </div>
