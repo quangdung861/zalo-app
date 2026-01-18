@@ -38,6 +38,7 @@ import angryIcon from "assets/emoji/angry.png";
 import ModalAddFriend from "components/ModalAddFriend";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
+import BackgoundModal from "./components/BackgoundModal";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
@@ -71,6 +72,7 @@ const BoxChat = () => {
   const [messages, setMessages] = useState([]);
   const [infoUsers, setInfoUsers] = useState();
   const [inputValue, setInputValue] = useState("");
+  const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -269,14 +271,10 @@ const BoxChat = () => {
             const roomRef = doc(db, "rooms", room.id);
 
             const members = room.members || [];
-            console.log("🚀 ~ createMes ~ members:", members)
             const unreadCount = room.unreadCount || {};
 
             const newUnreadCount = { ...unreadCount };
-            console.log(userInfo.id);
-            console.log(userInfo);
-            
-            
+
             const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
 
             members.forEach((uid) => {
@@ -2139,7 +2137,7 @@ const BoxChat = () => {
               </div>
             </div>
             <div className="right" style={{ color: "#333" }}>
-              <div className="box-icon">
+              {/* <div className="box-icon">
                 <i className="fa-solid fa-users"></i>
               </div>
               <div className="box-icon">
@@ -2150,8 +2148,12 @@ const BoxChat = () => {
               </div>
               <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
+              </div> */}
+              <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
+                <i class="fa-solid fa-brush"></i>
               </div>
             </div>
+            {isShowBackgroundModal && <BackgoundModal />}
           </div>
           <div className="container-content" >
             {isFriend === -1 &&
