@@ -270,8 +270,7 @@ export const Container = styled.div`
           justify-content: center;
           align-items: center;
           min-width: 120px;
-          padding: 4px 16px;
-          line-height: 1.2;
+          padding: 5px 16px;
           background-color: rgba(0, 0, 0, 0.2);
           color: #f1f1f1;
           border-radius: 10px;
