@@ -175,7 +175,7 @@ const Sidebar = () => {
               onClick={() => {
                 setIsShowModalConfirm("logout");
               }}
-            ><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+            ><i className="fa-solid fa-arrow-right-from-bracket"></i></div>
             <div
               className="action-item action-setting"
               title="Cài đặt"

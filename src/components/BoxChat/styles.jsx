@@ -7,6 +7,10 @@ export const Wrapper = styled.div`
   @media only screen and (max-width: 992px) {
     min-width: calc(100% - var(--sidebar-width));
   }
+   @media only screen and (max-width: 576px) {
+    position:fixed;
+    inset: 0;
+  }
 `;
 
 export const Container = styled.div`
@@ -23,6 +27,7 @@ export const Container = styled.div`
       align-items: center;
       user-select: none;
       z-index: 100;
+      background-color: white;
       .left {
         display: flex;
         align-items: center;
@@ -1476,16 +1481,8 @@ export const Container = styled.div`
     .box-chat {
       &__header {
         padding: 0 4px;
-        .left {
-          > .avatar {
-            display: none;
-          }
-        }
         .right {
           padding-left: 4px;
-          .box-icon {
-            display: none;
-          }
            .box-icon.background {
             display: block;
           }

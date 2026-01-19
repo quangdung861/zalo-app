@@ -7,6 +7,10 @@ export const Wrapper = styled.div`
   @media only screen and (max-width: 992px) {
     min-width: calc(100% - var(--sidebar-width));
   }
+  @media only screen and (max-width: 576px) {
+    position:fixed;
+    inset: 0;
+  }
 `;
 
 export const Container = styled.div`
@@ -21,6 +25,7 @@ export const Container = styled.div`
       justify-content: space-between;
       align-items: center;
       user-select: none;
+      background-color: white;
       .left {
         display: flex;
         align-items: center;
@@ -41,7 +46,6 @@ export const Container = styled.div`
           }
         }
         > .avatar {
-          margin-right: 12px;
           height: 48px;
           cursor: pointer;
           &:hover {
@@ -1521,11 +1525,6 @@ export const Container = styled.div`
   @media only screen and (max-width: 500px) {
     .box-chat {
       &__header {
-        .left {
-          > .avatar {
-            display: none;
-          }
-        }
       }
     }
   }
