@@ -2240,7 +2240,7 @@ const BoxChatGroup = () => {
               </div>
             </div>
             <div className="right" style={{ color: "#333" }}>
-              <div className="box-icon">
+              {/* <div className="box-icon">
                 <i className="fa-solid fa-users"></i>
               </div>
               <div className="box-icon">
@@ -2249,8 +2249,11 @@ const BoxChatGroup = () => {
               <div className="box-icon">
                 <i className="fa-solid fa-video"></i>
               </div>
-              <div className="box-icon">
+              <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
+              </div> */}
+              <div className="box-icon"  >
+                <i className="fa-solid fa-brush"></i>
               </div>
             </div>
           </div>
