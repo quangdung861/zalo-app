@@ -483,7 +483,7 @@ const BoxChat = () => {
           );
         });
 
-        await addDoc(collection(db, "messages"), {
+        await addDocument("messages", {
           category: "single",
           roomId: room.id,
           uid: userInfo.uid,
@@ -532,7 +532,7 @@ const BoxChat = () => {
         if (response.exists()) {
           setRoom({ id: response.id, ...response.data() });
 
-          await addDoc(collection(db, "messages"), {
+          await addDocument("messages", {
             category: "single",
             roomId: response.id,
             uid: userInfo.uid,
