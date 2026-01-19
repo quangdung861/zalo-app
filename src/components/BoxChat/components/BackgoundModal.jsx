@@ -20,10 +20,25 @@ export const backgroundImages = [
     img7, img8, img9, img10, img11, img12
 ];
 
-
-const BackgoundModal = () => {
+const BackgoundModal = ({ setIsShowBackgroundModal }) => {
 
     const [isMultiple, setIsMultiple] = useState(true);
+
+    // const setting = {
+    //     background: "",
+    //     backgroundMember: {
+    //         [uid]: {
+    //             backgrounds: [],
+    //             currentIndex: 0 
+    //         }
+    //     }
+    // }
+    // Thay ảnh chỉ phía tôi thì tải ảnh mới vào ví dụ nó sẽ thành ["img3", "img2", "img1"] và set currentIndex thành 1 = img3,
+    // Thay ảnh cho mọi người thì tải ảnh mới vào ví dụ nó sẽ thành ["img3", "img2", "img1"] và set currentIndex thành 1 = img3, 
+    // có thêm bước xóa tất cả currentIndex của mọi người khác về null, sau đó gán background: "img3"
+    // cách hiển thị trên UI ưu tiên hiển thị nếu currentIndex khác null, nếu là null thì hiển thị background
+    // xóa ảnh thì background vẫn tồn tại trừ khi set lại 1 ảnh mới, riêng người xóa sẽ bị set lại currentIndex: 0
+    // refacetor lại dùng link cả, ko dùng base64 nữa vì nặng k cân đc
 
     const renderListImg = () => {
         return backgroundImages.map((img, index) => {
@@ -35,7 +50,7 @@ const BackgoundModal = () => {
         <div id="background-modal">
             <div className="header">
                 <div className="header-left">
-                    <i className="fa-solid fa-xmark"></i>
+                    <i className="fa-solid fa-xmark" onClick={() => setIsShowBackgroundModal(false)}></i>
                     <span>Đổi hình nền</span>
                 </div>
                 <div className="header-right">
@@ -46,7 +61,7 @@ const BackgoundModal = () => {
             <div className="content">
                 <div className="img-list-wrapper">
                     <div className="img-list">
-                        <div className="img-item btn-upload-backgound"></div>
+                        <div className="img-item btn-upload-backgound"><i className="fa-solid fa-camera"></i></div>
                         {renderListImg()}
                     </div>
                 </div>

@@ -63,6 +63,7 @@ export const Wrapper = styled.div`
         .action-item--active {
           background-color: #006edc;
         }
+       
       }
       .action-bottom {
         width: 100%;
@@ -154,6 +155,44 @@ export const Wrapper = styled.div`
               padding-left: 40px;
               color: #d30e0e;
             }
+          }
+        }
+        .action-logout {
+          display: none;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 576px) {
+    .sidebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: row;
+      height: 64px;
+      padding: 0 16px;
+      .header {
+        padding-top: 0px;
+        height: auto;
+      }
+      .action-list {
+        flex-direction: row;
+        .action-top, .action-bottom {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          .action-item {
+            width: 64px;
+          }
+        }
+        .action-bottom  {
+          width: auto;
+          .action-setting {
+            display: none;
+          }
+          .action-logout {
+            display: block;
           }
         }
       }

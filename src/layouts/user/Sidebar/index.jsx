@@ -8,9 +8,11 @@ import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { TITLE_BAR } from "constants/public";
+import ModalConfirm from "common/ModalConfirm";
 
 const Sidebar = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
 
   const { setIsShowDropdown, isShowDropdown, dropdownRef } =
     useContext(DropdownContext);
@@ -34,7 +36,7 @@ const Sidebar = () => {
       icon: <i className="fa-solid fa-book"></i>,
     },
   ];
-  
+
   useEffect(() => {
     if (window.location.hostname === "localhost") {
       if (totalUnread >= 1) {
@@ -168,6 +170,13 @@ const Sidebar = () => {
               <i className="fa-solid fa-cloud icon-cloud"></i>
             </div>
             <div
+              className="action-item action-logout"
+              title="Đăng xuất"
+              onClick={() => {
+                setIsShowModalConfirm("logout");
+              }}
+            ><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+            <div
               className="action-item action-setting"
               title="Cài đặt"
               ref={dropdownRef}
@@ -235,7 +244,7 @@ const Sidebar = () => {
                   <div
                     className="dropdown-setting__item logout"
                     onClick={() => {
-                      handleLogout();
+                      setIsShowModalConfirm("logout");
                       setIsShowDropdown(!isShowDropdown);
                     }}
                   >
@@ -254,6 +263,9 @@ const Sidebar = () => {
           accountSelected={userInfo}
         />
       )}
+      {
+        isShowModalConfirm === "logout" && <ModalConfirm setIsShowModalConfirm={setIsShowModalConfirm} callback={handleLogout} text="Bạn có muốn đăng xuất khỏi Zalo?" btnSecond="Đăng xuất" />
+      }
     </S.Wrapper>
   );
 };

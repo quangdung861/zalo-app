@@ -2150,10 +2150,10 @@ const BoxChat = () => {
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
               <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
-                <i class="fa-solid fa-brush"></i>
+                <i className="fa-solid fa-brush"></i>
               </div>
             </div>
-            {isShowBackgroundModal && <BackgoundModal />}
+            {isShowBackgroundModal && <BackgoundModal setIsShowBackgroundModal={setIsShowBackgroundModal}/>}
           </div>
           <div className="container-content" >
             {isFriend === -1 &&

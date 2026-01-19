@@ -1,4 +1,5 @@
 #background-modal {
+    z-index: 99;
     position: absolute;
     top: 0;
     left: 0;
@@ -83,6 +84,17 @@
 
             .img-item.btn-upload-backgound {
                 background-color: #3989ff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                >i {
+                    color: white;
+                    line-height: 1;
+                    display: inline-block;
+                    transform-origin: center;
+                    animation: scalePulseDelay 5s cubic-bezier(.4, 0, .2, 1) infinite;
+                }
             }
 
 
@@ -122,6 +134,25 @@
             >span {
                 color: #7a7979;
             }
+        }
+    }
+
+    @keyframes scalePulseDelay {
+
+        0%,
+        80% {
+            font-size: 24px;
+            transform: scale(1);
+        }
+
+        90% {
+            font-size: 28px;
+            transform: scale(1.03);
+        }
+
+        100% {
+            font-size: 24px;
+            transform: scale(1);
         }
     }
 }

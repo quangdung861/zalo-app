@@ -339,7 +339,7 @@ const FormEmail = ({ setRegisterWay }) => {
                   className="password"
                   onChange={(e) => handleChange(e)}
                 />
-                <i class={formData.password.isShow ? "fa-solid fa-eye" : "fa-regular fa-eye"} onClick={() => setFormData(prev => ({ ...prev, password: { value: prev.password.value, isShow: !prev.password.isShow } }))}></i>
+                <i className={formData.password.isShow ? "fa-solid fa-eye" : "fa-regular fa-eye"} onClick={() => setFormData(prev => ({ ...prev, password: { value: prev.password.value, isShow: !prev.password.isShow } }))}></i>
               </div>
               <div className="error-fullname">{formData.password.error}</div>
 

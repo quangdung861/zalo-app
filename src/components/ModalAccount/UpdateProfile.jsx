@@ -402,7 +402,7 @@ const UpdateProfile = ({ userId, setIsShowUpdateProfile, setIsShowOverlayModal, 
                 <div className="title">
                     <div className="title-left">
                         <i
-                            class="fa-solid fa-angle-left btn-back"
+                            className="fa-solid fa-angle-left btn-back"
                             onClick={() => handleBack()}
                         ></i>
                         <span>Cập nhật thông tin cá nhân</span>
@@ -451,20 +451,20 @@ const UpdateProfile = ({ userId, setIsShowUpdateProfile, setIsShowOverlayModal, 
                         />
                     </div>
                     <div className="sub-title">Thông tin cá nhân</div>
-                    <div class="gender-group">
-                        <label class="radio-item">
+                    <div className="gender-group">
+                        <label className="radio-item">
                             <input type="radio" name="gender" value={GENDER.MALE} checked={profile.sex === GENDER.MALE}
                                 onChange={() => handleChange("sex", GENDER.MALE)} />
-                            <span class="custom-radio"></span>
-                            <span class="label-text">{GENDER_LABEL[GENDER.MALE]}</span>
+                            <span className="custom-radio"></span>
+                            <span className="label-text">{GENDER_LABEL[GENDER.MALE]}</span>
                         </label>
 
-                        <label class="radio-item">
+                        <label className="radio-item">
                             <input type="radio" name="gender" value={GENDER.FEMALE}
                                 checked={profile.sex === GENDER.FEMALE}
                                 onChange={() => handleChange("sex", GENDER.FEMALE)} />
-                            <span class="custom-radio"></span>
-                            <span class="label-text">{GENDER_LABEL[GENDER.FEMALE]}</span>
+                            <span className="custom-radio"></span>
+                            <span className="label-text">{GENDER_LABEL[GENDER.FEMALE]}</span>
                         </label>
                     </div>
                     <div className="info-item">
