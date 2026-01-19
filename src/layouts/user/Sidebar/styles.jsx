@@ -42,6 +42,13 @@ export const Wrapper = styled.div`
             font-size: 24px;
             color: white;
           }
+          > .fa-circle {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 10px;
+            color: #c31818;
+          }
           cursor: pointer;
           :hover {
             background-color: rgba(0, 0, 0, 0.1);
