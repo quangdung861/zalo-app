@@ -269,12 +269,13 @@ export const Container = styled.div`
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 4px 10px 6px 10px;
+          min-width: 120px;
+          padding: 4px 16px;
+          line-height: 1.2;
           background-color: rgba(0, 0, 0, 0.2);
           color: #f1f1f1;
-          border-radius: 16px;
+          border-radius: 10px;
           font-size: 12px;
-
           user-select: none;
         }
       }
