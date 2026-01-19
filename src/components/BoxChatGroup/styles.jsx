@@ -69,6 +69,7 @@ export const Container = styled.div`
             font-weight: 500;
             overflow: hidden;
             text-overflow: ellipsis;
+            cursor: pointer;
           }
           .new-seperator {
             background: #d6dbe1;
@@ -189,6 +190,7 @@ export const Container = styled.div`
           display: flex;
           justify-content: center;
           margin-bottom: 8px;
+          cursor: pointer;
           > img {
             width: 100px;
             height: 100px;
@@ -216,7 +218,7 @@ export const Container = styled.div`
         }
       }
 
-      .created-room {
+      .date-label {
         margin-bottom: 12px;
         display: flex;
         justify-content: center;

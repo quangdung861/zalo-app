@@ -37,6 +37,21 @@ const Sidebar = () => {
     },
   ];
 
+  const isNewInvitationReceive = (() => {
+    const invitations = userInfo?.invitationReceive;
+
+    if (!invitations || invitations.length === 0) return false;
+
+    const lastInvitation = [...invitations].sort(
+      (a, b) => b.createdAt - a.createdAt
+    )[0];
+
+    const now = Date.now();
+    const ONE_DAY = 24 * 60 * 60 * 1000; // 24h in ms
+
+    return now - lastInvitation.createdAt <= ONE_DAY;
+  })();
+
   useEffect(() => {
     if (window.location.hostname === "localhost") {
       if (totalUnread >= 1) {
@@ -85,6 +100,9 @@ const Sidebar = () => {
           }}
         >
           {item.icon}
+          {
+            isNewInvitationReceive && item.id === "phonebook" && <i className="fa-solid fa-circle"></i>
+          }
           {totalUnread > 0 && item.id === "message" && (
             <div className="unseen-messages">
               {totalUnread <= 99 ? totalUnread : "N"}

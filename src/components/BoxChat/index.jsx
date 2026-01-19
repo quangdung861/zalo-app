@@ -36,9 +36,9 @@ import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAddFriend from "components/ModalAddFriend";
+import BackgoundModal from "./components/BackgoundModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
-import BackgoundModal from "./components/BackgoundModal";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
@@ -909,6 +909,45 @@ const BoxChat = () => {
 
   const [clicked, setClicked] = useState("all");
 
+  function startOfDay(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function getDateLabel(createdAt) {
+    const msgDate = startOfDay(createdAt?.toDate());
+    const today = startOfDay(new Date());
+
+    const diffDays =
+      (today - msgDate) / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 0) return "Hôm nay";
+    if (diffDays === 1) return "Hôm qua";
+
+    const sameYear =
+      msgDate.getFullYear() === today.getFullYear();
+
+    if (sameYear) {
+      return msgDate.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+      });
+    }
+
+    return msgDate.toLocaleDateString("vi-VN");
+  }
+
+  function shouldShowLabel(current, next) {
+    if (!current?.createdAt) return false;
+    if (!next?.createdAt) return true;
+
+    const curDay = startOfDay(current.createdAt.toDate()).getTime();
+    const nextDay = startOfDay(next.createdAt.toDate()).getTime();
+
+    return curDay !== nextDay;
+  }
+
   const renderMessages = () => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
@@ -930,6 +969,10 @@ const BoxChat = () => {
       if (item.isDeleted?.includes(userInfo.uid)) {
         return undefined;
       }
+
+      const nextMsg = messages[index + 1];
+      const showLabel = shouldShowLabel(item, nextMsg);
+      const label = getDateLabel(item.createdAt);
 
       let CREATEDAT_URL;
       const getCreatedAtMessage = () => {
@@ -1028,7 +1071,7 @@ const BoxChat = () => {
 
           const data = infoUsers?.find((user) => user.uid === uid2);
 
-          if (clicked !== "all" && !categoriesId.includes(clicked)) return;
+          if (clicked !== "all" && !categoriesId.includes(clicked)) return null;
 
           let total = 0;
           sortedEmojiList.forEach((element) => {
@@ -1090,648 +1133,654 @@ const BoxChat = () => {
       };
 
       return (
-        <div
-          key={item.id}
-          className="message-item"
-          onMouseLeave={() => setEmojis()}
-        >
-          {isShowOverlayModalEmotion?.message?.id === item.id && (
-            <div className="modal-emoji-overlay">
-              <div className="modal-container">
-                <div className="modal-content" ref={emotionModal}>
-                  <div className="modal-content__header">
-                    <div className="title">Biểu cảm</div>
-                    <div className="icon-close">
-                      <i
-                        className="fa-solid fa-xmark"
-                        onClick={() => {
-                          setIsShowOverlayModalEmotion(false);
-                          setClicked("all");
-                        }}
-                      ></i>
+        <React.Fragment key={item.id}>
+          <div
+            className="message-item"
+            onMouseLeave={() => setEmojis()}
+          >
+            {isShowOverlayModalEmotion?.message?.id === item.id && (
+              <div className="modal-emoji-overlay">
+                <div className="modal-container">
+                  <div className="modal-content" ref={emotionModal}>
+                    <div className="modal-content__header">
+                      <div className="title">Biểu cảm</div>
+                      <div className="icon-close">
+                        <i
+                          className="fa-solid fa-xmark"
+                          onClick={() => {
+                            setIsShowOverlayModalEmotion(false);
+                            setClicked("all");
+                          }}
+                        ></i>
+                      </div>
                     </div>
-                  </div>
-                  <div className="modal-content__content">
-                    <div className="filter-category-list">
-                      <div
-                        className={`filter-category-item ${clicked === "all" ? "clicked" : ""
-                          }`}
-                        onClick={() => setClicked("all")}
-                      >
-                        Tất cả {total}
+                    <div className="modal-content__content">
+                      <div className="filter-category-list">
                         <div
-                          className={`dividing-bottom ${clicked === "all" ? "clicked" : ""
+                          className={`filter-category-item ${clicked === "all" ? "clicked" : ""
                             }`}
-                        ></div>
-                      </div>
-                      {sortedEmojiList.map(
-                        (emoji) =>
-                          emoji.uids[0] && (
-                            <div
-                              className={`filter-category-item ${clicked === emoji.id ? "clicked" : ""
-                                }`}
-                              key={emoji.id}
-                              onClick={() => setClicked(emoji.id)}
-                            >
-                              <img
-                                src={
-                                  dataIconEmoji.find(
-                                    (item) => item.id === emoji.id
-                                  ).src
-                                }
-                                alt=""
-                              />
-                              {emoji.uids.reduce(
-                                (accumulator, currentValue) =>
-                                  accumulator + currentValue.quantity,
-                                0
-                              )}
+                          onClick={() => setClicked("all")}
+                        >
+                          Tất cả {total}
+                          <div
+                            className={`dividing-bottom ${clicked === "all" ? "clicked" : ""
+                              }`}
+                          ></div>
+                        </div>
+                        {sortedEmojiList.map(
+                          (emoji) =>
+                            emoji.uids[0] && (
                               <div
-                                className={`dividing-bottom ${clicked === emoji.id ? "clicked" : ""
+                                className={`filter-category-item ${clicked === emoji.id ? "clicked" : ""
                                   }`}
-                              ></div>
-                            </div>
-                          )
-                      )}
-                      <div className="dividing-selected"></div>
+                                key={emoji.id}
+                                onClick={() => setClicked(emoji.id)}
+                              >
+                                <img
+                                  src={
+                                    dataIconEmoji.find(
+                                      (item) => item.id === emoji.id
+                                    ).src
+                                  }
+                                  alt=""
+                                />
+                                {emoji.uids.reduce(
+                                  (accumulator, currentValue) =>
+                                    accumulator + currentValue.quantity,
+                                  0
+                                )}
+                                <div
+                                  className={`dividing-bottom ${clicked === emoji.id ? "clicked" : ""
+                                    }`}
+                                ></div>
+                              </div>
+                            )
+                        )}
+                        <div className="dividing-selected"></div>
+                      </div>
+                      {renderEmotionList()}
                     </div>
-                    {renderEmotionList()}
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-          {item.uid === userInfo.uid ? (
-            <div className="message-item__myself">
-              <div className="container-options">
-                {!item.isRecall ? (
-                  <>
-                    <div className="myself-options">
-                      <i
-                        className="fa-solid fa-quote-right"
-                        title="Trả lời"
-                        onClick={() =>
-                          handleReplyMessage({
-                            name: newInfoUser.displayName,
-                            id: item.id,
-                            text: item.text,
-                            image: item?.images[0] || null,
-                          })
-                        }
-                      ></i>
-                      <i
-                        className="fa-solid fa-share"
-                        title="Chia sẻ"
-                        onClick={() =>
-                          handleSharingMessage({ infoMessage: item })
-                        }
-                      ></i>
-                      <i
-                        className="fa-solid fa-ellipsis"
-                        title="Thêm"
-                        onClick={() =>
-                          setIsShowDropdownOption({
-                            id: item.id,
-                          })
-                        }
-                      ></i>
-                    </div>
-
-                    {isShowDropdownOption?.id === item.id && (
-                      <div className="dropdown-menu" ref={dropdownRef}>
-                        <div
-                          className="menu-item"
-                          onClick={() => handleCopyText(item.text)}
-                        >
-                          <i className="fa-regular fa-copy"></i>
-                          Copy tin nhắn
-                        </div>
-                        <div
-                          className="menu-item"
-                          style={{ color: "#d91b1b" }}
+            )}
+            {item.uid === userInfo.uid ? (
+              <div className="message-item__myself">
+                <div className="container-options">
+                  {!item.isRecall ? (
+                    <>
+                      <div className="myself-options">
+                        <i
+                          className="fa-solid fa-quote-right"
+                          title="Trả lời"
                           onClick={() =>
-                            handleRecallMessage({
+                            handleReplyMessage({
+                              name: newInfoUser.displayName,
                               id: item.id,
-                              createdAt: item.createdAt,
+                              text: item.text,
+                              image: item?.images[0] || null,
                             })
                           }
-                        >
-                          <i
-                            className="fa-solid fa-rotate-left"
-                            style={{ color: "#d91b1b" }}
-                          ></i>
-                          Thu hồi
-                        </div>
-                        <div
-                          className="menu-item"
-                          style={{ color: "#d91b1b" }}
+                        ></i>
+                        <i
+                          className="fa-solid fa-share"
+                          title="Chia sẻ"
                           onClick={() =>
-                            handleDeleteMessage({
-                              message: item,
+                            handleSharingMessage({ infoMessage: item })
+                          }
+                        ></i>
+                        <i
+                          className="fa-solid fa-ellipsis"
+                          title="Thêm"
+                          onClick={() =>
+                            setIsShowDropdownOption({
+                              id: item.id,
                             })
                           }
-                        >
-                          <i
-                            className="fa-regular fa-trash-can"
-                            style={{ color: "#d91b1b" }}
-                          ></i>
-                          Xoá chỉ ở phía tôi
-                        </div>
+                        ></i>
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <div
-                    className="myself-options recall"
-                    onClick={() =>
-                      handleDeleteMessage({
-                        message: item,
-                      })
-                    }
-                  >
-                    <i className="fa-regular fa-trash-can"></i>
-                  </div>
-                )}
-              </div>
-              <div className="box-image">
-                <div className="text">
-                  {isRenderUserNameInEmojiList === item.id && (
-                    <div
-                      className="dropdown-username-reaction"
-                      style={{
-                        bottom: messages.length - 1 === index ? "46px" : "auto",
-                        top: messages.length - 1 === index ? "auto" : "100%",
-                      }}
-                    >
-                      {renderUserNameInEmojiList()}
-                    </div>
-                  )}
 
-                  {!item.isRecall ? (
-                    <>
-                      {item.infoReply?.id && (
-                        <div className="reply-content">
-                          <div className="reply-content__left"></div>
-                          {item.infoReply?.image && (
-                            <img
-                              src={item.infoReply?.image?.url}
-                              alt=""
-                              className="image-reply"
-                            />
-                          )}
-                          <div className="reply-content__right">
-                            <div className="subcription">
-                              <span className="name">
-                                {item.infoReply?.name || userInfo.displayName}
-                              </span>
-                            </div>
-                            <div className="content">
-                              {item.infoReply.text || "[Hình ảnh]"}
-                            </div>
+                      {isShowDropdownOption?.id === item.id && (
+                        <div className="dropdown-menu" ref={dropdownRef}>
+                          <div
+                            className="menu-item"
+                            onClick={() => handleCopyText(item.text)}
+                          >
+                            <i className="fa-regular fa-copy"></i>
+                            Copy tin nhắn
+                          </div>
+                          <div
+                            className="menu-item"
+                            style={{ color: "#d91b1b" }}
+                            onClick={() =>
+                              handleRecallMessage({
+                                id: item.id,
+                                createdAt: item.createdAt,
+                              })
+                            }
+                          >
+                            <i
+                              className="fa-solid fa-rotate-left"
+                              style={{ color: "#d91b1b" }}
+                            ></i>
+                            Thu hồi
+                          </div>
+                          <div
+                            className="menu-item"
+                            style={{ color: "#d91b1b" }}
+                            onClick={() =>
+                              handleDeleteMessage({
+                                message: item,
+                              })
+                            }
+                          >
+                            <i
+                              className="fa-regular fa-trash-can"
+                              style={{ color: "#d91b1b" }}
+                            ></i>
+                            Xoá chỉ ở phía tôi
                           </div>
                         </div>
                       )}
-                      {item?.images[0] &&
-                        item.images.map((image, index) => {
-                          return (
-                            <img
-                              className="image-item"
-                              key={index}
-                              src={image.url}
-                              alt=""
-                              style={{ width: "100%" }}
-                              onClick={() => {
-                                setMessageSelected({
-                                  ...newInfoUser,
-                                  URL: image.url,
-                                  CREATEDAT_URL,
-                                  MESSAGE_ID: item.id,
-                                  IMAGE_INDEX: index,
-                                });
-                                setIsShowOverlayModalDetailImage(true);
-                              }}
-                            />
-                          );
-                        })}
-                      {item.text}
                     </>
                   ) : (
-                    <span
-                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                    <div
+                      className="myself-options recall"
+                      onClick={() =>
+                        handleDeleteMessage({
+                          message: item,
+                        })
+                      }
                     >
-                      Tin nhắn đã được thu hồi
-                    </span>
-                  )}
-
-                  <div className="box-date">
-                    <div className="format-date-message">{CREATEDAT_URL}</div>
-                  </div>
-                  {total > 0 && (
-                    <div className="reaction-emoji">
-                      {isNewest && (
-                        <div
-                          className="emoji-newest"
-                          onClick={() =>
-                            handleAddEmoji({ id: isNewest.id, message: item })
-                          }
-                          onMouseEnter={() => setEmojis(item.id)}
-                        >
-                          <img
-                            src={
-                              dataIconEmoji.find(
-                                (item) => item.id === isNewest.id
-                              ).src
-                            }
-                            alt=""
-                            className="emoji-item"
-                          />
-                        </div>
-                      )}
-
-                      <div
-                        className="total-emoji"
-                        onMouseEnter={() =>
-                          setIsRenderUserNameInEmojiList(item.id)
-                        }
-                        onMouseLeave={() =>
-                          setIsRenderUserNameInEmojiList(false)
-                        }
-                        onClick={() =>
-                          setIsShowOverlayModalEmotion({ message: item })
-                        }
-                      >
-                        <span>{total}</span>
-
-                        {sortedEmojiList
-                          .slice(0, 3)
-                          .map(
-                            (emoji, index) =>
-                              emoji.uids[0] && (
-                                <img
-                                  key={emoji.id}
-                                  src={
-                                    dataIconEmoji.find(
-                                      (item) => item.id === emoji.id
-                                    ).src
-                                  }
-                                  alt=""
-                                />
-                              )
-                          )}
-                      </div>
+                      <i className="fa-regular fa-trash-can"></i>
                     </div>
                   )}
-                  <div className="box-emoji">
-                    {!isNewest && (
+                </div>
+                <div className="box-image">
+                  <div className="text">
+                    {isRenderUserNameInEmojiList === item.id && (
                       <div
-                        className="btn-emoji btn-emoji-hidden"
-                        onMouseEnter={() => setEmojis(item.id)}
+                        className="dropdown-username-reaction"
+                        style={{
+                          bottom: messages.length - 1 === index ? "46px" : "auto",
+                          top: messages.length - 1 === index ? "auto" : "100%",
+                        }}
                       >
-                        <i className="fa-regular fa-thumbs-up"></i>
+                        {renderUserNameInEmojiList()}
                       </div>
                     )}
 
-                    {emojis === item.id && (
-                      <div
-                        className="dropdown-emoji-list"
-                        ref={dropdownSelectEmoji}
-                        style={{ marginBottom: isNewest ? "30px" : "auto" }}
+                    {!item.isRecall ? (
+                      <>
+                        {item.infoReply?.id && (
+                          <div className="reply-content">
+                            <div className="reply-content__left"></div>
+                            {item.infoReply?.image && (
+                              <img
+                                src={item.infoReply?.image?.url}
+                                alt=""
+                                className="image-reply"
+                              />
+                            )}
+                            <div className="reply-content__right">
+                              <div className="subcription">
+                                <span className="name">
+                                  {item.infoReply?.name || userInfo.displayName}
+                                </span>
+                              </div>
+                              <div className="content">
+                                {item.infoReply.text || "[Hình ảnh]"}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {item?.images[0] &&
+                          item.images.map((image, index) => {
+                            return (
+                              <img
+                                className="image-item"
+                                key={index}
+                                src={image.url}
+                                alt=""
+                                style={{ width: "100%" }}
+                                onClick={() => {
+                                  setMessageSelected({
+                                    ...newInfoUser,
+                                    URL: image.url,
+                                    CREATEDAT_URL,
+                                    MESSAGE_ID: item.id,
+                                    IMAGE_INDEX: index,
+                                  });
+                                  setIsShowOverlayModalDetailImage(true);
+                                }}
+                              />
+                            );
+                          })}
+                        {item.text}
+                      </>
+                    ) : (
+                      <span
+                        style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
                       >
-                        <img
-                          src={smileIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "smile", message: item })
+                        Tin nhắn đã được thu hồi
+                      </span>
+                    )}
+
+                    <div className="box-date">
+                      <div className="format-date-message">{CREATEDAT_URL}</div>
+                    </div>
+                    {total > 0 && (
+                      <div className="reaction-emoji">
+                        {isNewest && (
+                          <div
+                            className="emoji-newest"
+                            onClick={() =>
+                              handleAddEmoji({ id: isNewest.id, message: item })
+                            }
+                            onMouseEnter={() => setEmojis(item.id)}
+                          >
+                            <img
+                              src={
+                                dataIconEmoji.find(
+                                  (item) => item.id === isNewest.id
+                                ).src
+                              }
+                              alt=""
+                              className="emoji-item"
+                            />
+                          </div>
+                        )}
+
+                        <div
+                          className="total-emoji"
+                          onMouseEnter={() =>
+                            setIsRenderUserNameInEmojiList(item.id)
                           }
-                        />
-                        <img
-                          src={heartIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "heart", message: item })
+                          onMouseLeave={() =>
+                            setIsRenderUserNameInEmojiList(false)
                           }
-                        />
-                        <img
-                          src={surpriseIcon}
-                          alt=""
-                          className="emoji-item"
                           onClick={() =>
-                            handleAddEmoji({ id: "surprise", message: item })
+                            setIsShowOverlayModalEmotion({ message: item })
                           }
-                        />
-                        <img
-                          src={cryIcon}
-                          alt=""
-                          className="emoji-item"
+                        >
+                          <span>{total}</span>
+
+                          {sortedEmojiList
+                            .slice(0, 3)
+                            .map(
+                              (emoji, index) =>
+                                emoji.uids[0] && (
+                                  <img
+                                    key={emoji.id}
+                                    src={
+                                      dataIconEmoji.find(
+                                        (item) => item.id === emoji.id
+                                      ).src
+                                    }
+                                    alt=""
+                                  />
+                                )
+                            )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="box-emoji">
+                      {!isNewest && (
+                        <div
+                          className="btn-emoji btn-emoji-hidden"
+                          onMouseEnter={() => setEmojis(item.id)}
+                        >
+                          <i className="fa-regular fa-thumbs-up"></i>
+                        </div>
+                      )}
+
+                      {emojis === item.id && (
+                        <div
+                          className="dropdown-emoji-list"
+                          ref={dropdownSelectEmoji}
+                          style={{ marginBottom: isNewest ? "30px" : "auto" }}
+                        >
+                          <img
+                            src={smileIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "smile", message: item })
+                            }
+                          />
+                          <img
+                            src={heartIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "heart", message: item })
+                            }
+                          />
+                          <img
+                            src={surpriseIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "surprise", message: item })
+                            }
+                          />
+                          <img
+                            src={cryIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "cry", message: item })
+                            }
+                          />
+                          <img
+                            src={angryIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "angry", message: item })
+                            }
+                          />
+                          <i
+                            className="fa-solid fa-xmark btn-close"
+                            onClick={() => handleRemoveEmojis({ message: item })}
+                          ></i>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* <img src={newInfoUser?.photoURL} alt="" className="avatar" /> */}
+                </div>
+              </div>
+            ) : (
+              <div className="message-item__other">
+                <div className="box-image">
+                  <img
+                    src={newInfoUser?.photoURL}
+                    alt=""
+                    className="avatar"
+                    onClick={() => setIsShowOverlayModal(true)}
+                  />
+                  <div className="text">
+                    {!item.isRecall ? (
+                      <>
+                        {item.infoReply?.id && (
+                          <div className="reply-content">
+                            <div className="reply-content__left"></div>
+                            {item.infoReply?.image && (
+                              <img
+                                src={item.infoReply?.image?.url}
+                                alt=""
+                                className="image-reply"
+                              />
+                            )}
+                            <div className="reply-content__right">
+                              <div className="subcription">
+                                <span className="name">
+                                  {item.infoReply?.name || userInfo.displayName}
+                                </span>
+                              </div>
+                              <div className="content">
+                                {item.infoReply.text || "[Hình ảnh]"}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {item.images[0] &&
+                          item.images.map((image, index) => {
+                            return (
+                              <img
+                                key={index}
+                                src={image.url}
+                                alt=""
+                                style={{ width: "100%", cursor: "pointer" }}
+                                onClick={() => {
+                                  setMessageSelected({
+                                    ...newInfoUser,
+                                    URL: image.url,
+                                    CREATEDAT_URL,
+                                    MESSAGE_ID: item.id,
+                                    IMAGE_INDEX: index,
+                                  });
+                                  setIsShowOverlayModalDetailImage(true);
+                                }}
+                              />
+                            );
+                          })}
+                        {item.text}
+                      </>
+                    ) : (
+                      <span
+                        style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
+                      >
+                        Tin nhắn đã được thu hồi
+                      </span>
+                    )}
+
+                    <div className="box-date">
+                      <div className="format-date-message">{CREATEDAT_URL}</div>
+                    </div>
+                    {total > 0 && (
+                      <div className="reaction-emoji">
+                        {isNewest && (
+                          <div
+                            className="emoji-newest"
+                            onClick={() =>
+                              handleAddEmoji({ id: isNewest.id, message: item })
+                            }
+                            onMouseEnter={() => setEmojis(item.id)}
+                          >
+                            <img
+                              src={
+                                dataIconEmoji.find(
+                                  (item) => item.id === isNewest.id
+                                ).src
+                              }
+                              alt=""
+                              className="emoji-item"
+                            />
+                          </div>
+                        )}
+
+                        <div
+                          className="total-emoji"
+                          onMouseEnter={() =>
+                            setIsRenderUserNameInEmojiList(item.id)
+                          }
+                          onMouseLeave={() =>
+                            setIsRenderUserNameInEmojiList(false)
+                          }
                           onClick={() =>
-                            handleAddEmoji({ id: "cry", message: item })
+                            setIsShowOverlayModalEmotion({ message: item })
                           }
-                        />
-                        <img
-                          src={angryIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "angry", message: item })
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-xmark btn-close"
-                          onClick={() => handleRemoveEmojis({ message: item })}
-                        ></i>
+                        >
+                          <span>{total}</span>
+
+                          {sortedEmojiList
+                            .slice(0, 3)
+                            .map(
+                              (emoji, index) =>
+                                emoji.uids[0] && (
+                                  <img
+                                    key={emoji.id}
+                                    src={
+                                      dataIconEmoji.find(
+                                        (item) => item.id === emoji.id
+                                      ).src
+                                    }
+                                    alt=""
+                                  />
+                                )
+                            )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="box-emoji">
+                      {lastIndex === index && !isNewest && (
+                        <div
+                          className="btn-emoji"
+                          onMouseEnter={() => setEmojis(item.id)}
+                        >
+                          <i className="fa-regular fa-thumbs-up"></i>
+                        </div>
+                      )}
+
+                      {!isNewest && (
+                        <div
+                          className="btn-emoji btn-emoji-hidden"
+                          onMouseEnter={() => setEmojis(item.id)}
+                        >
+                          <i className="fa-regular fa-thumbs-up"></i>
+                        </div>
+                      )}
+
+                      {emojis === item.id && (
+                        <div
+                          className="dropdown-emoji-list"
+                          ref={dropdownSelectEmoji}
+                          style={{ marginBottom: isNewest ? "30px" : "auto" }}
+                        >
+                          <img
+                            src={smileIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "smile", message: item })
+                            }
+                          />
+                          <img
+                            src={heartIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "heart", message: item })
+                            }
+                          />
+                          <img
+                            src={surpriseIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "surprise", message: item })
+                            }
+                          />
+                          <img
+                            src={cryIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "cry", message: item })
+                            }
+                          />
+                          <img
+                            src={angryIcon}
+                            alt=""
+                            className="emoji-item"
+                            onClick={() =>
+                              handleAddEmoji({ id: "angry", message: item })
+                            }
+                          />
+                          <i
+                            className="fa-solid fa-xmark btn-close"
+                            onClick={() => handleRemoveEmojis({ message: item })}
+                          ></i>
+                        </div>
+                      )}
+                    </div>
+                    {isRenderUserNameInEmojiList === item.id && (
+                      <div
+                        className="dropdown-username-reaction"
+                        style={{
+                          bottom: messages.length - 1 === index ? "46px" : "auto",
+                          top: messages.length - 1 === index ? "auto" : "100%",
+                        }}
+                      >
+                        {renderUserNameInEmojiList()}
                       </div>
                     )}
                   </div>
                 </div>
-                {/* <img src={newInfoUser?.photoURL} alt="" className="avatar" /> */}
-              </div>
-            </div>
-          ) : (
-            <div className="message-item__other">
-              <div className="box-image">
-                <img
-                  src={newInfoUser?.photoURL}
-                  alt=""
-                  className="avatar"
-                  onClick={() => setIsShowOverlayModal(true)}
-                />
-                <div className="text">
+                <div className="container-options">
                   {!item.isRecall ? (
                     <>
-                      {item.infoReply?.id && (
-                        <div className="reply-content">
-                          <div className="reply-content__left"></div>
-                          {item.infoReply?.image && (
-                            <img
-                              src={item.infoReply?.image?.url}
-                              alt=""
-                              className="image-reply"
-                            />
-                          )}
-                          <div className="reply-content__right">
-                            <div className="subcription">
-                              <span className="name">
-                                {item.infoReply?.name || userInfo.displayName}
-                              </span>
-                            </div>
-                            <div className="content">
-                              {item.infoReply.text || "[Hình ảnh]"}
-                            </div>
+                      <div className="other-options">
+                        <i
+                          className="fa-solid fa-quote-right"
+                          title="Trả lời"
+                          onClick={() =>
+                            handleReplyMessage({
+                              name: newInfoUser.displayName,
+                              id: item.id,
+                              text: item.text,
+                              image: item?.images[0] || null,
+                            })
+                          }
+                        ></i>
+                        <i
+                          className="fa-solid fa-share"
+                          title="Chia sẻ"
+                          onClick={() =>
+                            handleSharingMessage({ infoMessage: item })
+                          }
+                        ></i>
+                        <i
+                          className="fa-solid fa-ellipsis"
+                          title="Thêm"
+                          onClick={() =>
+                            setIsShowDropdownOption({
+                              id: item.id,
+                            })
+                          }
+                        ></i>
+                      </div>
+                      {isShowDropdownOption?.id === item.id && (
+                        <div className="dropdown-menu" ref={dropdownRef}>
+                          <div
+                            className="menu-item"
+                            onClick={() => handleCopyText(item.text)}
+                          >
+                            <i className="fa-regular fa-copy"></i>
+                            Copy tin nhắn
+                          </div>
+                          <div
+                            className="menu-item"
+                            style={{ color: "#d91b1b" }}
+                            onClick={() =>
+                              handleDeleteMessage({
+                                message: item,
+                              })
+                            }
+                          >
+                            <i
+                              className="fa-regular fa-trash-can"
+                              style={{ color: "#d91b1b" }}
+                            ></i>
+                            Xoá chỉ ở phía tôi
                           </div>
                         </div>
                       )}
-                      {item.images[0] &&
-                        item.images.map((image, index) => {
-                          return (
-                            <img
-                              key={index}
-                              src={image.url}
-                              alt=""
-                              style={{ width: "100%", cursor: "pointer" }}
-                              onClick={() => {
-                                setMessageSelected({
-                                  ...newInfoUser,
-                                  URL: image.url,
-                                  CREATEDAT_URL,
-                                  MESSAGE_ID: item.id,
-                                  IMAGE_INDEX: index,
-                                });
-                                setIsShowOverlayModalDetailImage(true);
-                              }}
-                            />
-                          );
-                        })}
-                      {item.text}
                     </>
                   ) : (
-                    <span
-                      style={{ color: "rgba(0,0,0,0.3)", userSelect: "none" }}
-                    >
-                      Tin nhắn đã được thu hồi
-                    </span>
-                  )}
-
-                  <div className="box-date">
-                    <div className="format-date-message">{CREATEDAT_URL}</div>
-                  </div>
-                  {total > 0 && (
-                    <div className="reaction-emoji">
-                      {isNewest && (
-                        <div
-                          className="emoji-newest"
-                          onClick={() =>
-                            handleAddEmoji({ id: isNewest.id, message: item })
-                          }
-                          onMouseEnter={() => setEmojis(item.id)}
-                        >
-                          <img
-                            src={
-                              dataIconEmoji.find(
-                                (item) => item.id === isNewest.id
-                              ).src
-                            }
-                            alt=""
-                            className="emoji-item"
-                          />
-                        </div>
-                      )}
-
-                      <div
-                        className="total-emoji"
-                        onMouseEnter={() =>
-                          setIsRenderUserNameInEmojiList(item.id)
-                        }
-                        onMouseLeave={() =>
-                          setIsRenderUserNameInEmojiList(false)
-                        }
-                        onClick={() =>
-                          setIsShowOverlayModalEmotion({ message: item })
-                        }
-                      >
-                        <span>{total}</span>
-
-                        {sortedEmojiList
-                          .slice(0, 3)
-                          .map(
-                            (emoji, index) =>
-                              emoji.uids[0] && (
-                                <img
-                                  key={emoji.id}
-                                  src={
-                                    dataIconEmoji.find(
-                                      (item) => item.id === emoji.id
-                                    ).src
-                                  }
-                                  alt=""
-                                />
-                              )
-                          )}
-                      </div>
-                    </div>
-                  )}
-                  <div className="box-emoji">
-                    {lastIndex === index && !isNewest && (
-                      <div
-                        className="btn-emoji"
-                        onMouseEnter={() => setEmojis(item.id)}
-                      >
-                        <i className="fa-regular fa-thumbs-up"></i>
-                      </div>
-                    )}
-
-                    {!isNewest && (
-                      <div
-                        className="btn-emoji btn-emoji-hidden"
-                        onMouseEnter={() => setEmojis(item.id)}
-                      >
-                        <i className="fa-regular fa-thumbs-up"></i>
-                      </div>
-                    )}
-
-                    {emojis === item.id && (
-                      <div
-                        className="dropdown-emoji-list"
-                        ref={dropdownSelectEmoji}
-                        style={{ marginBottom: isNewest ? "30px" : "auto" }}
-                      >
-                        <img
-                          src={smileIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "smile", message: item })
-                          }
-                        />
-                        <img
-                          src={heartIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "heart", message: item })
-                          }
-                        />
-                        <img
-                          src={surpriseIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "surprise", message: item })
-                          }
-                        />
-                        <img
-                          src={cryIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "cry", message: item })
-                          }
-                        />
-                        <img
-                          src={angryIcon}
-                          alt=""
-                          className="emoji-item"
-                          onClick={() =>
-                            handleAddEmoji({ id: "angry", message: item })
-                          }
-                        />
-                        <i
-                          className="fa-solid fa-xmark btn-close"
-                          onClick={() => handleRemoveEmojis({ message: item })}
-                        ></i>
-                      </div>
-                    )}
-                  </div>
-                  {isRenderUserNameInEmojiList === item.id && (
                     <div
-                      className="dropdown-username-reaction"
-                      style={{
-                        bottom: messages.length - 1 === index ? "46px" : "auto",
-                        top: messages.length - 1 === index ? "auto" : "100%",
-                      }}
+                      className="other-options recall"
+                      onClick={() =>
+                        handleDeleteMessage({
+                          message: item,
+                        })
+                      }
                     >
-                      {renderUserNameInEmojiList()}
+                      <i className="fa-regular fa-trash-can"></i>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="container-options">
-                {!item.isRecall ? (
-                  <>
-                    <div className="other-options">
-                      <i
-                        className="fa-solid fa-quote-right"
-                        title="Trả lời"
-                        onClick={() =>
-                          handleReplyMessage({
-                            name: newInfoUser.displayName,
-                            id: item.id,
-                            text: item.text,
-                            image: item?.images[0] || null,
-                          })
-                        }
-                      ></i>
-                      <i
-                        className="fa-solid fa-share"
-                        title="Chia sẻ"
-                        onClick={() =>
-                          handleSharingMessage({ infoMessage: item })
-                        }
-                      ></i>
-                      <i
-                        className="fa-solid fa-ellipsis"
-                        title="Thêm"
-                        onClick={() =>
-                          setIsShowDropdownOption({
-                            id: item.id,
-                          })
-                        }
-                      ></i>
-                    </div>
-                    {isShowDropdownOption?.id === item.id && (
-                      <div className="dropdown-menu" ref={dropdownRef}>
-                        <div
-                          className="menu-item"
-                          onClick={() => handleCopyText(item.text)}
-                        >
-                          <i className="fa-regular fa-copy"></i>
-                          Copy tin nhắn
-                        </div>
-                        <div
-                          className="menu-item"
-                          style={{ color: "#d91b1b" }}
-                          onClick={() =>
-                            handleDeleteMessage({
-                              message: item,
-                            })
-                          }
-                        >
-                          <i
-                            className="fa-regular fa-trash-can"
-                            style={{ color: "#d91b1b" }}
-                          ></i>
-                          Xoá chỉ ở phía tôi
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div
-                    className="other-options recall"
-                    onClick={() =>
-                      handleDeleteMessage({
-                        message: item,
-                      })
-                    }
-                  >
-                    <i className="fa-regular fa-trash-can"></i>
-                  </div>
-                )}
-              </div>
+            )}
+          </div>
+          {showLabel && (
+            <div className="date-label">
+              <div className="format-date"> {label} </div>
             </div>
           )}
-        </div>
+        </React.Fragment>
       );
     });
   };
@@ -2048,7 +2097,9 @@ const BoxChat = () => {
                 )}
               </div>
               <div className="user-info">
-                <div className="display-name">
+                <div className="display-name"
+                  onClick={() => setIsShowOverlayModal(true)}
+                >
                   {selectedUserMessaging?.displayNameSelected}
                 </div>
 
@@ -2153,7 +2204,7 @@ const BoxChat = () => {
                 <i className="fa-solid fa-brush"></i>
               </div>
             </div>
-            {isShowBackgroundModal && <BackgoundModal setIsShowBackgroundModal={setIsShowBackgroundModal}/>}
+            {isShowBackgroundModal && <BackgoundModal setIsShowBackgroundModal={setIsShowBackgroundModal} />}
           </div>
           <div className="container-content" >
             {isFriend === -1 &&
@@ -2220,9 +2271,6 @@ const BoxChat = () => {
                 style={{ display: "flex", flexDirection: "column-reverse" }}
               >
                 {renderMessages()}
-
-                <div className="created-room">{renderCreatedAt()}</div>
-
                 {showBtnUpToTop && (
                   <div className="up-to-top" onClick={() => handleUpToBottom()}>
                     <i className="fa-solid fa-chevron-up fa-rotate-180"></i>
@@ -2236,6 +2284,7 @@ const BoxChat = () => {
                         src={selectedUserMessaging.photoURLSelected}
                         alt=""
                         className="user-info__avatar"
+                        onClick={() => setIsShowOverlayModal(true)}
                       />
                       <div className="user-info__name">
                         {selectedUserMessaging.displayNameSelected}
@@ -2282,9 +2331,6 @@ const BoxChat = () => {
                     </div>
                   )}
                 </div>
-
-
-
               </InfiniteScroll>
             </div>
           </div>

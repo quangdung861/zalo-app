@@ -74,6 +74,7 @@ export const Container = styled.div`
             font-size: 18px;
             margin-bottom: 2px;
             font-weight: 500;
+            cursor: pointer;
           }
           .new-seperator {
             background: #d6dbe1;
@@ -247,6 +248,7 @@ export const Container = styled.div`
           border-radius: 50%;
           object-fit: cover;
           margin-bottom: 8px;
+          cursor: pointer;
         }
         &__name {
           font-size: 20px;
@@ -258,7 +260,7 @@ export const Container = styled.div`
         }
       }
 
-      .created-room {
+      .date-label {
         margin-bottom: 12px;
         display: flex;
         justify-content: center;
