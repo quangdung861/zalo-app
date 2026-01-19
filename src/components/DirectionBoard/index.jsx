@@ -56,7 +56,7 @@ const DirectionBoard = () => {
                     </div>
                   </div>
                   <div style={{ position: "relative" }}>
-                    <i class="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(0)}></i>
+                    <i className="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(0)}></i>
                     <img src={require("assets/finger4.apng")} alt="" srcset="" style={{ position: "absolute", width: 40, height: 40, right: "-30px" }} />
                   </div>
                 </div>
@@ -71,7 +71,7 @@ const DirectionBoard = () => {
                     </div>
                   </div>
                   <div>
-                    <i class="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(1)}></i>
+                    <i className="fa-solid fa-arrow-right-to-bracket" onClick={() => handleSubmit(1)}></i>
                   </div>
                 </div>
               </div>
