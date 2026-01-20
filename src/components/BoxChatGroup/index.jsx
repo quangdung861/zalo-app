@@ -37,10 +37,11 @@ import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAccount from "components/ModalAccount";
 import ModalAddFriend from "components/ModalAddFriend";
-import BackgoundModal from "components/BoxChat/components/BackgoundModal";
+import BackgoundModal from "common/BackgoundModal/BackgoundModal";
 import * as S from "./styles";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
+import { backgoundsDefault, BACKGROUND_GROUP_DEFAULT } from "../../common/BackgoundModal/constants";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging, startLoading, stopLoading } =
@@ -2203,10 +2204,43 @@ const BoxChatGroup = () => {
     setLastDoc(snap.docs[snap.docs.length - 1]);
   };
 
+  const userBackground =
+    room.settings?.backgroundMembers?.[userInfo.uid]?.background;
+
+  const backgrounds = [
+    ...(userBackground ? [userBackground] : []),
+    ...backgoundsDefault,
+  ];
+  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("")
+
+  const [currentIndex, setCurrentIndex] = useState(null);
+
+  const initInfoBackground = () => {
+    const index =
+      room?.settings?.backgroundMembers?.[userInfo.uid]?.currentIndex;
+
+    if (typeof index === "number") {
+      setCurrentIndex(index);
+    } else { // null or undefined
+      if (room?.settings?.background?.original) {
+        setCurrentIndex(null)
+        setBackgroundOriginalAll(room?.settings?.background?.original);
+      } else {
+        setCurrentIndex(BACKGROUND_GROUP_DEFAULT);
+      }
+    }
+  }
+
+  useEffect(() => {
+    initInfoBackground();
+  }, [room, userInfo.uid]);
+
 
   return (
     <S.Wrapper>
-      <S.Container isReplyMessage={isReplyMessage}>
+      <S.Container isReplyMessage={isReplyMessage}
+        background={typeof currentIndex === "number" ? backgrounds?.[currentIndex]?.original : backgroundOriginalAll}
+      >
         <div className="box-chat">
           <div className="box-chat__header">
             <div className="left">
@@ -2308,8 +2342,7 @@ const BoxChatGroup = () => {
               <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
                 <i className="fa-solid fa-brush"></i>
               </div>
-              {isShowBackgroundModal && <BackgoundModal setIsShowBackgroundModal={setIsShowBackgroundModal} />}
-
+              {isShowBackgroundModal && <BackgoundModal initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
             </div>
           </div>
           <div className="container-content">

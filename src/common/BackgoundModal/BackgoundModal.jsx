@@ -4,7 +4,6 @@ import { uploadImage } from "services/uploadImage";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { AppContext } from "Context/AppProvider";
-import { BACKGROUND_DEFAULT } from "../constants";
 
 const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurrentIndex, uid, members, roomId, setIsShowBackgroundModal }) => {
     const { startLoading, stopLoading } = useContext(AppContext);
@@ -24,7 +23,7 @@ const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurr
             }
 
             await updateDoc(roomRef, updates);
-            setCurrentIndex(BACKGROUND_DEFAULT);
+            setCurrentIndex(0);
         } catch (err) {
             console.error("Upload background error:", err);
         } finally {

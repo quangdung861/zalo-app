@@ -36,10 +36,10 @@ import surpriseIcon from "assets/emoji/surprise.png";
 import cryIcon from "assets/emoji/cry.png";
 import angryIcon from "assets/emoji/angry.png";
 import ModalAddFriend from "components/ModalAddFriend";
-import BackgoundModal from "./components/BackgoundModal";
+import BackgoundModal from "../../common/BackgoundModal/BackgoundModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
-import { backgoundsDefault, BACKGROUND_DEFAULT } from "./constants";
+import { backgoundsDefault, BACKGROUND_DEFAULT } from "../../common/BackgoundModal/constants";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
