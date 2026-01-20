@@ -1,48 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./BackgoundModal.scss";
-import img1 from "assets/backgound/img1.jpg";
-import img2 from "assets/backgound/img2.jpg";
-import img3 from "assets/backgound/img3.jpg";
-import img4 from "assets/backgound/img4.jpg";
-import img5 from "assets/backgound/img5.jpg";
-import img6 from "assets/backgound/img6.jpg";
-import img7 from "assets/backgound/img7.jpg";
-import img8 from "assets/backgound/img8.jpg";
-import img9 from "assets/backgound/img9.jpg";
-import img10 from "assets/backgound/img10.jpg";
-import img11 from "assets/backgound/img11.jpg";
-import img12 from "assets/backgound/img12.jpg";
-import img13 from "assets/backgound/img13.jpg";
-import img14 from "assets/backgound/img14.jpg";
+import { uploadImage } from "services/uploadImage";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db } from "firebaseConfig";
+import { AppContext } from "Context/AppProvider";
+import { BACKGROUND_DEFAULT } from "../constants";
 
-export const backgroundImages = [
-    img13, img14, img1, img2, img3, img4, img5, img6,
-    img7, img8, img9, img10, img11, img12
-];
-
-const BackgoundModal = ({ setIsShowBackgroundModal }) => {
-
+const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurrentIndex, uid, members, roomId, setIsShowBackgroundModal }) => {
+    const { startLoading, stopLoading } = useContext(AppContext);
     const [isMultiple, setIsMultiple] = useState(true);
 
-    // const setting = {
-    //     background: "",
-    //     backgroundMember: {
-    //         [uid]: {
-    //             backgrounds: [],
-    //             currentIndex: 0 
-    //         }
-    //     }
-    // }
-    // Thay ảnh chỉ phía tôi thì tải ảnh mới vào ví dụ nó sẽ thành ["img3", "img2", "img1"] và set currentIndex thành 1 = img3,
-    // Thay ảnh cho mọi người thì tải ảnh mới vào ví dụ nó sẽ thành ["img3", "img2", "img1"] và set currentIndex thành 1 = img3, 
-    // có thêm bước xóa tất cả currentIndex của mọi người khác về null, sau đó gán background: "img3"
-    // cách hiển thị trên UI ưu tiên hiển thị nếu currentIndex khác null, nếu là null thì hiển thị background
-    // xóa ảnh thì background vẫn tồn tại trừ khi set lại 1 ảnh mới, riêng người xóa sẽ bị set lại currentIndex: 0
-    // refacetor lại dùng link cả, ko dùng base64 nữa vì nặng k cân đc
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            startLoading();
+            const image = await uploadImage(file);
+            const roomRef = doc(db, "rooms", roomId);
+
+            const updates = {
+                [`settings.backgroundMembers.${uid}.background`]: image,
+            }
+
+            await updateDoc(roomRef, updates);
+            setCurrentIndex(BACKGROUND_DEFAULT);
+        } catch (err) {
+            console.error("Upload background error:", err);
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const handleChangeReal = async () => {
+        try {
+            startLoading();
+            const roomRef = doc(db, "rooms", roomId);
+
+            if (isMultiple) {
+                const updates = {
+                    "settings.background": backgrounds[currentIndex],
+                    [`settings.backgroundMembers.${uid}.currentIndex`]: currentIndex,
+                }
+
+                members.forEach((memberId) => {
+                    if (memberId !== uid) {
+                        updates[`settings.backgroundMembers.${memberId}.currentIndex`] = null;
+                    }
+                });
+
+                await updateDoc(roomRef, updates);
+            } else {
+                await updateDoc(roomRef, {
+                    [`settings.backgroundMembers.${uid}.currentIndex`]: currentIndex,
+                });
+            }
+            setIsShowBackgroundModal(false)
+
+        } catch (err) {
+            console.error("Upload background error:", err);
+        } finally {
+            stopLoading();
+        }
+    }
 
     const renderListImg = () => {
-        return backgroundImages.map((img, index) => {
-            return <img src={img} alt="" key={index} className="img-item" />
+        return backgrounds.map((img, index) => {
+            return <img src={img?.thumbnail} alt="" key={index}
+                className={currentIndex === index ? "img-item --active" : "img-item"}
+                onClick={() => {
+                    setCurrentIndex(index)
+                }} />
         })
     }
 
@@ -50,10 +78,10 @@ const BackgoundModal = ({ setIsShowBackgroundModal }) => {
         <div id="background-modal">
             <div className="header">
                 <div className="header-left">
-                    <i className="fa-solid fa-xmark" onClick={() => setIsShowBackgroundModal(false)}></i>
+                    <i className="fa-solid fa-xmark" onClick={() => { initInfoBackground(); setIsShowBackgroundModal(false) }}></i>
                     <span>Đổi hình nền</span>
                 </div>
-                <div className="header-right">
+                <div className="header-right" onClick={() => handleChangeReal()}>
                     <i className="fa-solid fa-check"></i>
                     <span>XONG</span>
                 </div>
@@ -61,13 +89,26 @@ const BackgoundModal = ({ setIsShowBackgroundModal }) => {
             <div className="content">
                 <div className="img-list-wrapper">
                     <div className="img-list">
-                        <div className="img-item btn-upload-backgound"><i className="fa-solid fa-camera"></i></div>
+                        <label
+                            htmlFor="upload-img"
+                            className="img-item btn-upload-backgound"
+                            style={{ cursor: "pointer" }}
+                        >
+                            <i className="fa-solid fa-camera"></i>
+                        </label>
+                        <input
+                            id="upload-img"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={(e) => handleUpload(e)}
+                        />
                         {renderListImg()}
                     </div>
                 </div>
                 <div className="option">
                     <i className={`${isMultiple ? "fa-solid fa-circle-check" : "fa-regular fa-circle"} `} onClick={() => setIsMultiple(!isMultiple)}></i>
-                    <span>Đổi hình nền cho cả hai bên</span>
+                    <span>Đổi hình nền mọi người</span>
                 </div>
             </div>
         </div>

@@ -138,3 +138,11 @@ function createThumbnail3(imageDataUrl, fileName, type) {
 
   return canvas.toDataURL();
 }
+
+export function normalizeImages(images) {
+  return images.map(img =>
+    typeof img === "string"
+      ? { original: img, thumb: img }
+      : { original: img.original, thumb: img.thumb || img.original }
+  );
+}

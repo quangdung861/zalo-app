@@ -159,10 +159,10 @@ export const Container = styled.div`
     }
     .container-content {
       min-height: calc(100dvh - var(--header-height) - var(--footer-height));
-      background-image: url(${(props) => (props.isCloud ? cloudBg : messageBg)});
+      background-image: url(${({ background, isCloud }) => isCloud ? cloudBg : background});
       background-blend-mode: multiply;
       background-color: rgba(
-        ${(props) => (props.isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
+        ${({ isCloud }) => (isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
       );
       background-size: cover;
       background-repeat: no-repeat;

@@ -39,6 +39,7 @@ import ModalAddFriend from "components/ModalAddFriend";
 import BackgoundModal from "./components/BackgoundModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
+import { backgoundsDefault, BACKGROUND_DEFAULT } from "./constants";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
@@ -73,6 +74,7 @@ const BoxChat = () => {
   const [infoUsers, setInfoUsers] = useState();
   const [inputValue, setInputValue] = useState("");
   const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
 
   const inputRef = useRef();
   const boxChatRef = useRef();
@@ -2042,7 +2044,7 @@ const BoxChat = () => {
       (item) => item.uid !== userInfo.uid
     );
     const strangerRef = doc(db, "users", id);
-    stopLoading();
+    startLoading();
     await setDoc(
       strangerRef,
       {
@@ -2071,6 +2073,37 @@ const BoxChat = () => {
     stopLoading();
   };
 
+  const userBackground =
+    room.settings?.backgroundMembers?.[userInfo.uid]?.background;
+
+  const backgrounds = [
+    ...(userBackground ? [userBackground] : []),
+    ...backgoundsDefault,
+  ];
+  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("")
+
+  const [currentIndex, setCurrentIndex] = useState(null);
+
+  const initInfoBackground = () => {
+    const index =
+      room?.settings?.backgroundMembers?.[userInfo.uid]?.currentIndex;
+
+    if (typeof index === "number") {
+      setCurrentIndex(index);
+    } else { // null or undefined
+      if (room?.settings?.background?.original) {
+        setCurrentIndex(null)
+        setBackgroundOriginalAll(room?.settings?.background?.original);
+      } else {
+        setCurrentIndex(BACKGROUND_DEFAULT);
+      }
+    }
+  }
+
+  useEffect(() => {
+    initInfoBackground();
+  }, [room, userInfo.uid]);
+
   return (
     <S.Wrapper>
       <S.Container
@@ -2079,6 +2112,7 @@ const BoxChat = () => {
         }
         isReplyMessage={isReplyMessage}
         isSuggest={isFriend}
+        background={typeof currentIndex === "number" ? backgrounds?.[currentIndex]?.original : backgroundOriginalAll}
       >
         <div className="box-chat">
           <div className="box-chat__header">
@@ -2200,11 +2234,11 @@ const BoxChat = () => {
               <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
-              <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
+              {(room.category !== "my cloud" && isFriend !== -1) && <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
                 <i className="fa-solid fa-brush"></i>
-              </div>
+              </div>}
             </div>
-            {isShowBackgroundModal && <BackgoundModal setIsShowBackgroundModal={setIsShowBackgroundModal} />}
+            {isShowBackgroundModal && <BackgoundModal initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
           </div>
           <div className="container-content" >
             {isFriend === -1 &&

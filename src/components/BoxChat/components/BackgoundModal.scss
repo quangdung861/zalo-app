@@ -53,7 +53,7 @@
 
             >span,
             i {
-                color: #3989ff;
+                color: #0091ff;
             }
         }
     }
@@ -82,8 +82,12 @@
                 cursor: pointer;
             }
 
+            .img-item.--active {
+                border: 5px solid #0091ff;
+            }
+
             .img-item.btn-upload-backgound {
-                background-color: #3989ff;
+                background-color: #0091ff;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -123,7 +127,7 @@
 
             >i {
                 font-size: 24px;
-                color: #3989ff;
+                color: #0091ff;
                 cursor: pointer;
             }
 
