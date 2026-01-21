@@ -206,32 +206,6 @@ const BoxChat = () => {
     });
   };
 
-  // useEffect(() => {
-  //   const inputElement = inputRef.current;
-  //   const toolbarChatInputElement = document.querySelector(
-  //     ".toolbar-chat-input"
-  //   );
-  //   const handleFocus = () => {
-  //     Object.assign(toolbarChatInputElement.style, {
-  //       borderBottom: "1px solid #0068FF",
-  //     });
-  //   };
-
-  //   const handleBlur = () => {
-  //     Object.assign(toolbarChatInputElement.style, {
-  //       borderBottom: `1px solid var(--boder-dividing-color)`,
-  //     });
-  //   };
-
-  //   inputElement.addEventListener("focus", handleFocus);
-  //   inputElement.addEventListener("blur", handleBlur);
-
-  //   return () => {
-  //     inputElement.removeEventListener("focus", handleFocus);
-  //     inputElement.removeEventListener("blur", handleBlur);
-  //   };
-  // }, []);
-
   const isFriend = userInfo.friends.findIndex(
     (item) => item.uid === selectedUserMessaging.uidSelected
   );
