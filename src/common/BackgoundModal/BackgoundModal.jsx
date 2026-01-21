@@ -5,7 +5,7 @@ import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { AppContext } from "Context/AppProvider";
 
-const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurrentIndex, uid, members, roomId, setIsShowBackgroundModal }) => {
+const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurrentIndex, uid, members, roomId, setIsShowBackgroundModal, text }) => {
     const { startLoading, stopLoading } = useContext(AppContext);
     const [isMultiple, setIsMultiple] = useState(true);
 
@@ -107,7 +107,7 @@ const BackgoundModal = ({ initInfoBackground, backgrounds, currentIndex, setCurr
                 </div>
                 <div className="option">
                     <i className={`${isMultiple ? "fa-solid fa-circle-check" : "fa-regular fa-circle"} `} onClick={() => setIsMultiple(!isMultiple)}></i>
-                    <span>Đổi hình nền mọi người</span>
+                    <span>{text}</span>
                 </div>
             </div>
         </div>

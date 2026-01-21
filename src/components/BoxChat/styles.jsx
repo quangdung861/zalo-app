@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import messageBg from "assets/messageBg.jpg";
 import cloudBg from "assets/cloudBg.jpg";
 
 export const Wrapper = styled.div`

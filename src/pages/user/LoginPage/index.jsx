@@ -11,6 +11,7 @@ import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import DirectionBoard from "components/DirectionBoard";
+import imgPhotocover from "assets/photocover/photocover.jpg"
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const LoginPage = () => {
         break;
     }
   };
-  
+
 
   const handleGoogleSignIn = async () => {
     try {
@@ -40,8 +41,7 @@ const LoginPage = () => {
             displayName: data.user.displayName,
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-            photoCover:
-              "https://chiemtaimobile.vn/images/companies/1/%E1%BA%A2nh%20Blog/anh-bia-facebook-dep/anh-bia-facebook-anime-mat-trang.jpg?1705887967948",
+            photoCover: imgPhotocover,
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
@@ -107,7 +107,7 @@ const LoginPage = () => {
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
-            unreadCount: {[data.user.uid]: 0},
+            unreadCount: { [data.user.uid]: 0 },
             unreadMembers: [],
             deleted: [],
             hideTemporarily: [],
@@ -121,7 +121,7 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } 
+    }
   };
 
   const handleGithubSignIn = async () => {
@@ -134,8 +134,7 @@ const LoginPage = () => {
             displayName: data.user.displayName,
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-            photoCover:
-              "https://chiemtaimobile.vn/images/companies/1/%E1%BA%A2nh%20Blog/anh-bia-facebook-dep/anh-bia-facebook-anime-mat-trang.jpg?1705887967948",
+            photoCover: imgPhotocover,
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
@@ -201,7 +200,7 @@ const LoginPage = () => {
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
-            unreadCount: {[data.user.uid]: 0},
+            unreadCount: { [data.user.uid]: 0 },
             unreadMembers: [],
             deleted: [],
             hideTemporarily: [],
@@ -215,7 +214,7 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } 
+    }
   };
 
   return (

@@ -13,6 +13,7 @@ import { addDocument, generateKeywords } from "services";
 import { serverTimestamp } from "firebase/firestore";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
+import imgPhotocover from "assets/photocover/photocover.jpg"
 
 const FormEmail = ({ setRegisterWay }) => {
   const [formData, setFormData] = useState({
@@ -189,8 +190,7 @@ const FormEmail = ({ setRegisterWay }) => {
             displayName: formData.fullName.value,
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-            photoCover:
-              "https://chiemtaimobile.vn/images/companies/1/%E1%BA%A2nh%20Blog/anh-bia-facebook-dep/anh-bia-facebook-anime-mat-trang.jpg?1705887967948",
+            photoCover: imgPhotocover,
             uid: data.user.uid,
             providerId: data.providerId,
             friends: [],
