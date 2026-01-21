@@ -36,24 +36,3 @@ export async function uploadImage(file) {
     thumbnail,
   };
 }
-
-// const handleUpload = async (e) => {
-//   const file = e.target.files[0];
-//   if (!file) return;
-
-//   try {
-//     const image = await uploadImage(file);
-
-//     console.log(image);
-//     /*
-//     {
-//       original: "...",
-//       thumb: "..."
-//     }
-//     */
-
-//     // lưu vào Firestore
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };

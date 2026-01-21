@@ -40,6 +40,7 @@ import BackgoundModal from "../../common/BackgoundModal/BackgoundModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 import { backgoundsDefault, BACKGROUND_DEFAULT } from "../../common/BackgoundModal/constants";
+import { uploadImage } from "services/uploadImage";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
@@ -1319,7 +1320,7 @@ const BoxChat = () => {
                             <div className="reply-content__left"></div>
                             {item.infoReply?.image && (
                               <img
-                                src={item.infoReply?.image?.url}
+                                src={item.infoReply?.image?.thumbnail}
                                 alt=""
                                 className="image-reply"
                               />
@@ -1342,13 +1343,13 @@ const BoxChat = () => {
                               <img
                                 className="image-item"
                                 key={index}
-                                src={image.url}
+                                src={image.thumbnail}
                                 alt=""
                                 style={{ width: "100%" }}
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
-                                    URL: image.url,
+                                    URL: image.original,
                                     CREATEDAT_URL,
                                     MESSAGE_ID: item.id,
                                     IMAGE_INDEX: index,
@@ -1532,13 +1533,13 @@ const BoxChat = () => {
                             return (
                               <img
                                 key={index}
-                                src={image.url}
+                                src={image.thumbnail}
                                 alt=""
                                 style={{ width: "100%", cursor: "pointer" }}
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
-                                    URL: image.url,
+                                    URL: image.original,
                                     CREATEDAT_URL,
                                     MESSAGE_ID: item.id,
                                     IMAGE_INDEX: index,
@@ -1914,31 +1915,60 @@ const BoxChat = () => {
     setIsShowBoxChat(false);
   };
 
-  const handleUploadImage = async (e) => {
-    // Chuyển đổi đối tượng thành mảng đơn giản
-    const files = Object.values(e.target.files);
+  const showError = (message) => {
+    setIsShowMessageError(message);
+    setTimeout(function () {
+      setIsShowMessageError(false);
+    }, 3000);
+  }
 
-    if (files) {
-      const sumSize = files.reduce((total, file) => {
-        return total + file.size;
-      }, 0);
-      if (sumSize >= 500000) {
-        //500000 bytes (max size)
-        setIsShowMessageError(true);
-        setTimeout(function () {
-          setIsShowMessageError(false);
-        }, 3000);
-        return;
-      }
-      startLoading();
-      const imageBase64FullInfo = await convertImagesToBase64(files);
-      stopLoading();
-      const e = {
+  const MAX_FILES = 10;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
+  const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
+
+  const handleUploadImage = async (event) => {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    // 1️⃣ Check số lượng
+    if (files.length > MAX_FILES) {
+      showError("Chỉ được gửi tối đa 10 ảnh");
+      return;
+    }
+
+    // 2️⃣ Check size từng file
+    if (files.some(file => file.size > MAX_FILE_SIZE)) {
+      showError("Mỗi ảnh không được vượt quá 10MB");
+      return;
+    }
+
+    // 3️⃣ Check tổng dung lượng
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      showError("Tổng dung lượng ảnh vượt quá 100MB");
+      return;
+    }
+
+    startLoading();
+
+    try {
+      // 4️⃣ Upload song song + chờ xong
+      const imgList = await Promise.all(
+        files.map(file => uploadImage(file))
+      );
+
+      // 5️⃣ Fake Enter để gửi message
+      handleKeyDown(imgList, {
         key: "Enter",
         isPreventDefault: true,
-      };
+      });
 
-      handleKeyDown(imageBase64FullInfo, e);
+    } catch (error) {
+      console.error(error);
+      showError("Upload ảnh thất bại, vui lòng thử lại");
+    } finally {
+      stopLoading();
+      event.target.value = ""; // reset input
     }
   };
 
@@ -1982,12 +2012,12 @@ const BoxChat = () => {
           <img
             className="image-item"
             key={index}
-            src={image.url}
+            src={image.thumbnail}
             alt=""
             onClick={() =>
               setMessageSelected({
                 ...newInfoUser,
-                URL: image.url,
+                URL: image.original,
                 CREATEDAT_URL: CREATEDAT_URL,
                 MESSAGE_ID: item.id,
                 IMAGE_INDEX: index,
@@ -2023,15 +2053,31 @@ const BoxChat = () => {
     });
   }, [messageSelected]);
 
-  const downloadImage = () => {
-    const randomNumber = Math.floor(Math.random() * 10000000000000);
-    const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
+  // const downloadImage = () => {
+  //   const randomNumber = Math.floor(Math.random() * 10000000000000);
+  //   const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
+  //   const link = document.createElement("a");
+  //   link.href = `${base64Data}`;
+  //   link.download = `photo-${randomNumber}`; // Tên file khi được lưu xuống máy
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
+
+  const downloadImage = async () => {
+    const response = await fetch(messageSelected?.URL);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = `${base64Data}`;
-    link.download = `photo-${randomNumber}`; // Tên file khi được lưu xuống máy
+
+    link.href = url;
+    link.download = `photo-${Date.now()}.jpg`;
     document.body.appendChild(link);
     link.click();
+
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const handleOpenModalAddFriend = () => {
@@ -2238,7 +2284,7 @@ const BoxChat = () => {
                 <i className="fa-solid fa-brush"></i>
               </div>}
             </div>
-            {isShowBackgroundModal && <BackgoundModal initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
+            {isShowBackgroundModal && <BackgoundModal text="Đổi hình nền cho cả hai bên" initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
           </div>
           <div className="container-content" >
             {isFriend === -1 &&
@@ -2416,7 +2462,7 @@ const BoxChat = () => {
                 <div className="reply-content__left"></div>
                 {infoReply?.image && (
                   <img
-                    src={infoReply?.image?.url}
+                    src={infoReply?.image?.thumbnail}
                     alt=""
                     className="image-reply"
                   />
@@ -2495,7 +2541,7 @@ const BoxChat = () => {
                 userSelect: "none",
               }}
             >
-              Hình ảnh phải có kích thước nhỏ hơn 0.5MB
+              {isShowMessageError}
             </div>
           )}
           {isShowAlertRecallRejectMessage && (
