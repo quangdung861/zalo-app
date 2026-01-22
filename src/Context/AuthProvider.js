@@ -35,13 +35,14 @@ const AuthProvider = ({ children }) => {
         const { displayName, email, uid, photoURL } = currentUser;
         setUser({ displayName, email, uid, photoURL });
       } else {
-        setUser({});
+        setUser(null);
       }
       setIsLoading(false);
     });
 
     return () => {
       unsubscribed();
+      setUser(null);
     };
   }, []);
 

@@ -1,25 +1,21 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as S from "./styles";
 import {
   collection,
   where,
   query,
   getDocs,
-  onSnapshot,
   doc,
   setDoc,
-  addDoc,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
-import useFirestore from "hooks/useFirestore";
 import empty from "assets/empty.png";
-import { addDocument } from "services";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import ModalAccount from "components/ModalAccount";
 import moment from "moment";
 
-const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
+const Invitations = () => {
   const { userInfo, setSelectedUserMessaging, startLoading, stopLoading } = useContext(AppContext);
   const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
     useContext(UserLayoutContext);
@@ -28,7 +24,6 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [invitationReceive, setInvitationReceive] = useState([]);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
   const [userInfoSelected, setUserInfoSelected] = useState();
-  
 
   useEffect(() => {
     const getInvitationSent = async () => {
@@ -304,7 +299,7 @@ const Invitations = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                         {item.displayName}
                       </span>
                       <div className="origin">
-                        {moment(item?.dataInvitationReceive?.createdAt)?.fromNow()} - {item.dataInvitationReceive?.from}
+                        {moment(item?.dataInvitationReceive?.clientCreatedAt)?.fromNow()} - {item.dataInvitationReceive?.from}
                       </div>
                     </div>
                   </div>

@@ -6,20 +6,14 @@ import {
   collection,
   query,
   where,
-  serverTimestamp,
   addDoc,
-  onSnapshot,
   doc,
   orderBy,
-  getDoc,
-  setDoc,
   getDocs,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
-import { convertImageToBase64 } from "utils/file";
 import empty from "assets/empty.png";
-import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import AvatarGroup from "components/AvatarGroup";
 import messageSend from "assets/audio/messageSend.wav";
@@ -171,7 +165,7 @@ const ModalSharingMessage = ({
                       text: textAreaValue,
                       displayName: userInfo.displayName,
                       uid: userInfo.uid,
-                      createdAt: serverTimestamp(),
+                      clientCreatedAt: Date.now(),
                       clientCreatedAt: Date.now(),
                     },
                     totalMessages: increment(1),
@@ -236,7 +230,7 @@ const ModalSharingMessage = ({
                       text: textAreaValue,
                       displayName: userInfo.displayName,
                       uid: userInfo.uid,
-                      createdAt: serverTimestamp(),
+                      clientCreatedAt: Date.now(),
                       clientCreatedAt: Date.now(),
                     },
                     totalMessages: increment(1),
@@ -274,10 +268,10 @@ const ModalSharingMessage = ({
                   text: textAreaValue,
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
-                createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
                 clientCreatedAt: Date.now(),
               });
 

@@ -1,49 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, useContext } from "react";
-import * as S from "./styles";
 
 import { AppContext } from "Context/AppProvider";
-import {
-  doc,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "firebaseConfig";
-import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
+import ModalAccount from "components/ModalAccount";
 import empty from "assets/empty.png";
 import searchEmpty from "assets/searchEmpty.png";
-import moment from "moment";
 import ModalAddFriend from "components/ModalAddFriend";
+import * as S from "./styles";
 
-async function fetchUserList(search) {
-  let array = [];
-
-  const dbRef = query(
-    collection(db, "users"),
-    where("keywords", "array-contains", search.toLowerCase())
-  );
-
-  const queryDocs = await getDocs(dbRef);
-
-  queryDocs.forEach((doc) => {
-    array.push({
-      id: doc.id,
-      ...doc.data(),
-    });
-  });
-
-  return array;
-}
-
-const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
-  const [isShowDropdown, setIsShowDropdown] = useState(false);
-  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
-
-  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
-    useContext(UserLayoutContext);
+const ChatWithStrangers = () => {
 
   const {
     userInfo,
@@ -54,21 +19,20 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     setSelectedGroupMessaging,
   } = useContext(AppContext);
 
-  const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
-    useState(false);
-  const [infoAddfriend, setInfoAddFriend] = useState({});
-
-  const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
-    const newStrangerSelected = strangerList.find((item) => item.id === id);
-    setStrangerSelected(newStrangerSelected);
-    setInfoAddFriend({ uid, id, invitationReceive });
-    setIsShowOverlayModalAddFriend(true);
-    setIsShowDropdown(false);
-  };
-  
+  const { isShowBoxChat, setIsShowBoxChat, setIsShowBoxChatGroup, handleComeBack } =
+    useContext(UserLayoutContext);
 
   const dropdownRef = useRef(null);
   const orderByRef = useRef(null);
+
+  const [isShowDropdown, setIsShowDropdown] = useState(false);
+  const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
+  const [isShowOverlayModalAddFriend, setIsShowOverlayModalAddFriend] =
+    useState(false);
+
+  const [orderBy, setOderBy] = useState("asc");
+  const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
+  const [strangerSelected, setStrangerSelected] = useState();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -86,7 +50,6 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     };
   }, []);
 
-  const [strangerSelected, setStrangerSelected] = useState();
 
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
@@ -111,8 +74,16 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     });
   };
 
-  const [orderBy, setOderBy] = useState("asc");
-  const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
+  const handleInvitationSent = async ({ uid, id, invitationReceive }) => {
+    const newStrangerSelected = strangerList.find((item) => item.id === id);
+    setStrangerSelected(newStrangerSelected);
+    setIsShowOverlayModalAddFriend(true);
+    setIsShowDropdown(false);
+  };
+
+  const handleSearch = async (value) => {
+    setKeywords(value);
+  };
 
   const renderStrangerList = useMemo(() => {
     if (strangerList[0]) {
@@ -165,9 +136,9 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                   {userInfo.invitationSent.find(
                     (element) => element.uid === item.uid
                   ) ||
-                  userInfo.invitationReceive.find(
-                    (element) => element.uid === item.uid
-                  ) ? (
+                    userInfo.invitationReceive.find(
+                      (element) => element.uid === item.uid
+                    ) ? (
                     <></>
                   ) : (
                     <>
@@ -249,11 +220,6 @@ const ChatWithStrangers = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
       );
     }
   }, [strangerList, isShowDropdown, orderBy]);
-
-  const handleSearch = async (value) => {
-    // const usersResult = await fetchUserList(value);
-    setKeywords(value);
-  };
 
   return (
     <S.Wrapper>

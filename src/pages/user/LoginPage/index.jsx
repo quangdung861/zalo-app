@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 
 import * as S from "./styles";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,8 +15,6 @@ import imgPhotocover from "assets/photocover/photocover.jpg"
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
-  const [dropdownContries, setDropdownContries] = useState(false);
 
   const [loginWay, setLoginWay] = useState("");
 
@@ -103,7 +101,7 @@ const LoginPage = () => {
               },
             ],
             messageLastest: {
-              createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
@@ -196,7 +194,7 @@ const LoginPage = () => {
               },
             ],
             messageLastest: {
-              createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,

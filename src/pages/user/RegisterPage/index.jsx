@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 
 import * as S from "./styles";
 import { Link } from "react-router-dom";
@@ -9,7 +9,6 @@ import { auth, githubProvider, googleProvider } from "firebaseConfig";
 import {
   signInWithPopup,
   getAdditionalUserInfo,
-  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "../../../services";
 import { serverTimestamp } from "firebase/firestore";
@@ -95,7 +94,7 @@ const LoginPage = () => {
               },
             ],
             messageLastest: {
-              createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
@@ -188,7 +187,7 @@ const LoginPage = () => {
               },
             ],
             messageLastest: {
-              createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,

@@ -18,7 +18,7 @@ const useFirestore = (collectionName, condition, params) => {
       collection(db, collectionName),
       params?.orderByName
         ? orderBy(params.orderByName, params.orderByType)
-        : orderBy("createdAt", "desc")
+        : orderBy("clientCreatedAt", "desc"),
     );
 
     if (condition) {
@@ -29,17 +29,23 @@ const useFirestore = (collectionName, condition, params) => {
 
       dbRef = query(
         dbRef,
-        where(condition.fieldName, condition.operator, condition.compareValue)
+        where(condition.fieldName, condition.operator, condition.compareValue),
       );
     }
 
-    const unsubscribe = onSnapshot(dbRef, (docsSnap) => {
-      const docs = docsSnap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setDocuments(docs);
-    });
+    const unsubscribe = onSnapshot(
+      dbRef,
+      (docsSnap) => {
+        const docs = docsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDocuments(docs);
+      },
+      (error) => {
+        console.error("🔥 onSnapshot messages error:", error);
+      },
+    );
 
     return () => {
       unsubscribe();

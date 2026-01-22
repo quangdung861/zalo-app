@@ -3,12 +3,9 @@ import {
   collection,
   query,
   where,
-  serverTimestamp,
-  addDoc,
   onSnapshot,
   doc,
   orderBy,
-  getDoc,
   setDoc,
   getDocs,
   startAfter,
@@ -28,7 +25,6 @@ import AvatarGroup from "components/AvatarGroup";
 import UserManual from "components/UserManual";
 import ModalAccountGroup from "components/ModalAccoutGroup";
 import { UserLayoutContext } from "layouts/user/UserLayout";
-import { convertImagesToBase64 } from "utils/image";
 import ModalSharingMessage from "components/ModalSharingMessage";
 import smileIcon from "assets/emoji/smile.png";
 import heartIcon from "assets/emoji/heart.png";
@@ -300,7 +296,7 @@ const BoxChatGroup = () => {
                   text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
@@ -416,7 +412,7 @@ const BoxChatGroup = () => {
                 text: inputValue,
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
-                createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
                 clientCreatedAt: Date.now(),
               },
               totalMessages: room.totalMessages + 1,
@@ -574,7 +570,7 @@ const BoxChatGroup = () => {
         const messagesRef = query(
           collection(db, "messages"),
           where("roomId", "==", room.id),
-          orderBy("createdAt", "desc"),
+          orderBy("clientCreatedAt", "desc"),
           limit(PAGE_SIZE_MESSAGES)
         );
         unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
@@ -588,7 +584,10 @@ const BoxChatGroup = () => {
           });
           setMessages(documents);
           setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
-        });
+        },
+          (error) => {
+            console.error("🔥 onSnapshot messages error:", error);
+          });
       };
       handleSnapShotMessage();
     }
@@ -604,7 +603,7 @@ const BoxChatGroup = () => {
   }, [room.id]);
 
   useEffect(() => {
-    if (room?.messageLastest?.createdAt) {
+    if (room?.messageLastest?.clientCreatedAt) {
       const chatWindow = boxChatRef?.current;
       if (showBtnUpToTop) return;
       setTimeout(() => {
@@ -614,7 +613,7 @@ const BoxChatGroup = () => {
         });
       }, 100);
     }
-  }, [room?.messageLastest?.createdAt]);
+  }, [room?.messageLastest?.clientCreatedAt]);
 
   useEffect(() => {
     if (room.members) {
@@ -720,36 +719,34 @@ const BoxChatGroup = () => {
     }
   };
 
-  const handleRecallMessage = async ({ id, createdAt }) => {
+  const handleRecallMessage = async ({ id, clientCreatedAt }) => {
     const now = moment();
-    const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
-    startLoading();
+    const date = moment(clientCreatedAt);
 
     const diffSeconds = now.diff(date, "seconds");
+
+    startLoading();
+    setIsShowDropdownOption(false);
+
     if (diffSeconds < 30) {
       const messageRef = doc(db, "messages", id);
-      setIsShowDropdownOption(false);
+
       await setDoc(
         messageRef,
-        {
-          isRecall: true,
-        },
-        {
-          merge: true,
-        }
+        { isRecall: true },
+        { merge: true }
       );
-      setIsShowDropdownOption(false);
+
       stopLoading();
       return;
     }
 
-    setIsShowDropdownOption(false);
     setIsShowAlertRecallRejectMessage(true);
-    setTimeout(function () {
+    setTimeout(() => {
       setIsShowAlertRecallRejectMessage(false);
     }, 3000);
+
     stopLoading();
-    return;
   };
 
   const handleDeleteMessage = async ({ message }) => {
@@ -881,8 +878,8 @@ const BoxChatGroup = () => {
     return d;
   }
 
-  function getDateLabel(createdAt) {
-    const msgDate = startOfDay(createdAt?.toDate());
+  function getDateLabel(clientCreatedAt) {
+    const msgDate = startOfDay(clientCreatedAt);
     const today = startOfDay(new Date());
 
     const diffDays =
@@ -905,11 +902,11 @@ const BoxChatGroup = () => {
   }
 
   function shouldShowLabel(current, next) {
-    if (!current?.createdAt) return false;
-    if (!next?.createdAt) return true;
+    if (!current?.clientCreatedAt) return false;
+    if (!next?.clientCreatedAt) return true;
 
-    const curDay = startOfDay(current.createdAt.toDate()).getTime();
-    const nextDay = startOfDay(next.createdAt.toDate()).getTime();
+    const curDay = startOfDay(current.clientCreatedAt).getTime();
+    const nextDay = startOfDay(next.clientCreatedAt).getTime();
 
     return curDay !== nextDay;
   }
@@ -921,9 +918,9 @@ const BoxChatGroup = () => {
       );
 
       if (infoDeleted) {
-        const formatDate = moment(item.createdAt)._i.seconds * 1000;
+        const formatDate = moment(item.clientCreatedAt);
 
-        if (formatDate < infoDeleted?.createdAt) {
+        if (formatDate < infoDeleted?.clientCreatedAt) {
           return null;
         }
       }
@@ -938,36 +935,35 @@ const BoxChatGroup = () => {
 
       const nextMsg = messages[index + 1];
       const showLabel = shouldShowLabel(item, nextMsg);
-      const label = getDateLabel(item.createdAt);
+      const label = getDateLabel(item.clientCreatedAt);
 
       let CREATEDAT_URL;
 
       const renderCreatedAtMessage = () => {
-        if (item.createdAt) {
-          let formattedDate = "";
-          const now = moment(); // Lấy thời điểm hiện tại
+        if (!item?.clientCreatedAt) return null;
 
-          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+        let formattedDate = "";
+        const now = moment();
 
-          if (date.isSame(now, "day")) {
-            // Nếu timestamp là cùng ngày với hiện tại
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm nay`;
-          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-            // Nếu timestamp là ngày hôm qua
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm qua`;
-          } else {
-            // Trường hợp khác
-            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-            formattedDate = `${formattedDateTime} `;
-          }
+        const date = moment(item.clientCreatedAt);
 
-          CREATEDAT_URL = formattedDate;
-
-          return <div className="format-date-message"> {formattedDate} </div>;
+        if (date.isSame(now, "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm nay`;
+        } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm qua`;
+        } else {
+          formattedDate = date.format("HH:mm DD/MM/YYYY");
         }
+
+        CREATEDAT_URL = formattedDate;
+
+        return (
+          <div className="format-date-message">
+            {formattedDate}
+          </div>
+        );
       };
+
 
       const renderText = () => {
         let text = item.text;
@@ -1259,7 +1255,7 @@ const BoxChatGroup = () => {
                             onClick={() =>
                               handleRecallMessage({
                                 id: item.id,
-                                createdAt: item.createdAt,
+                                clientCreatedAt: item.clientCreatedAt,
                               })
                             }
                           >
@@ -1795,34 +1791,6 @@ const BoxChatGroup = () => {
     });
   };
 
-
-
-
-  const renderCreatedAt = () => {
-    if (room.createdAt) {
-      let formattedDate = "";
-      const now = moment(); // Lấy thời điểm hiện tại
-
-      const date = moment(room.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
-
-      if (date.isSame(now, "day")) {
-        // Nếu timestamp là cùng ngày với hiện tại
-        const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-        formattedDate = `${formattedTime} Hôm nay`;
-      } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-        // Nếu timestamp là ngày hôm qua
-        const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-        formattedDate = `${formattedTime} Hôm qua`;
-      } else {
-        // Trường hợp khác
-        const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-        formattedDate = `${formattedDateTime} `;
-      }
-
-      return <div className="format-date"> {formattedDate} </div>;
-    }
-  };
-
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const pickerEmojiRef = useRef(null);
 
@@ -1997,30 +1965,26 @@ const BoxChatGroup = () => {
       );
 
       let CREATEDAT_URL;
+
       const getCreatedAtMessage = () => {
-        if (item.createdAt) {
-          let formattedDate = "";
-          const now = moment(); // Lấy thời điểm hiện tại
+        if (!item?.clientCreatedAt) return;
 
-          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+        let formattedDate = "";
+        const now = moment();
 
-          if (date.isSame(now, "day")) {
-            // Nếu timestamp là cùng ngày với hiện tại
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm nay`;
-          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-            // Nếu timestamp là ngày hôm qua
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm qua`;
-          } else {
-            // Trường hợp khác
-            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-            formattedDate = `${formattedDateTime} `;
-          }
+        const date = moment(item.clientCreatedAt);
 
-          return (CREATEDAT_URL = formattedDate);
+        if (date.isSame(now, "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm nay`;
+        } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm qua`;
+        } else {
+          formattedDate = date.format("HH:mm DD/MM/YYYY");
         }
+
+        CREATEDAT_URL = formattedDate;
       };
+
       getCreatedAtMessage();
 
       return item.images.map((image, index) => {
@@ -2223,7 +2187,7 @@ const BoxChatGroup = () => {
     const messageRef = query(
       collection(db, "messages"),
       where("roomId", "==", room.id),
-      orderBy("createdAt", "desc"),
+      orderBy("clientCreatedAt", "desc"),
       startAfter(lastDoc),
       limit(PAGE_SIZE_MESSAGES)
     );

@@ -6,7 +6,7 @@ import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { TITLE_BAR } from "constants/public";
 import ModalConfirm from "common/ModalConfirm";
 
@@ -22,7 +22,7 @@ const Sidebar = () => {
     setSidebarSelected,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading, totalUnread } = useContext(AppContext);
+  const { userInfo, handleLogout, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading, totalUnread } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -43,13 +43,13 @@ const Sidebar = () => {
     if (!invitations || invitations.length === 0) return false;
 
     const lastInvitation = [...invitations].sort(
-      (a, b) => b.createdAt - a.createdAt
+      (a, b) => b.clientCreatedAt - a.clientCreatedAt
     )[0];
 
     const now = Date.now();
     const ONE_DAY = 24 * 60 * 60 * 1000; // 24h in ms
 
-    return now - lastInvitation.createdAt <= ONE_DAY;
+    return now - lastInvitation.clientCreatedAt <= ONE_DAY;
   })();
 
   useEffect(() => {
@@ -113,27 +113,6 @@ const Sidebar = () => {
     });
   };
 
-
-  const handleLogout = async () => {
-    if (!userInfo?.id) return;
-    const docRef = doc(db, "users", userInfo.id);
-    startLoading();
-    await setDoc(
-      docRef,
-      {
-        isOnline: {
-          value: false,
-          updatedAt: serverTimestamp(),
-        },
-      },
-      {
-        merge: true,
-      }
-    );
-    await auth.signOut();
-    stopLoading();
-    // window.location.reload(); // make sure the state has been clear all (bad pratice)
-  };
 
   const { setIsShowBoxChat } = useContext(UserLayoutContext);
 

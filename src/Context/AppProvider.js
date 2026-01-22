@@ -1,15 +1,8 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -19,19 +12,19 @@ import {
   where,
   serverTimestamp,
   startAfter,
+  updateDoc,
 } from "firebase/firestore";
-import { db } from "firebaseConfig";
+import { auth, db } from "firebaseConfig";
 import moment from "moment";
-import { generateKeywords } from "services";
 import { PAGE_SIZE } from "constants/public";
 import Loading from "components/Loading";
 
 export const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
-  const {
-    user: { uid },
-  } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+
+  const uid = user?.uid;
 
   const initialState = {
     strangerList: [],
@@ -90,18 +83,12 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     if (userInfo?.id) {
       const docRef = doc(db, "users", userInfo.id);
-      setDoc(
-        docRef,
-        {
-          isOnline: {
-            value: true,
-            updatedAt: serverTimestamp(),
-          },
+      updateDoc(docRef, {
+        isOnline: {
+          value: true,
+          updatedAt: serverTimestamp(),
         },
-        {
-          merge: true,
-        },
-      );
+      });
     }
 
     if (!userInfo?.notificationDowloadZaloPc?.updatedAt) return;
@@ -132,87 +119,65 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     let unSubcribe;
-    if (uid) {
+
+    if (!uid) {
+      resetAppState();
+      return;
+    }
+
+    try {
       const userInfoRef = query(
         collection(db, "users"),
         where("uid", "==", uid),
       );
-      unSubcribe = onSnapshot(userInfoRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setUserInfo(documents[0]);
-      });
-    } else {
+
+      unSubcribe = onSnapshot(
+        userInfoRef,
+        (docsSnap) => {
+          if (docsSnap.empty) {
+            console.warn("⚠️ User document not found");
+            setUserInfo(null);
+            return;
+          }
+
+          const doc = docsSnap.docs[0];
+          setUserInfo({
+            ...doc.data(),
+            id: doc.id,
+          });
+        },
+        (error) => {
+          console.error("🔥 onSnapshot userInfo error:", error);
+
+          // permission error → reset state cho an toàn
+          if (error.code === "permission-denied") {
+            resetAppState();
+          }
+        },
+      );
+    } catch (error) {
+      console.error("🔥 subscribe userInfo failed:", error);
       resetAppState();
     }
+
     return () => {
-      unSubcribe && unSubcribe();
+      if (unSubcribe) unSubcribe();
+      resetAppState();
     };
   }, [uid]);
 
   useEffect(() => {
-    if (userInfo?.friends) {
-      const getStrangerList = async () => {
-        // Nơi add thêm trường dữ liệu mới - sau khi add xong thì comment lại!
+    if (!userInfo?.uid) {
+      setStrangerList([]);
+      return;
+    }
 
-        /**
-         * 
-        
-        const allUsesrRef = query(collection(db, "messages"));
-        const response2 = await getDocs(allUsesrRef);
-        const documents2 = response2.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
+    let cancelled = false; // 🔥 FLAG HỦY
 
-        for (let i = 0; i < documents2.length; i++) {
-          const messageRef = doc(db, "messages", documents2[i].id);
-          await setDoc(
-            messageRef,
-            {
-              emojiList: [
-                {
-                  id: "smile",
-                  uids: [],
-                },
-                {
-                  id: "heart",
-                  uids: [],
-                },
-                {
-                  id: "surprise",
-                  uids: [],
-                },
-                {
-                  id: "cry",
-                  uids: [],
-                },
-                {
-                  id: "angry",
-                  uids: [],
-                },
-              ],
-            },
-            {
-              merge: true,
-            }
-          );
-        }
-        * 
-         */
-        //
-
+    const getStrangerList = async () => {
+      try {
         let strangerListRef;
+
         if (keywords) {
           strangerListRef = query(
             collection(db, "users"),
@@ -223,68 +188,87 @@ const AppProvider = ({ children }) => {
         }
 
         const response = await getDocs(strangerListRef);
-        const documents = response.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
+
+        if (cancelled) return; // 🔥 logout rồi thì bỏ
+
+        const documents = response.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
 
         const uidFriends = [
-          uid,
-          ...userInfo.friends.map((friend) => friend.uid),
+          userInfo.uid,
+          ...(userInfo.friends || []).map((f) => f.uid),
         ];
 
         const result = documents.filter(
           (item) => !uidFriends.includes(item.uid),
         );
-        return setStrangerList(result);
-      };
-      getStrangerList();
-    } else {
-      setStrangerList([]);
-    }
-  }, [userInfo, keywords, uid]);
+
+        setStrangerList(result);
+      } catch (error) {
+        if (!cancelled && error.code !== "permission-denied") {
+          console.error("🔥 getStrangerList error:", error);
+        }
+        setStrangerList([]);
+      }
+    };
+
+    getStrangerList();
+
+    return () => {
+      cancelled = true; // 🔥 cleanup
+    };
+  }, [userInfo?.uid, userInfo?.friends, keywords]);
 
   useEffect(() => {
     if (!uid) return;
-    const q = query(
-      collection(db, "rooms"),
-      where("members", "array-contains", uid),
-      orderBy("messageLastest.createdAt", "desc"),
-      limit(PAGE_SIZE),
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      if (docs.length < 1) setHasMore(false);
 
-      const sortedRooms = [...docs].sort((a, b) => {
-        const aTime =
-          a.messageLastest?.clientCreatedAt ??
-          a.messageLastest?.createdAt?.seconds * 1000 ??
-          0;
+    try {
+      const q = query(
+        collection(db, "rooms"),
+        where("members", "array-contains", uid),
+        orderBy("messageLastest.clientCreatedAt", "desc"),
+        limit(PAGE_SIZE),
+      );
 
-        const bTime =
-          b.messageLastest?.clientCreatedAt ??
-          b.messageLastest?.createdAt?.seconds * 1000 ??
-          0;
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          try {
+            const docs = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
 
-        return bTime - aTime;
-      });
+            if (docs.length < 1) setHasMore(false);
 
-      setRooms(sortedRooms);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-    });
+            setRooms(docs);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+          } catch (err) {
+            console.error("❌ Error processing snapshot:", err);
+          }
+        },
+        (error) => {
+          // ❗ BẮT LỖI QUERY / PERMISSION / INDEX
+          console.error("🔥 Firestore onSnapshot error:", error);
 
-    return () => {
-      unsubscribe();
-    };
-  }, [uid, keywords, userInfo]);
+          if (error.code === "permission-denied") {
+            console.error("⛔ Không có quyền đọc rooms");
+          }
+
+          if (error.code === "failed-precondition") {
+            console.error("⚠️ Thiếu index Firestore");
+          }
+        },
+      );
+
+      return () => unsubscribe();
+    } catch (err) {
+      // ❗ LỖI SYNTAX / KHỞI TẠO QUERY
+      console.error("❌ Setup Firestore listener failed:", err);
+    }
+  }, [uid]);
 
   useEffect(() => {
     if (selectedUserMessaging.uidSelected) {
@@ -313,26 +297,30 @@ const AppProvider = ({ children }) => {
       return;
     }
 
-    const q = query(
-      collection(db, "rooms"),
-      where("unreadMembers", "array-contains", uid),
-    );
+    try {
+      const q = query(
+        collection(db, "rooms"),
+        where("unreadMembers", "array-contains", uid),
+      );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        let sum = 0;
-        snapshot.forEach((doc) => {
-          sum += doc.data().unreadCount?.[uid] || 0;
-        });
-        setTotalUnread(sum);
-      },
-      (error) => {
-        console.error("Firestore error:", error);
-      },
-    );
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          let sum = 0;
+          snapshot.forEach((doc) => {
+            sum += doc.data().unreadCount?.[uid] || 0;
+          });
+          setTotalUnread(sum);
+        },
+        (error) => {
+          console.error("🔥 subscribe userInfo failed:", error);
+        },
+      );
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("❌ Setup Firestore listener failed:", error);
+    }
   }, [uid]);
 
   useEffect(() => {
@@ -356,7 +344,7 @@ const AppProvider = ({ children }) => {
     const roomsRef = query(
       collection(db, "rooms"),
       where("members", "array-contains", uid),
-      orderBy("messageLastest.createdAt", "desc"),
+      orderBy("messageLastest.clientCreatedAt", "desc"),
       startAfter(lastDoc),
       limit(PAGE_SIZE),
     );
@@ -374,9 +362,33 @@ const AppProvider = ({ children }) => {
     return newRooms.length;
   };
 
+  const handleLogout = async () => {
+    if (!userInfo?.id) return;
+
+    const docRef = doc(db, "users", userInfo.id);
+    startLoading();
+
+    try {
+      await updateDoc(docRef, {
+        isOnline: {
+          value: false,
+          updatedAt: serverTimestamp(),
+        },
+      });
+      await auth.signOut();
+    } catch (error) {
+      console.error("🔥 Logout error:", error);
+    } finally {
+      resetAppState();
+      setUserInfo(null);
+      stopLoading();
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
+        handleLogout,
         userInfo,
         strangerList,
         setSelectedUserMessaging,

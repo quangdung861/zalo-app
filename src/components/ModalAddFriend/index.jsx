@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { db } from "firebaseConfig";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import moment from "moment";
 import { AppContext } from "Context/AppProvider";
 import * as S from "./styles";
@@ -61,7 +61,7 @@ const ModalAddFriend = ({
     const nowDate = moment().unix() * 1000;
     const strangerRef = doc(db, "users", id);
     startLoading();
-    await setDoc(
+    await updateDoc(
       strangerRef,
       {
         invitationReceive: [
@@ -70,15 +70,14 @@ const ModalAddFriend = ({
             uid: userInfo.uid,
             message: messageValue,
             from: "Từ trò chuyện với người lạ",
-            createdAt: nowDate,
+            clientCreatedAt: nowDate,
           },
         ],
-      },
-      { merge: true }
+      }
     );
     // ME
     const userInfoRef = doc(db, "users", userInfo.id);
-    await setDoc(
+    await updateDoc(
       userInfoRef,
       {
         invitationSent: [
@@ -87,11 +86,10 @@ const ModalAddFriend = ({
             uid,
             message: messageValue,
             from: "Từ trò chuyện với người lạ",
-            createdAt: nowDate,
+            clientCreatedAt: nowDate,
           },
         ],
-      },
-      { merge: true }
+      }
     );
     stopLoading();
     setIsShowOverlayModalAddFriend(false);
