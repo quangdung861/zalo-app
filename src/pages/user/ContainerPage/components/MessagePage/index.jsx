@@ -193,7 +193,7 @@ const MessagePage = () => {
     const newDeleted = [...roomDelete.deleted].filter(
       (item) => item.uid !== userInfo.uid
     );
-    newDeleted.push({ uid: userInfo.uid, createdAt: now });
+    newDeleted.push({ uid: userInfo.uid, clientCreatedAt: now });
 
     if (
       roomDelete.category === "single" ||
@@ -266,7 +266,7 @@ const MessagePage = () => {
       });
 
       const formatDate = moment(
-        room.messageLastest?.createdAt?.seconds * 1000
+        room.messageLastest?.clientCreatedAt
       )?.fromNow();
 
       const uidSelected = room.members.filter(
@@ -274,11 +274,11 @@ const MessagePage = () => {
       )[0];
 
       let categoryData;
-      const friendData = userInfo.friends.find(
+      const friendData = userInfo?.friends?.find(
         (item) => item.uid === uidSelected
       );
       if (friendData) {
-        categoryData = userInfo.categoriesTemplate.find(
+        categoryData = userInfo?.categoriesTemplate?.find(
           (item) => item.name === friendData.category
         );
       }
@@ -394,7 +394,7 @@ const MessagePage = () => {
       const infoGroup = infoPartner.find((item) => item.id === room.id);
 
       const formatDate = moment(
-        room.messageLastest?.createdAt?.seconds * 1000
+        room.messageLastest?.clientCreatedAt
       )?.fromNow();
 
       const unseenMessages = room.unreadCount && room.unreadCount[userInfo.uid];
@@ -742,35 +742,6 @@ const MessagePage = () => {
                 <div className="dividing-selected"></div>
               </div>
               <div className="room-list" id="parentScrollDiv">
-                {/* {loading && (
-                  <div className="room-item">
-                    <div className="room-item__left">
-                      <Skeleton
-                        circle={true}
-                        style={{
-                          width: "48px",
-                          height: "48px",
-                          borderRadius: "50%",
-                        }}
-                      />
-                      <div className="info">
-                        <div className="room-name">
-                          <Skeleton />
-                        </div>
-                        <div className="new-message">
-                          <span className="new-message__text">
-                            <Skeleton />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className="room-item__right"
-                      style={{ width: "100%" }}
-                    ></div>
-                  </div>
-                )} */}
-
                 {userInfo?.notificationDowloadZaloPc.value && (
                   <div className="notification-compatible">
                     <div className="notification-compatible__header">
@@ -800,7 +771,6 @@ const MessagePage = () => {
                   </div>
                 )}
 
-                {/*  */}
                 <InfiniteScroll
                   dataLength={rooms.length}
                   next={fetchMoreData}
@@ -811,7 +781,6 @@ const MessagePage = () => {
                   {roomlist}
                 </InfiniteScroll>
 
-                {/* {!loading ? roomlist : "Loading..."} */}
                 {
                   !filterRoom[0] &&
                   filterOption === "unseen" && !categorySelected && (
@@ -825,7 +794,6 @@ const MessagePage = () => {
                     </div>
                   )
                 }
-
 
                 {!filterRoom[0] &&
                   (!categorySelected ? (

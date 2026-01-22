@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import * as S from "./styles";
 
@@ -15,7 +15,7 @@ import avatarDefault from "assets/avatar-mac-dinh-1.png";
 import avatarCloud from "assets/avatarCloudjpg.jpg";
 import imgPhotocover from "assets/photocover/photocover.jpg"
 
-const FormEmail = ({ setRegisterWay }) => {
+const FormEmail = () => {
   const [formData, setFormData] = useState({
     fullName: {
       value: undefined,
@@ -31,7 +31,7 @@ const FormEmail = ({ setRegisterWay }) => {
       isShow: false,
     },
   });
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -186,7 +186,7 @@ const FormEmail = ({ setRegisterWay }) => {
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
         if (isNewUser) {
-          addDocument("users", {
+          await addDocument("users", {
             displayName: formData.fullName.value,
             email: data.user.email,
             photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
@@ -236,7 +236,7 @@ const FormEmail = ({ setRegisterWay }) => {
               updatedAt: serverTimestamp(),
             },
           });
-          addDocument("rooms", {
+          await addDocument("rooms", {
             category: "my cloud",
             members: [data.user.uid, "my-cloud"],
             info: [
@@ -252,11 +252,11 @@ const FormEmail = ({ setRegisterWay }) => {
               },
             ],
             messageLastest: {
-              createdAt: serverTimestamp(),
+              clientCreatedAt: Date.now(),
               clientCreatedAt: Date.now(),
             },
             totalMessages: 0,
-            unreadCount: {[data.user.uid]: 0},
+            unreadCount: { [data.user.uid]: 0 },
             unreadMembers: [],
             deleted: [],
             hideTemporarily: [],

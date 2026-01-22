@@ -1,10 +1,9 @@
-import React, { useContext, useState, useRef, useEffect, useMemo } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import * as S from "./styles";
 import {
   collection,
   query,
   where,
-  serverTimestamp,
   addDoc,
   onSnapshot,
   doc,
@@ -28,7 +27,6 @@ import Picker from "@emoji-mart/react";
 import ModalAccount from "components/ModalAccount";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import suggestCloudImage from "assets/suggestCloudImage.png";
-import { convertImagesToBase64 } from "utils/image";
 import ModalSharingMessage from "components/ModalSharingMessage";
 import smileIcon from "assets/emoji/smile.png";
 import heartIcon from "assets/emoji/heart.png";
@@ -75,8 +73,22 @@ const BoxChat = () => {
   const [infoUsers, setInfoUsers] = useState();
   const [inputValue, setInputValue] = useState("");
   const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
-  const [backgroundIndex, setBackgroundIndex] = useState(0);
+  const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [infoMessageSharing, setInfoMessageSharing] = useState({});
+  const [clicked, setClicked] = useState("all");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [categoryUser, setCategoryUser] = useState({});
+  const [messageSelected, setMessageSelected] = useState();
+  const [imageFormat, setImageFormat] = useState({
+    rotate: 0,
+    scale: 1,
+  });
+  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(null);
 
+  const pickerEmojiRef = useRef(null);
   const inputRef = useRef();
   const boxChatRef = useRef();
   const categoryRef = useRef();
@@ -110,15 +122,24 @@ const BoxChat = () => {
     },
   ];
 
-  const [showBtnUpToTop, setShowBtnUpToTop] = useState(false);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+        setCategoryDropdown(false);
+      }
+      if (
+        dropdownSelectEmoji.current &&
+        !dropdownSelectEmoji.current.contains(event.target)
+      ) {
+        setEmojis(false);
+      }
+    };
 
-  const handleScroll = () => {
-    const chatWindow = boxChatRef?.current;
-    if (chatWindow) {
-      const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
-      setShowBtnUpToTop(!isNearTop)
-    }
-  };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const chatWindow = boxChatRef?.current;
@@ -180,6 +201,181 @@ const BoxChat = () => {
     clearUnreadCount();
   }, [room.totalMessages]);
 
+  useEffect(() => {
+    setMessages([]);
+    let unSubcribe;
+
+    if (room?.id) {
+      const q = query(
+        collection(db, "messages"),
+        where("roomId", "==", room.id),
+        orderBy("clientCreatedAt", "desc"),
+        limit(PAGE_SIZE_MESSAGES)
+      );
+
+      // 🔥 FETCH NGAY
+      getDocs(q).then(snap => {
+        setMessages(
+          snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        );
+      });
+
+      unSubcribe = onSnapshot(
+        q,
+        (docsSnap) => {
+          const documents = docsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setMessages(documents);
+          setLastDoc(docsSnap.docs.at(-1) || null);
+        },
+        (error) => {
+          console.error("🔥 onSnapshot messages error:", error);
+        }
+      );
+    }
+
+    const chatWindow = boxChatRef?.current;
+    if (chatWindow) {
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "auto",
+        });
+      }, 100);
+    }
+
+    return () => {
+      if (unSubcribe) unSubcribe();
+      setMessages([]);
+    };
+  }, [room?.id]);
+
+  useEffect(() => {
+    if (room?.messageLastest?.clientCreatedAt) {
+      const chatWindow = boxChatRef?.current;
+      if (showBtnUpToTop) return;
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "auto",
+        });
+      }, 100);
+    }
+  }, [room?.messageLastest?.clientCreatedAt]);
+
+  useEffect(() => {
+    if (messages.length > 0 && userInfo?.uid) {
+      const allUser = messages.map((item) => item.uid);
+      var uniqueArr = [...new Set(allUser)];
+
+      const fetchData = async () => {
+        startLoading();
+        const docRef = query(
+          collection(db, "users"),
+          where("uid", "in", uniqueArr)
+        );
+        const reponse = await getDocs(docRef);
+        const documents = reponse.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setInfoUsers(documents);
+        stopLoading();
+      };
+      fetchData();
+    }
+  }, [messages, userInfo?.uid]);
+
+  useEffect(() => {
+    let unSubcribe;
+    if (selectedUserMessaging?.uidSelected) {
+      const fullInfoUserMessagingRef = query(
+        collection(db, "users"),
+        where("uid", "==", selectedUserMessaging.uidSelected)
+      );
+
+      unSubcribe = onSnapshot(fullInfoUserMessagingRef, (docsSnap) => {
+        const documents = docsSnap.docs.map((doc) => {
+          const id = doc.id;
+          const data = doc.data();
+          return {
+            ...data,
+            id: id,
+          };
+        });
+        setFullInfoUser(documents[0]);
+      },
+        (error) => {
+          console.error("🔥 onSnapshot messages error:", error);
+        });
+    }
+    return () => unSubcribe && unSubcribe();
+  }, [selectedUserMessaging?.uidSelected]);
+
+  useEffect(() => {
+    // focus to input again after submit
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const infoFriend = userInfo.friends.find(
+      (item) => item.uid === selectedUserMessaging.uidSelected
+    );
+
+    const categoryResult = userInfo.categoriesTemplate.find(
+      (item) => item.name === infoFriend?.category
+    );
+
+    setCategoryUser(categoryResult);
+  }, [selectedUserMessaging, userInfo]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        pickerEmojiRef.current &&
+        !pickerEmojiRef.current.contains(event.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleInputChange = (value) => {
+    setInputValue(value);
+  };
+
+  useEffect(() => {
+    setImageFormat({
+      rotate: 0,
+      scale: 1,
+    });
+  }, [messageSelected]);
+
+  useEffect(() => {
+    initInfoBackground();
+  }, [room, userInfo.uid]);
+
+  const handleScroll = () => {
+    const chatWindow = boxChatRef?.current;
+    if (chatWindow) {
+      const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
+      setShowBtnUpToTop(!isNearTop)
+    }
+  };
+
   const handleFocus = () => {
     const toolbarChatInputElement = document.querySelector(
       ".toolbar-chat-input"
@@ -217,32 +413,15 @@ const BoxChat = () => {
     (item) => item.uid === selectedUserMessaging.uidSelected
   );
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryDropdown(false);
-      }
-      if (
-        dropdownSelectEmoji.current &&
-        !dropdownSelectEmoji.current.contains(event.target)
-      ) {
-        setEmojis(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
-  const handleKeyDown = (imageBase64FullInfo, e) => {
+  const handleKeyDown = (imgList, e) => {
     if (e?.key === "Enter") {
       if (!e?.isPreventDefault) {
         e.preventDefault();
       }
-      if (inputValue || imageBase64FullInfo[0]) {
-        if (room.id) {
+      if (inputValue || imgList[0]) {
+        if (room.id) { // Đã có room
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
@@ -263,23 +442,20 @@ const BoxChat = () => {
             });
 
             startLoading();
-            await setDoc(
+            await updateDoc(
               roomRef,
               {
                 messageLastest: {
-                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
+                  text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
                 unreadCount: newUnreadCount,
                 unreadMembers: newUnreadMembers,
                 hideTemporarily: [],
-              },
-              {
-                merge: true,
               }
             );
 
@@ -288,7 +464,7 @@ const BoxChat = () => {
               roomId: room.id,
               uid: userInfo.uid,
               text: inputValue,
-              images: imageBase64FullInfo || [],
+              images: imgList || [],
               infoReply: infoReply,
               emojiList: [
                 {
@@ -316,21 +492,20 @@ const BoxChat = () => {
             stopLoading();
           };
           createMes();
-        } else {
+        } else { // Chưa có room
           const createRoomAndMes = async () => {
             try {
               startLoading();
-              const roomRef = await addDoc(collection(db, "rooms"), {
+              const roomRef = await addDocument("rooms", {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
                 messageLastest: {
-                  text: inputValue || (imageBase64FullInfo && "Hình ảnh"),
+                  text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  createdAt: serverTimestamp(),
+                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
-                createdAt: serverTimestamp(),
                 totalMessages: 1,
                 unreadCount: {
                   [userInfo.uid]: 0,
@@ -343,14 +518,15 @@ const BoxChat = () => {
 
               const response = await getDoc(roomRef);
 
+              await setRoom({ id: response.id, ...response.data() });
+
               if (roomRef && roomRef.id) {
-                await setRoom({ id: response.id, ...response.data() });
                 await addDocument("messages", {
                   category: "single",
                   roomId: response.id,
                   uid: userInfo.uid,
                   text: inputValue,
-                  images: imageBase64FullInfo || [],
+                  images: imgList || [],
                   infoReply: infoReply,
                   emojiList: [
                     {
@@ -375,6 +551,7 @@ const BoxChat = () => {
                     },
                   ],
                 });
+
               } else {
                 console.log("false");
               }
@@ -448,7 +625,7 @@ const BoxChat = () => {
                 text: inputValue,
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
-                createdAt: serverTimestamp(),
+                clientCreatedAt: Date.now(),
                 clientCreatedAt: Date.now(),
               },
               totalMessages: increment(1),
@@ -490,10 +667,10 @@ const BoxChat = () => {
             text: inputValue,
             displayName: userInfo.displayName,
             uid: userInfo.uid,
-            createdAt: serverTimestamp(),
+            clientCreatedAt: Date.now(),
             clientCreatedAt: Date.now(),
           },
-          createdAt: serverTimestamp(),
+          clientCreatedAt: Date.now(),
           clientCreatedAt: Date.now(),
           totalMessages: 1,
           unreadCount: {
@@ -552,42 +729,6 @@ const BoxChat = () => {
 
 
 
-  // const [isOnline, setIsOnline] = useState(false);
-
-  useEffect(() => {
-    let unSubcribe;
-    if (selectedUserMessaging?.uidSelected) {
-      const fullInfoUserMessagingRef = query(
-        collection(db, "users"),
-        where("uid", "==", selectedUserMessaging.uidSelected)
-      );
-
-      unSubcribe = onSnapshot(fullInfoUserMessagingRef, (docsSnap) => {
-        const documents = docsSnap.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            ...data,
-            id: id,
-          };
-        });
-        setFullInfoUser(documents[0]);
-      });
-    }
-    return () => unSubcribe && unSubcribe();
-  }, [selectedUserMessaging?.uidSelected]);
-
-  useEffect(() => {
-    // focus to input again after submit
-    if (inputRef?.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      });
-    }
-  }, []);
-
-  const [lastDoc, setLastDoc] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
 
   const fetchMoreData = async () => {
     if (!hasMore) return;
@@ -601,7 +742,7 @@ const BoxChat = () => {
     const messageRef = query(
       collection(db, "messages"),
       where("roomId", "==", room.id),
-      orderBy("createdAt", "desc"),
+      orderBy("clientCreatedAt", "desc"),
       startAfter(lastDoc),
       limit(PAGE_SIZE_MESSAGES)
     );
@@ -618,82 +759,6 @@ const BoxChat = () => {
 
     setLastDoc(snap.docs[snap.docs.length - 1]);
   };
-
-  useEffect(() => {
-    setMessages([]);
-    let unSubcribe;
-    if (room.id) {
-      const messagesRef = query(
-        collection(db, "messages"),
-        where("roomId", "==", room.id),
-        orderBy("createdAt", "desc"),
-        limit(PAGE_SIZE_MESSAGES)
-      );
-      const handleSnapShotMessage = async () => {
-        unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
-          const documents = docsSnap.docs.map((doc) => {
-            const id = doc.id;
-            const data = doc.data();
-            return {
-              ...data,
-              id: id,
-            };
-          });
-          setMessages(documents);
-          setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
-        });
-      };
-      handleSnapShotMessage();
-    }
-    const chatWindow = boxChatRef?.current;
-    setTimeout(() => {
-      chatWindow.scrollTo({
-        top: chatWindow.scrollHeight,
-        behavior: "auto",
-      });
-    }, 100);
-
-    return () => unSubcribe && unSubcribe();
-  }, [room.id]);
-
-  useEffect(() => {
-    if (room?.messageLastest?.createdAt) {
-      const chatWindow = boxChatRef?.current;
-      if (showBtnUpToTop) return;
-      setTimeout(() => {
-        chatWindow.scrollTo({
-          top: chatWindow.scrollHeight,
-          behavior: "auto",
-        });
-      }, 100);
-    }
-  }, [room?.messageLastest?.createdAt]);
-
-
-  useEffect(() => {
-    if (messages[0]) {
-      const allUser = messages.map((item) => item.uid);
-      var uniqueArr = [...new Set(allUser)];
-
-      const fetchData = async () => {
-        startLoading();
-        const docRef = query(
-          collection(db, "users"),
-          where("uid", "in", uniqueArr)
-        );
-        const reponse = await getDocs(docRef);
-        const documents = reponse.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
-        });
-        setInfoUsers(documents);
-        stopLoading();
-      };
-      fetchData();
-    }
-  }, [messages, userInfo]);
 
   const handleReplyMessage = ({ name, id, text, image }) => {
     setInfoReply({ name, id, text, image });
@@ -727,40 +792,36 @@ const BoxChat = () => {
     setIsShowDropdownOption(false);
   };
 
-  const handleRecallMessage = async ({ id, createdAt }) => {
+  const handleRecallMessage = async ({ id, clientCreatedAt }) => {
     const now = moment();
-    const date = moment(createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+    const date = moment(clientCreatedAt);
 
     const diffSeconds = now.diff(date, "seconds");
+
     startLoading();
+    setIsShowDropdownOption(false);
+
     if (diffSeconds < 30) {
       const messageRef = doc(db, "messages", id);
-      setIsShowDropdownOption(false);
 
       await setDoc(
         messageRef,
-        {
-          isRecall: true,
-        },
-        {
-          merge: true,
-        }
+        { isRecall: true },
+        { merge: true }
       );
-      setIsShowDropdownOption(false);
+
       stopLoading();
       return;
     }
 
-    setIsShowDropdownOption(false);
     setIsShowAlertRecallRejectMessage(true);
-    setTimeout(function () {
+    setTimeout(() => {
       setIsShowAlertRecallRejectMessage(false);
     }, 3000);
+
     stopLoading();
-    return;
   };
 
-  const [infoMessageSharing, setInfoMessageSharing] = useState({});
   const handleSharingMessage = ({ infoMessage }) => {
     setInfoMessageSharing(infoMessage);
     setIsShowOverlayModalSharingMessage(true);
@@ -884,16 +945,14 @@ const BoxChat = () => {
     setEmojis();
   };
 
-  const [clicked, setClicked] = useState("all");
-
   function startOfDay(date) {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
     return d;
   }
 
-  function getDateLabel(createdAt) {
-    const msgDate = startOfDay(createdAt?.toDate());
+  function getDateLabel(clientCreatedAt) {
+    const msgDate = startOfDay(clientCreatedAt);
     const today = startOfDay(new Date());
 
     const diffDays =
@@ -916,13 +975,13 @@ const BoxChat = () => {
   }
 
   function shouldShowLabel(current, next) {
-    if (!current?.createdAt) return false;
-    if (!next?.createdAt) return true;
+    if (!current?.clientCreatedAt) return false;
+    if (!next?.clientCreatedAt) return true;
 
-    const curDay = startOfDay(current.createdAt.toDate()).getTime();
-    const nextDay = startOfDay(next.createdAt.toDate()).getTime();
-
-    return curDay !== nextDay;
+    return (
+      startOfDay(new Date(current.clientCreatedAt)).getTime() !==
+      startOfDay(new Date(next.clientCreatedAt)).getTime()
+    );
   }
 
   const renderMessages = () => {
@@ -932,9 +991,9 @@ const BoxChat = () => {
       );
 
       if (infoDeleted) {
-        const formatDate = moment(item.createdAt)._i.seconds * 1000;
+        const formatDate = moment(item.clientCreatedAt)
 
-        if (formatDate < infoDeleted?.createdAt) {
+        if (formatDate < infoDeleted?.clientCreatedAt) {
           return null;
         }
       }
@@ -949,33 +1008,29 @@ const BoxChat = () => {
 
       const nextMsg = messages[index + 1];
       const showLabel = shouldShowLabel(item, nextMsg);
-      const label = getDateLabel(item.createdAt);
+      const label = getDateLabel(item.clientCreatedAt);
 
       let CREATEDAT_URL;
+
       const getCreatedAtMessage = () => {
-        if (item.createdAt) {
-          let formattedDate = "";
-          const now = moment(); // Lấy thời điểm hiện tại
+        if (!item?.clientCreatedAt) return;
 
-          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+        let formattedDate = "";
+        const now = moment();
 
-          if (date.isSame(now, "day")) {
-            // Nếu timestamp là cùng ngày với hiện tại
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm nay`;
-          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-            // Nếu timestamp là ngày hôm qua
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm qua`;
-          } else {
-            // Trường hợp khác
-            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-            formattedDate = `${formattedDateTime} `;
-          }
+        const date = moment(item.clientCreatedAt);
 
-          return (CREATEDAT_URL = formattedDate);
+        if (date.isSame(now, "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm nay`;
+        } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm qua`;
+        } else {
+          formattedDate = date.format("HH:mm DD/MM/YYYY");
         }
+
+        CREATEDAT_URL = formattedDate;
       };
+
       getCreatedAtMessage();
 
       let total = 0;
@@ -1232,7 +1287,7 @@ const BoxChat = () => {
                             onClick={() =>
                               handleRecallMessage({
                                 id: item.id,
-                                createdAt: item.createdAt,
+                                clientCreatedAt: item.clientCreatedAt,
                               })
                             }
                           >
@@ -1762,52 +1817,7 @@ const BoxChat = () => {
     });
   };
 
-  const renderCreatedAt = () => {
-    if (room.createdAt) {
-      let formattedDate = "";
-      const now = moment(); // Lấy thời điểm hiện tại
 
-      const date = moment(room.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
-
-      if (date.isSame(now, "day")) {
-        // Nếu timestamp là cùng ngày với hiện tại
-        const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-        formattedDate = `${formattedTime} Hôm nay`;
-      } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-        // Nếu timestamp là ngày hôm qua
-        const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-        formattedDate = `${formattedTime} Hôm qua`;
-      } else {
-        // Trường hợp khác
-        const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-        formattedDate = `${formattedDateTime} `;
-      }
-
-      return <div className="format-date"> {formattedDate} </div>;
-    }
-  };
-
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const pickerEmojiRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        pickerEmojiRef.current &&
-        !pickerEmojiRef.current.contains(event.target)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleInputChange = (value) => {
-    setInputValue(value);
-  };
 
   // Hàm xử lý sự kiện khi bấm nút hiển thị/ẩn bảng chọn emoji
   const handleToggleEmojiPicker = () => {
@@ -1819,19 +1829,7 @@ const BoxChat = () => {
     setInputValue(inputValue + emoji.native);
   };
 
-  const [categoryUser, setCategoryUser] = useState({});
 
-  useEffect(() => {
-    const infoFriend = userInfo.friends.find(
-      (item) => item.uid === selectedUserMessaging.uidSelected
-    );
-
-    const categoryResult = userInfo.categoriesTemplate.find(
-      (item) => item.name === infoFriend?.category
-    );
-
-    setCategoryUser(categoryResult);
-  }, [selectedUserMessaging, userInfo]);
 
   const handleCategoryUser = async (value) => {
     const friendIndex = userInfo.friends.findIndex(
@@ -1946,8 +1944,6 @@ const BoxChat = () => {
     }
   };
 
-  const [messageSelected, setMessageSelected] = useState();
-
   const renderContainerImages = () => {
     return messages.map((item) => {
       const newInfoUser = infoUsers?.find(
@@ -1955,30 +1951,26 @@ const BoxChat = () => {
       );
 
       let CREATEDAT_URL;
+
       const getCreatedAtMessage = () => {
-        if (item.createdAt) {
-          let formattedDate = "";
-          const now = moment(); // Lấy thời điểm hiện tại
+        if (!item?.clientCreatedAt) return;
 
-          const date = moment(item.createdAt.toDate()); // Chuyển đổi timestamp thành đối tượng Moment.js
+        let formattedDate = "";
+        const now = moment();
 
-          if (date.isSame(now, "day")) {
-            // Nếu timestamp là cùng ngày với hiện tại
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm nay`;
-          } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
-            // Nếu timestamp là ngày hôm qua
-            const formattedTime = date.format("HH:mm"); // Định dạng giờ theo "HH:mm"
-            formattedDate = `${formattedTime} Hôm qua`;
-          } else {
-            // Trường hợp khác
-            const formattedDateTime = date.format("HH:mm DD/MM/YYYY"); // Định dạng ngày và giờ theo "HH:mm DD/MM/YYYY"
-            formattedDate = `${formattedDateTime} `;
-          }
+        const date = moment(item.clientCreatedAt);
 
-          return (CREATEDAT_URL = formattedDate);
+        if (date.isSame(now, "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm nay`;
+        } else if (date.isSame(now.clone().subtract(1, "day"), "day")) {
+          formattedDate = `${date.format("HH:mm")} Hôm qua`;
+        } else {
+          formattedDate = date.format("HH:mm DD/MM/YYYY");
         }
+
+        CREATEDAT_URL = formattedDate;
       };
+
       getCreatedAtMessage();
 
       return item.images.map((image, index) => {
@@ -2014,29 +2006,6 @@ const BoxChat = () => {
       });
     });
   };
-
-  const [imageFormat, setImageFormat] = useState({
-    rotate: 0,
-    scale: 1,
-  });
-
-  useEffect(() => {
-    setImageFormat({
-      rotate: 0,
-      scale: 1,
-    });
-  }, [messageSelected]);
-
-  // const downloadImage = () => {
-  //   const randomNumber = Math.floor(Math.random() * 10000000000000);
-  //   const base64Data = messageSelected?.URL; // Dữ liệu base64 của ảnh
-  //   const link = document.createElement("a");
-  //   link.href = `${base64Data}`;
-  //   link.download = `photo-${randomNumber}`; // Tên file khi được lưu xuống máy
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
 
   const downloadImage = async () => {
     const response = await fetch(messageSelected?.URL);
@@ -2100,9 +2069,6 @@ const BoxChat = () => {
     ...(userBackground ? [userBackground] : []),
     ...backgoundsDefault,
   ];
-  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("")
-
-  const [currentIndex, setCurrentIndex] = useState(null);
 
   const initInfoBackground = () => {
     const index =
@@ -2119,10 +2085,6 @@ const BoxChat = () => {
       }
     }
   }
-
-  useEffect(() => {
-    initInfoBackground();
-  }, [room, userInfo.uid]);
 
   return (
     <S.Wrapper>

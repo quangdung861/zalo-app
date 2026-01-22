@@ -14,7 +14,6 @@ const RoomItem = ({
     infoGroup,
     formatDate,
     categoryData,
-    //
     selectedUserMessaging,
     toogleBoxChat,
     avatarDefault,
@@ -59,7 +58,6 @@ const RoomItem = ({
             >
                 <div className="room-item__left">
                     <img
-                        // className="image-with-replacement"
                         src={partner?.photoURL}
                         alt=""
                         onError={(e) => {
@@ -150,7 +148,6 @@ const RoomItem = ({
                 <div className="room-item__left">
                     {room.avatar?.url && (
                         <img
-                            // className="image-with-replacement"
                             src={room.avatar?.url}
                             alt=""
                             onError={(e) => {

@@ -2,10 +2,12 @@ import { db } from "./firebaseConfig";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 export const addDocument = async (collectionName, data) => {
-  await addDoc(collection(db, collectionName), {
+  const docRef = await addDoc(collection(db, collectionName), {
     ...data,
+    clientCreatedAt: Date.now(),
     createdAt: serverTimestamp(),
   });
+  return docRef;
 };
 
 // tao keywords cho displayName, su dung cho search

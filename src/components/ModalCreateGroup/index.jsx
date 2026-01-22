@@ -10,17 +10,14 @@ import {
   query,
   setDoc,
   where,
-  serverTimestamp,
   addDoc,
   getDoc,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { convertImageToBase64 } from "utils/file";
-import { addDocument } from "services";
 import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
-import { convertImagesToBase64 } from "utils/image";
 import searchEmpty from "assets/searchEmpty.png";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
@@ -329,7 +326,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       category: "group",
       members: [userInfo.uid, ...members],
       messageLastest: {
-        createdAt: serverTimestamp(),
+        clientCreatedAt: Date.now(),
         clientCreatedAt: Date.now(),
       },
       totalMessages: 0,
@@ -340,7 +337,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       avatar: imgPreviewAvatar || "",
       deleted: [],
       hideTemporarily: [],
-      createdAt: serverTimestamp(),
+      clientCreatedAt: Date.now(),
     };
 
     try {
