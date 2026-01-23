@@ -178,7 +178,7 @@ const BoxChat = () => {
     if (inputRef) {
       inputRef.current.focus();
     }
-    setMessages([])
+    setInputValue('');
     setHasMore(true);
     setLastDoc(null)
   }, [room.id]);
@@ -202,10 +202,9 @@ const BoxChat = () => {
   }, [room.totalMessages]);
 
   useEffect(() => {
-    setMessages([]);
     let unSubcribe;
 
-    if (room?.id) {
+    try {
       const q = query(
         collection(db, "messages"),
         where("roomId", "==", room.id),
@@ -213,20 +212,15 @@ const BoxChat = () => {
         limit(PAGE_SIZE_MESSAGES)
       );
 
-      // 🔥 FETCH NGAY
-      getDocs(q).then(snap => {
-        setMessages(
-          snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        );
-      });
-
       unSubcribe = onSnapshot(
         q,
         (docsSnap) => {
-          const documents = docsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+          const documents = docsSnap.docs.map((doc) => {
+            return {
+              id: doc.id,
+              ...doc.data(),
+            };
+          });
 
           setMessages(documents);
           setLastDoc(docsSnap.docs.at(-1) || null);
@@ -235,8 +229,9 @@ const BoxChat = () => {
           console.error("🔥 onSnapshot messages error:", error);
         }
       );
+    } catch (error) {
+      console.log(error);
     }
-
     const chatWindow = boxChatRef?.current;
     if (chatWindow) {
       setTimeout(() => {
@@ -249,7 +244,6 @@ const BoxChat = () => {
 
     return () => {
       if (unSubcribe) unSubcribe();
-      setMessages([]);
     };
   }, [room?.id]);
 
@@ -413,8 +407,6 @@ const BoxChat = () => {
     (item) => item.uid === selectedUserMessaging.uidSelected
   );
 
-
-
   const handleKeyDown = (imgList, e) => {
     if (e?.key === "Enter") {
       if (!e?.isPreventDefault) {
@@ -424,86 +416,78 @@ const BoxChat = () => {
         if (room.id) { // Đã có room
           audio.play();
           const createMes = async () => {
-            const roomRef = doc(db, "rooms", room.id);
+            await runTransaction(db, async (tx) => {
+              const roomRef = doc(db, "rooms", room.id);
+              const msgRef = doc(collection(db, "messages"));
 
-            const members = room.members || [];
-            const unreadCount = room.unreadCount || {};
+              const roomSnap = await tx.get(roomRef);
+              if (!roomSnap.exists()) throw new Error("Room not found");
 
-            const newUnreadCount = { ...unreadCount };
+              const roomData = roomSnap.data();
+              const members = roomData.members || [];
 
-            const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
+              const newUnreadCount = {};
+              members.forEach(uid => {
+                newUnreadCount[uid] =
+                  uid === userInfo.uid ? 0 : (roomData.unreadCount?.[uid] || 0) + 1;
+              });
 
-            members.forEach((uid) => {
-              if (uid === userInfo.uid) {
-                newUnreadCount[uid] = 0;
-              } else {
-                newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
-              }
-            });
-
-            startLoading();
-            await updateDoc(
-              roomRef,
-              {
+              tx.update(roomRef, {
                 messageLastest: {
-                  text: inputValue || (imgList && "Hình ảnh"),
+                  text: inputValue || "Hình ảnh",
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
                   clientCreatedAt: Date.now(),
-                  clientCreatedAt: Date.now(),
                 },
-                totalMessages: room.totalMessages + 1,
+                totalMessages: (roomData.totalMessages || 0) + 1,
                 unreadCount: newUnreadCount,
-                unreadMembers: newUnreadMembers,
                 hideTemporarily: [],
               }
-            );
+              );
 
-            await addDocument("messages", {
-              category: "single",
-              roomId: room.id,
-              uid: userInfo.uid,
-              text: inputValue,
-              images: imgList || [],
-              infoReply: infoReply,
-              emojiList: [
-                {
-                  id: "smile",
-                  uids: [],
-                },
-                {
-                  id: "heart",
-                  uids: [],
-                },
-                {
-                  id: "surprise",
-                  uids: [],
-                },
-                {
-                  id: "cry",
-                  uids: [],
-                },
-                {
-                  id: "angry",
-                  uids: [],
-                },
-              ],
+              tx.set(msgRef, {
+                roomId: room.id,
+                uid: userInfo.uid,
+                text: inputValue || "",
+                images: imgList || [],
+                clientCreatedAt: Date.now(),
+                emojiList: [
+                  {
+                    id: "smile",
+                    uids: [],
+                  },
+                  {
+                    id: "heart",
+                    uids: [],
+                  },
+                  {
+                    id: "surprise",
+                    uids: [],
+                  },
+                  {
+                    id: "cry",
+                    uids: [],
+                  },
+                  {
+                    id: "angry",
+                    uids: [],
+                  },
+                ],
+              });
             });
-            stopLoading();
           };
           createMes();
         } else { // Chưa có room
           const createRoomAndMes = async () => {
             try {
               startLoading();
-              const roomRef = await addDocument("rooms", {
+              const roomPayload = {
                 category: "single",
                 members: [userInfo.uid, selectedUserMessaging.uidSelected],
                 messageLastest: {
                   text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: 1,
@@ -514,16 +498,16 @@ const BoxChat = () => {
                 unreadMembers: [selectedUserMessaging.uidSelected],
                 deleted: [],
                 hideTemporarily: [],
-              });
+                clientCreatedAt: Date.now(),
+              }
 
-              const response = await getDoc(roomRef);
+              const roomRef = await addDocument("rooms", roomPayload);
+              const roomId = roomRef.id; // 🔥 ID Ở ĐÂY
 
-              await setRoom({ id: response.id, ...response.data() });
-
-              if (roomRef && roomRef.id) {
+              if (roomId) {
                 await addDocument("messages", {
                   category: "single",
-                  roomId: response.id,
+                  roomId: roomId,
                   uid: userInfo.uid,
                   text: inputValue,
                   images: imgList || [],
@@ -550,8 +534,10 @@ const BoxChat = () => {
                       uids: [],
                     },
                   ],
+                  clientCreatedAt: Date.now(),
                 });
 
+                setRoom(prev => prev?.roomId === roomId ? prev : { id: roomId, ...roomPayload });
               } else {
                 console.log("false");
               }
@@ -626,12 +612,12 @@ const BoxChat = () => {
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
                 clientCreatedAt: Date.now(),
-                clientCreatedAt: Date.now(),
               },
               totalMessages: increment(1),
               unreadCount: nextUnread,
               unreadMembers: newUnreadMembers,
               hideTemporarily: [],
+              clientCreatedAt: Date.now(),
             },
             { merge: true }
           );
@@ -644,6 +630,7 @@ const BoxChat = () => {
           text: inputValue,
           images: [],
           infoReply,
+          clientCreatedAt: Date.now(),
           emojiList: [
             { id: "smile", uids: [] },
             { id: "heart", uids: [] },
@@ -668,9 +655,7 @@ const BoxChat = () => {
             displayName: userInfo.displayName,
             uid: userInfo.uid,
             clientCreatedAt: Date.now(),
-            clientCreatedAt: Date.now(),
           },
-          clientCreatedAt: Date.now(),
           clientCreatedAt: Date.now(),
           totalMessages: 1,
           unreadCount: {
@@ -700,6 +685,7 @@ const BoxChat = () => {
               { id: "cry", uids: [] },
               { id: "angry", uids: [] },
             ],
+            clientCreatedAt: Date.now(),
           });
         }
       }

@@ -21,10 +21,10 @@ const UserLayout = () => {
   const [isShowBoxChatGroup, setIsShowBoxChatGroup] = useState(false);
 
   const {
-    user: { uid },
+    user,
   } = useContext(AuthContext);
 
-  if (!uid) {
+  if (!user?.uid) {
     navigate(ROUTES.LOGIN);
   }
 
