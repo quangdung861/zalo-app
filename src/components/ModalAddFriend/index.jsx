@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { db } from "firebaseConfig";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import moment from "moment";
 import { AppContext } from "Context/AppProvider";
 import * as S from "./styles";
@@ -112,7 +112,7 @@ const ModalAddFriend = ({
               </div>
               <div className="modal-content__content">
                 <img
-                  src={fullInfoUser.photoCover}
+                  src={fullInfoUser.photoCover.thumbnail}
                   alt=""
                   className="photo-cover"
                 />
@@ -120,7 +120,7 @@ const ModalAddFriend = ({
                 <div className="box-image">
                   <div className="box-image__item">
                     <img
-                      src={fullInfoUser.photoURL}
+                      src={fullInfoUser.photoURL.thumbnail}
                       alt=""
                       className="photo-avatar"
                     />

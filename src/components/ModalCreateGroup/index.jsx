@@ -186,7 +186,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                   : {}
               }
             ></i>
-            <img className="friend-item__avatar" src={item.photoURL} alt="" />
+            <img className="friend-item__avatar" src={item.photoURL?.thumbnail} alt="" />
             <div className="friend-item__name">{item.displayName}</div>
           </div>
         );
@@ -266,7 +266,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
           title={item.displayName}
         >
           <img
-            src={item.photoURL}
+            src={item.photoURL?.thumbnail}
             alt=""
             className="friend-selected-item__avatar"
           />

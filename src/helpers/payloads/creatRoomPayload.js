@@ -7,12 +7,18 @@ export const creatRoomPayload = (data) => {
     members: [data.user.uid, "my-cloud"],
     info: [
       {
-        avatar: avatarCloud,
+        avatar: {
+          original: avatarCloud,
+          thumbnail: avatarCloud,
+        },
         name: "Cloud của tôi",
         uid: "my-cloud",
       },
       {
-        avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
+        avatar: {
+          original: data.user.photoURL ? data.user.photoURL : avatarDefault,
+          thumbnail: data.user.photoURL ? data.user.photoURL : avatarDefault,
+        },
         name: data.user.displayName,
         uid: data.user.uid,
       },

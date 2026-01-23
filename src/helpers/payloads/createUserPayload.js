@@ -8,8 +8,14 @@ export const createUserPayload = (data) => {
   return {
     displayName: data.user.displayName,
     email: data.user.email,
-    photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-    photoCover: imgPhotocover,
+    photoURL: {
+      original: data.user.photoURL ? data.user.photoURL : avatarDefault,
+      thumbnail: data.user.photoURL ? data.user.photoURL : avatarDefault,
+    },
+    photoCover: {
+      original: imgPhotocover,
+      thumbnail: imgPhotocover,
+    },
     uid: data.user.uid,
     providerId: data.providerId,
     friends: [],

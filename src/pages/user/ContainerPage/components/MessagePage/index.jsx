@@ -136,7 +136,10 @@ const MessagePage = () => {
 
           if (uidSelected === "my-cloud") {
             return {
-              photoURL: avatarCloud,
+              photoURL: {
+                original: avatarCloud,
+                thumbnail: avatarCloud,
+              },
               displayName: "Cloud của tôi",
               id: "my-cloud",
               uid: "my-cloud",

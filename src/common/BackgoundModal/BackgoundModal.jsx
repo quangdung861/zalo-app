@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import "./BackgoundModal.scss";
 import { uploadImage } from "services/uploadImage";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { AppContext } from "Context/AppProvider";
 

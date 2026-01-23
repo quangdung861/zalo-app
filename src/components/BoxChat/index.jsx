@@ -1115,7 +1115,7 @@ const BoxChat = () => {
             return (
               <div className="reaction-item" key={uid2}>
                 <div className="reaction-item__left">
-                  <img src={data.photoURL} alt="" />
+                  <img src={data.photoURL.thumbnail} alt="" />
                   <span>{data.displayName}</span>
                 </div>
                 <div className="reaction-item__right">
@@ -1513,7 +1513,7 @@ const BoxChat = () => {
               <div className="message-item__other">
                 <div className="box-image">
                   <img
-                    src={newInfoUser?.photoURL}
+                    src={newInfoUser?.photoURL?.thumbnail}
                     alt=""
                     className="avatar"
                     onClick={() => setIsShowOverlayModal(true)}
@@ -2090,7 +2090,7 @@ const BoxChat = () => {
               </div>
               <div className="avatar">
                 <img
-                  src={selectedUserMessaging?.photoURLSelected}
+                  src={selectedUserMessaging?.photoURLSelected?.thumbnail}
                   alt=""
                   onClick={() => setIsShowOverlayModal(true)}
                 />
@@ -2283,7 +2283,7 @@ const BoxChat = () => {
                   {selectedUserMessaging.uidSelected !== "my-cloud" && (
                     <>
                       <img
-                        src={selectedUserMessaging.photoURLSelected}
+                        src={selectedUserMessaging.photoURLSelected.thumbnail}
                         alt=""
                         className="user-info__avatar"
                         onClick={() => setIsShowOverlayModal(true)}
@@ -2514,7 +2514,7 @@ const BoxChat = () => {
             <div className="image-show__center">
               <div className="main-image">
                 <img
-                  src={messageSelected?.URL}
+                  src={messageSelected?.URL?.thumbnail}
                   alt=""
                   style={{
                     zIndex: 2,

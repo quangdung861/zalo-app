@@ -26,7 +26,6 @@ const RoomItem = ({
     setIsShowOverlayModalConfirmDelete
 }) => {
     const dropdownRef = useRef(null);
-  
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -58,7 +57,7 @@ const RoomItem = ({
             >
                 <div className="room-item__left">
                     <img
-                        src={partner?.photoURL}
+                        src={partner?.photoURL?.thumbnail}
                         alt=""
                         onError={(e) => {
                             e.target.src = avatarDefault;

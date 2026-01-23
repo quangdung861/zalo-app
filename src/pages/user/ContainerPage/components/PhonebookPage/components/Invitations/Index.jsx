@@ -136,7 +136,7 @@ const Invitations = () => {
                 <div className="info">
                   <div className="info__left">
                     <img
-                      src={item.photoURL}
+                      src={item.photoURL.thumbnail}
                       alt=""
                       onClick={() => {
                         setUserInfoSelected(item);
@@ -281,7 +281,7 @@ const Invitations = () => {
                 <div className="info">
                   <div className="info__left">
                     <img
-                      src={item.photoURL}
+                      src={item.photoURL.thumbnail}
                       alt=""
                       onClick={() => {
                         setUserInfoSelected(item);

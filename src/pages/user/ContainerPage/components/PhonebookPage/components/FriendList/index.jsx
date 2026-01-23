@@ -213,7 +213,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                 })
               }
             >
-              <img src={item.photoURL} alt="" />
+              <img src={item.photoURL.thumbnail} alt="" />
               <div className="box-info">
                 <span>{item.displayName}</span>
                 {categoryResult && (
