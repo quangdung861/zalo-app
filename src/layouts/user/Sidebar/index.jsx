@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { auth, db } from "firebaseConfig";
 import { DropdownContext } from "App";
 import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { TITLE_BAR } from "constants/public";
 import ModalConfirm from "common/ModalConfirm";
 
@@ -22,7 +20,7 @@ const Sidebar = () => {
     setSidebarSelected,
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
-  const { userInfo, handleLogout, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading, totalUnread } = useContext(AppContext);
+  const { userInfo, handleLogout, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, totalUnread } = useContext(AppContext);
 
   const listItemTop = [
     {
@@ -130,7 +128,7 @@ const Sidebar = () => {
       getRoomCloud();
     }
   }, [rooms]);
-
+  
   const toogleBoxChat = () => {
     setSelectedGroupMessaging({})
     setIsShowBoxChatGroup(false);
@@ -148,7 +146,7 @@ const Sidebar = () => {
         <div className="header">
           <div className="avatar">
             <img
-              src={userInfo?.photoURL}
+              src={userInfo?.photoURL?.thumbnail}
               alt=""
               onClick={() => setIsShowOverlayModal(true)}
             />

@@ -1,17 +1,20 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "./styles.scss";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import { convertImageToBase64 } from "utils/file";
 import coverCloud from "assets/coverCloud.png";
-import { generateKeywords } from "services";
 import UpdateProfile from "./UpdateProfile";
 import { GENDER_LABEL } from "constants/backend/gender.enum";
 import { formatISOToVN } from "utils/date";
 import { formatPhoneVN } from "utils/phone";
+import { uploadImage } from "services/uploadImage";
+import Loading from "components/Loading";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
 
 const ModalAccount = ({
   setIsShowOverlayModal,
@@ -83,62 +86,70 @@ const ModalAccount = ({
 
   /// IMAGE
 
-  const handleCoverImagePreview = (file) => {
-    if (file.size >= 500000) {
+  const handleCoverImagePreview = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
       setIsShowMessageError(true);
-      setTimeout(function () {
-        setIsShowMessageError(false);
-      }, 3000);
+      setTimeout(() => setIsShowMessageError(false), 3000);
       return;
     }
     const imgPreviewCoverConvert = convertImageToBase64(file);
     imgPreviewCoverConvert.then((res) => {
       setImgPreviewCover({
         url: res,
+        file,
       });
     });
   };
 
-  async function uploadImage() {
+  async function uploadPhotocover() {
     if (imgPreviewCover) {
-      const userInfoRef = doc(db, "users", userInfo.id);
-      startLoading();
-      await setDoc(
-        userInfoRef,
-        {
-          photoCover: imgPreviewCover.url,
-        },
-        {
-          merge: true,
-        }
-      );
-      stopLoading();
-      return setImgPreviewCover("");
+      try {
+        startLoading();
+        const photoCover = await uploadImage(imgPreviewCover.file)
+        const userInfoRef = doc(db, "users", userInfo.id);
+        await updateDoc(
+          userInfoRef,
+          {
+            photoCover,
+          },
+        );
+        return setImgPreviewCover(null);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        stopLoading();
+      }
     }
   }
 
-  const handleAvatarImage = (file) => {
-    if (file) {
-      if (file.size >= 500000) {
+  const handleAvatarImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      startLoading();
+      if (file.size > MAX_FILE_SIZE) {
         setIsShowMessageError(true);
         setTimeout(function () {
           setIsShowMessageError(false);
         }, 3000);
         return;
       }
-      let imageAvatar = convertImageToBase64(file);
-      imageAvatar.then((res) => {
-        const userInfoRef = doc(db, "users", userInfo.id);
-        return setDoc(
-          userInfoRef,
-          {
-            photoURL: res,
-          },
-          {
-            merge: true,
-          }
-        );
-      });
+      const image = await uploadImage(file);
+      const userInfoRef = doc(db, "users", userInfo.id);
+      return updateDoc(
+        userInfoRef,
+        {
+          photoURL: image,
+        }
+      );
+    } catch (error) {
+      console.log(error)
+    } finally {
+      stopLoading();
     }
   };
 
@@ -279,7 +290,7 @@ const ModalAccount = ({
           userSelect: "none",
         }}
       >
-        Hình ảnh phải có kích thước nhỏ hơn 0.5MB
+        Hình ảnh phải có kích thước nhỏ hơn 10MB
       </div>
     );
 
@@ -298,7 +309,7 @@ const ModalAccount = ({
             <div className="box-account-info">
               <div className="header">
                 <img
-                  src={imgPreviewCover?.url || accountSelected.photoCover}
+                  src={imgPreviewCover?.url || accountSelected.photoCover?.original}
                   alt=""
                   className="photo-cover"
                 />
@@ -313,7 +324,7 @@ const ModalAccount = ({
                       </button>
                       <button
                         className=" btn-default--custome"
-                        onClick={() => uploadImage()}
+                        onClick={() => uploadPhotocover()}
                       >
                         Lưu
                       </button>
@@ -332,7 +343,7 @@ const ModalAccount = ({
                         className="custom-file-input"
                         onClick={(e) => (e.target.value = null)}
                         onChange={(e) =>
-                          handleCoverImagePreview(e.target.files[0])
+                          handleCoverImagePreview(e)
                         }
                       />
                     </>
@@ -341,7 +352,7 @@ const ModalAccount = ({
                 <div className="box-image">
                   <div className="box-image__item">
                     <img
-                      src={accountSelected.photoURL}
+                      src={accountSelected.photoURL.thumbnail}
                       alt=""
                       className="photo-avatar"
                     />
@@ -356,7 +367,7 @@ const ModalAccount = ({
                       id="inputFileAvatar"
                       className="custom-file-input"
                       onClick={(e) => (e.target.value = null)}
-                      onChange={(e) => handleAvatarImage(e.target.files[0])}
+                      onChange={(e) => handleAvatarImage(e)}
                     />
                   </div>
                   <div className="display-name">
@@ -429,7 +440,7 @@ const ModalAccount = ({
               <img src={coverCloud} alt="" className="photo-cover" />
               <div className="box-image">
                 <img
-                  src={accountSelected.myCloud.photoURLSelected}
+                  src={accountSelected.myCloud.photoURLSelected.thumbnail}
                   alt=""
                   className="photo-avatar"
                 />
@@ -477,13 +488,13 @@ const ModalAccount = ({
           <div className="box-account-info">
             <div className="header">
               <img
-                src={accountSelected.photoCover}
+                src={accountSelected.photoCover?.original}
                 alt=""
                 className="photo-cover"
               />
               <div className="box-image">
                 <img
-                  src={accountSelected.photoURL}
+                  src={accountSelected.photoURL.thumbnail}
                   alt=""
                   className="photo-avatar"
                 />
