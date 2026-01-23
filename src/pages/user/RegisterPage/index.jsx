@@ -10,17 +10,12 @@ import {
   signInWithPopup,
   getAdditionalUserInfo,
 } from "firebase/auth";
-import { addDocument, generateKeywords } from "../../../services";
-import { serverTimestamp } from "firebase/firestore";
-import avatarDefault from "assets/avatar-mac-dinh-1.png";
-import avatarCloud from "assets/avatarCloudjpg.jpg";
-import imgPhotocover from "assets/photocover/photocover.jpg"
-
+import { addDocument } from "../../../services";
+import { createUserPayload, creatRoomPayload } from "helpers/payloads";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [registerWay, setRegisterWay] = useState("");
-  
 
   const handleGoogleSignIn = async () => {
     try {
@@ -28,81 +23,12 @@ const LoginPage = () => {
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
         if (isNewUser) {
-          await addDocument("users", {
-            displayName: data.user.displayName,
-            email: data.user.email,
-            photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-            photoCover: imgPhotocover,
-            uid: data.user.uid,
-            providerId: data.providerId,
-            friends: [],
-            groups: [],
-            invitationSent: [],
-            invitationReceive: [],
-            keywords: generateKeywords(data.user.displayName.toLowerCase()),
-            phoneNumber: "",
-            sex: "",
-            dateOfBirth: "",
-            categoriesTemplate: [
-              {
-                name: "Công việc",
-                color: "#FF6905",
-              },
-              {
-                name: "Khách hàng",
-                color: "#D91B1B",
-              },
-              {
-                name: "Gia đình",
-                color: "#F31BC8",
-              },
-              {
-                name: "Bạn bè",
-                color: "#FAC000",
-              },
-              {
-                name: "Trả lời sau",
-                color: "#4BC377",
-              },
-              {
-                name: "Đồng nghiệp",
-                color: "#0068FF",
-              },
-            ],
-            notificationDowloadZaloPc: {
-              value: true,
-              updatedAt: serverTimestamp(),
-            },
-            isOnline: {
-              value: true,
-              updatedAt: serverTimestamp(),
-            },
-          });
-          addDocument("rooms", {
-            category: "my cloud",
-            members: [data.user.uid, "my-cloud"],
-            info: [
-              {
-                avatar: avatarCloud,
-                name: "Cloud của tôi",
-                uid: "my-cloud",
-              },
-              {
-                avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
-                name: data.user.displayName,
-                uid: data.user.uid,
-              },
-            ],
-            messageLastest: {
-              clientCreatedAt: Date.now(),
-              clientCreatedAt: Date.now(),
-            },
-            totalMessages: 0,
-            unreadCount: {[data.user.uid]: 0},
-            unreadMembers: [],
-            deleted: [],
-            hideTemporarily: [],
-          });
+          const userPayload = createUserPayload(data);
+          addDocument("users",
+            userPayload
+          );
+          const roomPayload = creatRoomPayload(data);
+          addDocument("rooms", roomPayload);
         }
       }
     } catch (error) {
@@ -112,7 +38,7 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } 
+    }
   };
 
   const handleGithubSignIn = async () => {
@@ -121,81 +47,12 @@ const LoginPage = () => {
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
         if (isNewUser) {
-          addDocument("users", {
-            displayName: data.user.displayName,
-            email: data.user.email,
-            photoURL: data.user.photoURL ? data.user.photoURL : avatarDefault,
-            photoCover: imgPhotocover,
-            uid: data.user.uid,
-            providerId: data.providerId,
-            friends: [],
-            groups: [],
-            invitationSent: [],
-            invitationReceive: [],
-            keywords: generateKeywords(data.user.displayName.toLowerCase()),
-            phoneNumber: "",
-            sex: "",
-            dateOfBirth: "",
-            categoriesTemplate: [
-              {
-                name: "Công việc",
-                color: "#FF6905",
-              },
-              {
-                name: "Khách hàng",
-                color: "#D91B1B",
-              },
-              {
-                name: "Gia đình",
-                color: "#F31BC8",
-              },
-              {
-                name: "Bạn bè",
-                color: "#FAC000",
-              },
-              {
-                name: "Trả lời sau",
-                color: "#4BC377",
-              },
-              {
-                name: "Đồng nghiệp",
-                color: "#0068FF",
-              },
-            ],
-            notificationDowloadZaloPc: {
-              value: true,
-              updatedAt: serverTimestamp(),
-            },
-            isOnline: {
-              value: true,
-              updatedAt: serverTimestamp(),
-            },
-          });
-          addDocument("rooms", {
-            category: "my cloud",
-            members: [data.user.uid, "my-cloud"],
-            info: [
-              {
-                avatar: avatarCloud,
-                name: "Cloud của tôi",
-                uid: "my-cloud",
-              },
-              {
-                avatar: data.user.photoURL ? data.user.photoURL : avatarDefault,
-                name: data.user.displayName,
-                uid: data.user.uid,
-              },
-            ],
-            messageLastest: {
-              clientCreatedAt: Date.now(),
-              clientCreatedAt: Date.now(),
-            },
-            totalMessages: 0,
-            unreadCount: {[data.user.uid]: 0},
-            unreadMembers: [],
-            deleted: [],
-            hideTemporarily: [],
-          });
+          const userPayload = createUserPayload(data);
+          addDocument("users",
+            userPayload
+          );
+          const roomPayload = creatRoomPayload(data);
+          addDocument("rooms", roomPayload);
         }
       }
     } catch (error) {
@@ -205,7 +62,7 @@ const LoginPage = () => {
       } else {
         // Xử lý lỗi khác
       }
-    } 
+    }
   };
 
   const renderRegisterWay = () => {
