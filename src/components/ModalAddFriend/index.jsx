@@ -4,6 +4,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import moment from "moment";
 import { AppContext } from "Context/AppProvider";
 import * as S from "./styles";
+import useClickOutside from "hooks/useClickOutside";
 const ModalAddFriend = ({
   setIsShowOverlayModalAddFriend,
   fullInfoUser,
@@ -28,20 +29,9 @@ const ModalAddFriend = ({
     }
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        modalContainer.current &&
-        !modalContainer.current.contains(event.target)
-      ) {
-        setIsShowOverlayModalAddFriend(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(modalContainer, () => {
+    setIsShowOverlayModalAddFriend(false);
+  });
 
   const handleFocus = () => {
     Object.assign(textAreaRef.current.style, {

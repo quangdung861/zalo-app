@@ -1,4 +1,5 @@
 import AvatarGroup from 'components/AvatarGroup';
+import useClickOutside from 'hooks/useClickOutside';
 import React, { useEffect, useRef } from 'react'
 
 const RoomItem = ({
@@ -26,17 +27,10 @@ const RoomItem = ({
     setIsShowOverlayModalConfirmDelete
 }) => {
     const dropdownRef = useRef(null);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsShowDropdownOption(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+
+    useClickOutside(dropdownRef, () => {
+        setIsShowDropdownOption(false);
+    });
 
     let roomItem = <div />;
     if (type === "single") {

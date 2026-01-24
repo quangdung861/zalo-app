@@ -16,6 +16,7 @@ import searchEmpty from "assets/searchEmpty.png";
 import Skeleton from "react-loading-skeleton";
 import ModalAccount from "components/ModalAccount";
 import ModalConfirm from "./components/ModalConfirm";
+import useClickOutside from "hooks/useClickOutside";
 
 const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
@@ -66,7 +67,7 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
     };
     getFriends();
   }, [userInfo?.friends, keywords]);
-  
+
 
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
@@ -80,27 +81,16 @@ const FriendList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const orderByRef = useRef(null);
   const categoriesRef = useRef();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsShowDropdown(false);
-      }
-      if (
-        categoriesRef.current &&
-        !categoriesRef.current.contains(event.target)
-      ) {
-        setIsShowDropdownCategories(false);
-        setDropdownCategorySecond(false);
-      }
-      if (orderByRef.current && !orderByRef.current.contains(event.target)) {
-        setDropdownOrderBy(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(dropdownRef, () => {
+    setIsShowDropdown(false);
+  });
+  useClickOutside(categoriesRef, () => {
+    setIsShowDropdownCategories(false);
+    setDropdownCategorySecond(false);
+  });
+  useClickOutside(orderByRef, () => {
+    setDropdownOrderBy(false);
+  });
 
   const [friendSelected, setFriendSelected] = useState();
 

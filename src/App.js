@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, createContext } from "react";
+import React, { useEffect } from "react";
 import UserLayout from "layouts/user/UserLayout";
 import "_variables.scss";
 import { ROUTES } from "routes";
@@ -15,8 +15,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "react-loading-skeleton/dist/skeleton.css";
 
-export const DropdownContext = createContext();
-
 function App() {
   const { pathname } = useLocation();
 
@@ -26,22 +24,6 @@ function App() {
       left: 0,
     });
   }, [pathname]);
-
-  const dropdownRef = useRef(null);
-
-  const [isShowDropdown, setIsShowDropdown] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   // THAY ĐỔI FAVICON ĐỘNG
   // useEffect(() => {
@@ -58,19 +40,15 @@ function App() {
     <div className="app">
       <AuthProvider>
         <AppProvider>
-          <DropdownContext.Provider
-            value={{ setIsShowDropdown, isShowDropdown, dropdownRef }}
-          >
-            <Routes>
-              <Route element={<UserLayout />}>
-                <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
-              </Route>
-              <Route element={<LoginRegisterLayout />}>
-                <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-                <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-              </Route>
-            </Routes>
-          </DropdownContext.Provider>
+          <Routes>
+            <Route element={<UserLayout />}>
+              <Route path={ROUTES.USER.HOME} element={<ContainerPage />} />
+            </Route>
+            <Route element={<LoginRegisterLayout />}>
+              <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            </Route>
+          </Routes>
         </AppProvider>
       </AuthProvider>
     </div>

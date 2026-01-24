@@ -39,6 +39,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 import { backgoundsDefault, BACKGROUND_GROUP_DEFAULT } from "../../common/BackgoundModal/constants";
 import { uploadImage } from "services/uploadImage";
+import useClickOutside from "hooks/useClickOutside";
 
 const BoxChatGroup = () => {
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging, startLoading, stopLoading } =
@@ -80,7 +81,9 @@ const BoxChatGroup = () => {
     useState(true);
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
-
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  const pickerEmojiRef = useRef(null);
   const inputRef = useRef();
   const imagesRef = useRef();
   const boxChatRef = useRef();
@@ -1790,24 +1793,11 @@ const BoxChatGroup = () => {
     });
   };
 
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const pickerEmojiRef = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        pickerEmojiRef.current &&
-        !pickerEmojiRef.current.contains(event.target)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
+  useClickOutside(pickerEmojiRef, () => {
+    setShowEmojiPicker(false);
+  });
 
   const isOverlap = (aStart, aEnd, bStart, bEnd) => {
     return aStart < bEnd && aEnd > bStart;
@@ -2361,7 +2351,7 @@ const BoxChatGroup = () => {
                   <div className="user-info__avatar"
                     onClick={() => setIsShowOverlayModal(true)}
                   >
-                    {selectedGroupMessaging?.room?.avatar.thumbnail ? (
+                    {selectedGroupMessaging?.room?.avatar?.thumbnail ? (
                       <img src={selectedGroupMessaging?.room?.avatar?.thumbnail} alt="" />
                     ) : (
                       <AvatarGroup

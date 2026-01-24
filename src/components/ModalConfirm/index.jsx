@@ -1,26 +1,16 @@
 import React, { useEffect, useRef } from "react";
 
 import * as S from "./styles";
+import useClickOutside from "hooks/useClickOutside";
 const ModalConfirm = ({
   setIsShowOverlayModalConfirmDelete,
   handleDeleteRoomChat,
 }) => {
   const modalContainer = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        modalContainer.current &&
-        !modalContainer.current.contains(event.target)
-      ) {
-        setIsShowOverlayModalConfirmDelete(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(modalContainer, () => {
+    setIsShowOverlayModalConfirmDelete(false);
+  });
 
   return (
     <S.Wrapper>

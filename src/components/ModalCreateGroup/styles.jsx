@@ -370,7 +370,6 @@ export const Container = styled.div`
             }
           }
           .btn-create-group {
-            pointer-events: none;
             background-color: #abcdff;
             color: #e5efff;
           }

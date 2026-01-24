@@ -20,11 +20,12 @@ import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import searchEmpty from "assets/searchEmpty.png";
 import { uploadImage } from "services/uploadImage";
+import useClickOutside from "hooks/useClickOutside";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
 
-  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging } =
+  const { userInfo, setSelectedUserMessaging, setSelectedGroupMessaging, startLoading, stopLoading } =
     useContext(AppContext);
 
   const { setIsShowBoxChat, setIsShowBoxChatGroup, setSidebarSelected } =
@@ -36,20 +37,9 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const [friendsSelected, setFriendsSelected] = useState([]);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        modalContainer.current &&
-        !modalContainer.current.contains(event.target)
-      ) {
-        setIsShowOverlayModal(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(modalContainer, () => {
+    setIsShowOverlayModal(false);
+  });
 
   const [widthCategoryList, setWidthCategoryList] = useState(0);
 
@@ -313,44 +303,45 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   };
 
   const handleCreateGroup = async () => {
-    const newFriendsSelected = friendsSelected.map((item) => ({
-      avatar: item.photoURL,
-      name: item.displayName,
-      uid: item.uid,
-    }));
-
-    const members = newFriendsSelected.map((item) => item.uid);
-    const unreadCount = {};
-    members.forEach((uid) => {
-      unreadCount[uid] = 0;
-    })
-
-    let avatar = null;
-    if (imgPreviewAvatar?.url) {
-      try {
-        avatar = await uploadImage(imgPreviewAvatar.file)
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    const data = {
-      category: "group",
-      members: [userInfo.uid, ...members],
-      messageLastest: {
-        clientCreatedAt: Date.now(),
-      },
-      totalMessages: 0,
-      unreadCount,
-      unreadMembers: [],
-      name: groupName,
-      avatar: avatar,
-      deleted: [],
-      hideTemporarily: [],
-      clientCreatedAt: Date.now(),
-    };
-
     try {
+      startLoading();
+      const newFriendsSelected = friendsSelected.map((item) => ({
+        avatar: item.photoURL,
+        name: item.displayName,
+        uid: item.uid,
+      }));
+
+      const members = newFriendsSelected.map((item) => item.uid);
+      const unreadCount = {};
+      members.forEach((uid) => {
+        unreadCount[uid] = 0;
+      })
+
+      let avatar = null;
+      if (imgPreviewAvatar?.url) {
+        try {
+          avatar = await uploadImage(imgPreviewAvatar.file)
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      const data = {
+        category: "group",
+        members: [userInfo.uid, ...members],
+        messageLastest: {
+          clientCreatedAt: Date.now(),
+        },
+        totalMessages: 0,
+        unreadCount,
+        unreadMembers: [],
+        name: groupName,
+        avatar: avatar,
+        deleted: [],
+        hideTemporarily: [],
+        clientCreatedAt: Date.now(),
+      };
+
       const collectionRef = collection(db, "rooms");
       const docRef = await addDoc(collectionRef, data);
       const response = await getDoc(docRef);
@@ -422,6 +413,8 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       toogleBoxChatGroup(room, avatars, name);
     } catch (error) {
       console.error("Lỗi khi thêm tài liệu:", error);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -590,7 +583,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                       ? "btn-create-group btn-create-group--active"
                       : "btn-create-group"
                   }
-                  onClick={() => handleCreateGroup()}
+                  onClick={() => friendsSelected.length > 1 && handleCreateGroup()}
                 >
                   Tạo Nhóm
                 </div>
