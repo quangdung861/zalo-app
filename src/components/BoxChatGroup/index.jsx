@@ -1485,7 +1485,6 @@ const BoxChatGroup = () => {
                       )}
                     </div>
                   </div>
-                  {/* <img src={item.photoURL} alt="" className="avatar" /> */}
                 </div>
               </div>
             ) : (
@@ -2252,8 +2251,8 @@ const BoxChatGroup = () => {
                 className="avatar"
                 onClick={() => setIsShowOverlayModal(true)}
               >
-                {selectedGroupMessaging?.room?.avatar?.url ? (
-                  <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
+                {selectedGroupMessaging?.room?.avatar?.original ? (
+                  <img src={selectedGroupMessaging?.room?.avatar?.original} alt="" />
                 ) : (
                   <AvatarGroup
                     props={{
@@ -2263,7 +2262,6 @@ const BoxChatGroup = () => {
                   />
                 )}
               </div>
-
               <div className="user-info">
                 <div className="display-name"
                   onClick={() => setIsShowOverlayModal(true)}
@@ -2272,10 +2270,7 @@ const BoxChatGroup = () => {
                     ? selectedGroupMessaging?.room?.name
                     : selectedGroupMessaging.name}
                 </div>
-
                 <div className="last-time">
-                  {/* <></>
-                    <span className="new-seperator"></span> */}
                   <div style={{ color: "#7589A3" }}>Nhóm</div>
                   <span className="new-seperator"></span>
                   <div className="category">
@@ -2366,8 +2361,8 @@ const BoxChatGroup = () => {
                   <div className="user-info__avatar"
                     onClick={() => setIsShowOverlayModal(true)}
                   >
-                    {selectedGroupMessaging?.room?.avatar.url ? (
-                      <img src={selectedGroupMessaging?.room?.avatar?.url} alt="" />
+                    {selectedGroupMessaging?.room?.avatar.thumbnail ? (
+                      <img src={selectedGroupMessaging?.room?.avatar?.thumbnail} alt="" />
                     ) : (
                       <AvatarGroup
                         props={{
