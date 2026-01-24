@@ -18,6 +18,7 @@ import Skeleton from "react-loading-skeleton";
 import AvatarGroup from "components/AvatarGroup";
 import messageSend from "assets/audio/messageSend.wav";
 import searchEmpty from "assets/searchEmpty.png";
+import useClickOutside from "hooks/useClickOutside";
 
 const ModalSharingMessage = ({
   setIsShowOverlayModalSharingMessage,
@@ -32,25 +33,14 @@ const ModalSharingMessage = ({
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isShowEditArea, setIsShowEditArea] = useState(false);
   const [textAreaValue, setTextAreaValue] = useState(infoMessageSharing.text);
+  const [widthCategoryList, setWidthCategoryList] = useState(0);
 
   const modalContainer = useRef();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        modalContainer.current &&
-        !modalContainer.current.contains(event.target)
-      ) {
-        setIsShowOverlayModalSharingMessage(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(modalContainer, () => {
+    setIsShowOverlayModalSharingMessage(false);
+  });
 
-  const [widthCategoryList, setWidthCategoryList] = useState(0);
 
   useEffect(() => {
     const elementParent = document.querySelector(".category-carousel");

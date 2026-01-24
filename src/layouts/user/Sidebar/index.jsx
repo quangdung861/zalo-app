@@ -1,19 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { DropdownContext } from "App";
 import * as S from "./styles";
 import { UserLayoutContext } from "../UserLayout";
 import { AppContext } from "Context/AppProvider";
 import ModalAccount from "components/ModalAccount";
 import { TITLE_BAR } from "constants/public";
 import ModalConfirm from "common/ModalConfirm";
+import useClickOutside from "hooks/useClickOutside";
 
 const Sidebar = () => {
   const [isShowOverlayModal, setIsShowOverlayModal] = useState(false);
   const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
-
-  const { setIsShowDropdown, isShowDropdown, dropdownRef } =
-    useContext(DropdownContext);
 
   const {
     sidebarSelected,
@@ -21,6 +18,8 @@ const Sidebar = () => {
     setIsShowBoxChatGroup,
   } = useContext(UserLayoutContext);
   const { userInfo, handleLogout, rooms, setSelectedUserMessaging, setSelectedGroupMessaging, totalUnread } = useContext(AppContext);
+  const [isShowDropdown, setIsShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   const listItemTop = [
     {
@@ -34,6 +33,10 @@ const Sidebar = () => {
       icon: <i className="fa-solid fa-book"></i>,
     },
   ];
+
+  useClickOutside(dropdownRef, () => {
+    setIsShowDropdown(false);
+  });
 
   const isNewInvitationReceive = (() => {
     const invitations = userInfo?.invitationReceive;
@@ -128,7 +131,7 @@ const Sidebar = () => {
       getRoomCloud();
     }
   }, [rooms]);
-  
+
   const toogleBoxChat = () => {
     setSelectedGroupMessaging({})
     setIsShowBoxChatGroup(false);

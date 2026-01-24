@@ -39,6 +39,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 import { backgoundsDefault, BACKGROUND_DEFAULT } from "../../common/BackgoundModal/constants";
 import { uploadImage } from "services/uploadImage";
+import useClickOutside from "hooks/useClickOutside";
 
 const BoxChat = () => {
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
@@ -122,24 +123,13 @@ const BoxChat = () => {
     },
   ];
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryDropdown(false);
-      }
-      if (
-        dropdownSelectEmoji.current &&
-        !dropdownSelectEmoji.current.contains(event.target)
-      ) {
-        setEmojis(false);
-      }
-    };
+  useClickOutside(categoryRef, () => {
+    setCategoryDropdown(false);
+  });
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(dropdownSelectEmoji, () => {
+    setEmojis(false);
+  });
 
   useEffect(() => {
     const chatWindow = boxChatRef?.current;
@@ -155,24 +145,14 @@ const BoxChat = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsShowDropdownOption(false);
-      }
-      if (
-        emotionModal.current &&
-        !emotionModal.current.contains(event.target)
-      ) {
-        setIsShowOverlayModalEmotion(false);
-        setClicked("all");
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(dropdownRef, () => {
+    setIsShowDropdownOption(false);
+  });
+
+  useClickOutside(emotionModal, () => {
+    setIsShowOverlayModalEmotion(false);
+    setClicked("all");
+  });
 
   useEffect(() => {
     if (inputRef) {
@@ -332,20 +312,9 @@ const BoxChat = () => {
     setCategoryUser(categoryResult);
   }, [selectedUserMessaging, userInfo]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        pickerEmojiRef.current &&
-        !pickerEmojiRef.current.contains(event.target)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(pickerEmojiRef, () => {
+    setShowEmojiPicker(false);
+  });
 
   const handleInputChange = (value) => {
     setInputValue(value);

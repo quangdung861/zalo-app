@@ -1,5 +1,5 @@
-import { AppContext } from "Context/AppProvider";
 import { useContext, useEffect } from "react";
+import { AppContext } from "Context/AppProvider";
 
 const useClickOutside = (ref, handler) => {
   const { isLoading } = useContext(AppContext);
