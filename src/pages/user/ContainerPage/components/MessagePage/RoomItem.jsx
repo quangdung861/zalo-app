@@ -145,9 +145,9 @@ const RoomItem = ({
                 }
             >
                 <div className="room-item__left">
-                    {room.avatar?.url && (
+                    {room.avatar && (
                         <img
-                            src={room.avatar?.url}
+                            src={room.avatar?.thumbnail}
                             alt=""
                             onError={(e) => {
                                 e.target.src = avatarDefault;
@@ -155,7 +155,7 @@ const RoomItem = ({
                         />
                     )}
 
-                    {!room.avatar?.url && infoGroup?.photoURL && (
+                    {!room.avatar && infoGroup?.photoURL && (
                         <AvatarGroup props={{ room, avatars: infoGroup?.photoURL }} />
                     )}
 

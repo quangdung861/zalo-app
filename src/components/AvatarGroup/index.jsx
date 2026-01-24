@@ -3,7 +3,6 @@ import * as S from "./styles";
 import avatarDefault from "assets/avatar-mac-dinh-1.png";
 const AvatarGroup = ({ props, styleBox, styleIcon }) => {
   const { avatars, room } = props;
-  
 
   return (
     avatars &&
@@ -16,7 +15,7 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                 {avatars.map((item, index) => (
                   <img
                     key={index}
-                    src={item}
+                    src={item.thumbnail}
                     alt=""
                     className={`avatar-${index}`}
                     onError={(e) => {
@@ -32,7 +31,7 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                 {avatars.map((item, index) => (
                   <img
                     key={index}
-                    src={item}
+                    src={item.thumbnail}
                     alt=""
                     className={`avatar-${index}`}
                     onError={(e) => {
@@ -48,7 +47,7 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                 {avatars.map((item, index) => (
                   <img
                     key={index}
-                    src={item}
+                    src={item.thumbnail}
                     alt=""
                     className={`avatar-${index}`}
                     onError={(e) => {
@@ -64,7 +63,7 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                 {avatars.map((item, index) => (
                   <img
                     key={index}
-                    src={item}
+                    src={item.thumbnail}
                     alt=""
                     className={`avatar-${index}`}
                     onError={(e) => {
@@ -81,7 +80,7 @@ const AvatarGroup = ({ props, styleBox, styleIcon }) => {
                   index < 3 ? (
                     <img
                       key={index}
-                      src={item}
+                      src={item.thumbnail}
                       alt=""
                       className={`avatar-${index}`}
                       onError={(e) => {

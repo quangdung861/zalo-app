@@ -12,7 +12,6 @@ import { GENDER_LABEL } from "constants/backend/gender.enum";
 import { formatISOToVN } from "utils/date";
 import { formatPhoneVN } from "utils/phone";
 import { uploadImage } from "services/uploadImage";
-import Loading from "components/Loading";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
 

@@ -7,7 +7,7 @@ import { db } from "firebaseConfig";
 import AvatarGroup from "components/AvatarGroup";
 import empty from "assets/empty.png";
 
-const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
+const GroupList = () => {
   const {
     setIsShowBoxChat,
     setIsShowBoxChatGroup,
@@ -23,7 +23,6 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
   const [keywords, setKeywords] = useState("");
   const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
   const [orderBy, setOderBy] = useState("asc");
-  
 
   const orderByRef = useRef(null);
 
@@ -82,14 +81,6 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
 
         const name = documents.map((item) => item.displayName).join(", ");
 
-        // let keywordsName;
-
-        // if (room.name) {
-        //   keywordsName = generateKeywords(room.name.toLowerCase());
-        // } else {
-        //   keywordsName = generateKeywords(name.toLowerCase());
-        // }
-
         infoPartner.push({
           id: room.id,
           photoURL: avatars,
@@ -146,8 +137,8 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
                   })
                 }
               >
-                {room.avatar?.url ? (
-                  <img src={room.avatar?.url} alt="" />
+                {room.avatar ? (
+                  <img src={room.avatar?.thumbnail} alt="" />
                 ) : (
                   <AvatarGroup
                     props={{ avatars: infoParnerData.photoURL, room }}
@@ -161,9 +152,6 @@ const GroupList = ({ setIsShowSectionRight, setIsShowSectionLeft }) => {
               <div className="item-group__right">
                 <i
                   className="fa-solid fa-ellipsis"
-                // onClick={() => {
-                //   setIsShowDropdown(item.id);
-                // }}
                 ></i>
               </div>
             </div>
