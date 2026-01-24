@@ -68,7 +68,7 @@ const AppProvider = ({ children }) => {
     setHasMore(true);
   };
 
-  const loading = loadingCount > 0;
+  const isLoading = loadingCount > 0;
 
   const startLoading = () => {
     setLoadingCount((c) => c + 1);
@@ -405,11 +405,12 @@ const AppProvider = ({ children }) => {
         setHasMore,
         startLoading,
         stopLoading,
+        isLoading,
         totalUnread,
       }}
     >
       {children}
-      {loading && <Loading />}
+      {isLoading && <Loading />}
     </AppContext.Provider>
   );
 };

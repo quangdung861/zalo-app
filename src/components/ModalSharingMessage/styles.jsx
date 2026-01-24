@@ -408,7 +408,6 @@ export const Container = styled.div`
             }
           }
           .btn-sharing-message {
-            pointer-events: none;
             background-color: #abcdff;
             color: #e5efff;
           }

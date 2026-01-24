@@ -110,7 +110,7 @@ const ChatWithStrangers = () => {
                 })
               }
             >
-              <img src={item.photoURL.thumbnail} alt="" />
+              <img src={item.photoURL?.thumbnail} alt="" />
               <span>{item.displayName}</span>
             </div>
             <div className="item-stranger__right">
