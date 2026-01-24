@@ -5,6 +5,7 @@ import "./styles.scss";
 import { AppContext } from "Context/AppProvider";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import AvatarGroup from "components/AvatarGroup";
+import useClickOutside from "hooks/useClickOutside";
 
 const ModalAccount = ({
   setIsShowOverlayModal,
@@ -18,20 +19,10 @@ const ModalAccount = ({
   const { setIsShowBoxChat, setIsShowBoxChatGroup } =
     useContext(UserLayoutContext);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        accountInfoRef.current &&
-        !accountInfoRef.current.contains(event.target)
-      ) {
-        setIsShowOverlayModal(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+
+  useClickOutside(accountInfoRef, () => {
+    setIsShowOverlayModal(false);
+  });
 
   const toogleBoxChat = () => {
     setSelectedUserMessaging({});

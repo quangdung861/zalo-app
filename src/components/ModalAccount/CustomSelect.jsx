@@ -1,8 +1,9 @@
+import useClickOutside from "hooks/useClickOutside";
 import { useState, useRef, useEffect } from "react";
 
 const CustomSelect = ({ placeholder, options, value, onChange, width = 120, disabled }) => {
     const [open, setOpen] = useState(false);
-    const ref = useRef(null);
+    const ModalRef = useRef(null);
 
     useEffect(() => {
         if (disabled) {
@@ -10,15 +11,9 @@ const CustomSelect = ({ placeholder, options, value, onChange, width = 120, disa
         }
     }, [disabled]);
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (ref.current && !ref.current.contains(e.target)) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    useClickOutside(ModalRef, () => {
+        setOpen(false);
+    });
 
     const handleToggle = () => {
         if (disabled) return;
@@ -101,7 +96,7 @@ const CustomSelect = ({ placeholder, options, value, onChange, width = 120, disa
 `}
             </style>
 
-            <div className="select-wrapper" style={{ width }} ref={ref}>
+            <div className="select-wrapper" style={{ width }} ref={ModalRef}>
 
                 <div
                     className={`custom-select ${open ? "open" : ""} ${disabled ? "disabled" : ""}`}

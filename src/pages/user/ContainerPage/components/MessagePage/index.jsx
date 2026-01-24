@@ -28,6 +28,7 @@ import ModalConfirm from "components/ModalConfirm";
 import RoomItem from "./RoomItem";
 import InfiniteScroll from "react-infinite-scroll-component";
 import RoomItemSkeleton from "./RoomItemSkeleton";
+import useClickOutside from "hooks/useClickOutside";
 
 const MessagePage = () => {
   const {
@@ -616,18 +617,9 @@ const MessagePage = () => {
     setCategoryDropdown(false);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickOutside(categoryRef, () => {
+    setCategoryDropdown(false);
+  });
 
   const switchOverStranger = () => {
     setSidebarSelected("phonebook");

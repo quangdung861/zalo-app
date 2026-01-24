@@ -7,6 +7,7 @@ import empty from "assets/empty.png";
 import searchEmpty from "assets/searchEmpty.png";
 import ModalAddFriend from "components/ModalAddFriend";
 import * as S from "./styles";
+import useClickOutside from "hooks/useClickOutside";
 
 const ChatWithStrangers = () => {
 
@@ -34,22 +35,12 @@ const ChatWithStrangers = () => {
   const [dropdownOrderBy, setDropdownOrderBy] = useState(false);
   const [strangerSelected, setStrangerSelected] = useState();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsShowDropdown(false);
-      }
-      if (orderByRef.current && !orderByRef.current.contains(event.target)) {
-        setDropdownOrderBy(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  useClickOutside(dropdownRef, () => {
+    setIsShowDropdown(false);
+  });
+  useClickOutside(orderByRef, () => {
+    setDropdownOrderBy(false);
+  });
 
   const handleWatchInfo = ({ id }) => {
     setIsShowOverlayModal(true);
