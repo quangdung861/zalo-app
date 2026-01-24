@@ -2361,7 +2361,7 @@ const BoxChatGroup = () => {
                   <div className="user-info__avatar"
                     onClick={() => setIsShowOverlayModal(true)}
                   >
-                    {selectedGroupMessaging?.room?.avatar.thumbnail ? (
+                    {selectedGroupMessaging?.room?.avatar?.thumbnail ? (
                       <img src={selectedGroupMessaging?.room?.avatar?.thumbnail} alt="" />
                     ) : (
                       <AvatarGroup
