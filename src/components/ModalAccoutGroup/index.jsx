@@ -56,12 +56,10 @@ const ModalAccount = ({
           <div className="box-account-info">
             <div className="header">
               <div className="header-right"></div>
-
-              {/*  */}
               <div className="box-image">
                 {accountSelected?.room?.avatar ? (
                   <img
-                    src={accountSelected?.room?.avatar?.url}
+                    src={accountSelected?.room?.avatar?.thumbnail}
                     alt=""
                     className="photo-avatar"
                   />
@@ -75,16 +73,6 @@ const ModalAccount = ({
                     styleIcon={{ width: "38px", height: "38px" }}
                   />
                 )}
-
-                {/* <label htmlFor="inputFileAvatar" className="box-avatar__icon">
-                  <i className="fa-solid fa-camera"></i>
-                </label>
-                <input
-                  type="file"
-                  id="inputFileAvatar"
-                  className="custom-file-input"
-                /> */}
-                {/*  */}
                 <div className="display-name">
                   {accountSelected?.room?.name || accountSelected.name}
                 </div>
@@ -102,7 +90,7 @@ const ModalAccount = ({
                   accountSelected?.avatars.map((item, index) => (
                     <img
                       key={index}
-                      src={item}
+                      src={item.thumbnail}
                       alt=""
                       className="member-item"
                       style={{
@@ -142,10 +130,6 @@ const ModalAccount = ({
                 <div className="action-item">
                   <i className="fa-regular fa-address-card"></i>
                   <span>Chia sẻ danh thiếp</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-ban"></i>
-                  <span>Chặn tin nhắn</span>
                 </div>
               </div>
             </div>

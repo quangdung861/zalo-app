@@ -19,6 +19,7 @@ import empty from "assets/empty.png";
 import { UserLayoutContext } from "layouts/user/UserLayout";
 import Skeleton from "react-loading-skeleton";
 import searchEmpty from "assets/searchEmpty.png";
+import { uploadImage } from "services/uploadImage";
 
 const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   const modalContainer = useRef();
@@ -285,20 +286,22 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
   };
 
   /// IMAGE
-  const handleCoverImagePreview = (file) => {
-    if (file.size >= 500000) {
-      //500000 bytes (max size)
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
+
+  const handleCoverImagePreview = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
       setIsShowMessageError(true);
-      setTimeout(function () {
-        setIsShowMessageError(false);
-      }, 3000);
+      setTimeout(() => setIsShowMessageError(false), 3000);
       return;
     }
-
     const imgPreviewCoverConvert = convertImageToBase64(file);
     imgPreviewCoverConvert.then((res) => {
       setImgPreviewAvatar({
         url: res,
+        file,
       });
     });
   };
@@ -322,19 +325,26 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
       unreadCount[uid] = 0;
     })
 
+    let avatar = null;
+    if (imgPreviewAvatar?.url) {
+      try {
+        avatar = await uploadImage(imgPreviewAvatar.file)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     const data = {
       category: "group",
       members: [userInfo.uid, ...members],
       messageLastest: {
         clientCreatedAt: Date.now(),
-        clientCreatedAt: Date.now(),
       },
       totalMessages: 0,
       unreadCount,
       unreadMembers: [],
-      //
       name: groupName,
-      avatar: imgPreviewAvatar || "",
+      avatar: avatar,
       deleted: [],
       hideTemporarily: [],
       clientCreatedAt: Date.now(),
@@ -442,7 +452,7 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
                     id="myFileInput"
                     className="custom-file-input"
                     onClick={(e) => (e.target.value = null)}
-                    onChange={(e) => handleCoverImagePreview(e.target.files[0])}
+                    onChange={(e) => handleCoverImagePreview(e)}
                   />
                   <input
                     type="text"
