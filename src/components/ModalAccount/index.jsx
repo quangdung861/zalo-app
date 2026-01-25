@@ -13,6 +13,8 @@ import { formatISOToVN } from "utils/date";
 import { formatPhoneVN } from "utils/phone";
 import { uploadImage } from "services/uploadImage";
 import useClickOutside from "hooks/useClickOutside";
+import { useImagePreview } from "hooks/useImagePreview";
+import ImagePreviewModal from "common/ImagePreviewModal";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
 
@@ -22,7 +24,7 @@ const ModalAccount = ({
   accountSelected,
   setIsShowOverlayModalAddFriend,
 }) => {
-
+  const { preview, openPreview, closePreview } = useImagePreview();
   const accountInfoRef = useRef(null);
   const dropdownResponseRef = useRef(null);
 
@@ -37,11 +39,11 @@ const ModalAccount = ({
   const [isShowUpdateProfile, setIsShowUpdateProfile] = useState(false);
 
   const [profile, setProfile] = useState({
-    displayName: accountSelected.displayName ?? "",
-    status: accountSelected.status ?? "",
-    phoneNumber: accountSelected.phoneNumber ?? "",
-    sex: accountSelected.sex ?? "",
-    dateOfBirth: accountSelected.dateOfBirth ?? "",
+    displayName: accountSelected?.displayName ?? "",
+    status: accountSelected?.status ?? "",
+    phoneNumber: accountSelected?.phoneNumber ?? "",
+    sex: accountSelected?.sex ?? "",
+    dateOfBirth: accountSelected?.dateOfBirth ?? "",
   });
 
   useClickOutside(accountInfoRef, () => {
@@ -280,331 +282,331 @@ const ModalAccount = ({
       </div>
     );
 
-  return accountSelected.uid === userInfo.uid ? (
-    <div className="modal-overlay">
-      <div className="container-account-info" ref={accountInfoRef}>
-        {!isShowUpdateProfile ? (
-          <div className="account-info">
-            <div className="title">
-              Thông tin tài khoản
-              <i
-                className="fa-solid fa-xmark"
-                onClick={() => setIsShowOverlayModal(false)}
-              ></i>
-            </div>
-            <div className="box-account-info">
-              <div className="header">
-                <img
-                  src={imgPreviewCover?.url || accountSelected.photoCover?.original}
-                  alt=""
-                  className="photo-cover"
-                />
-                <div className="header-right">
-                  {imgPreviewCover ? (
-                    <>
-                      <button
-                        className=" btn-default--custome"
-                        onClick={() => setImgPreviewCover("")}
-                      >
-                        Hủy
-                      </button>
-                      <button
-                        className=" btn-default--custome"
-                        onClick={() => uploadPhotocover()}
-                      >
-                        Lưu
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <label
-                        htmlFor="myFileInput"
-                        className="custom-file-label"
-                      >
-                        <i className="fa-solid fa-camera"></i>
-                      </label>
-                      <input
-                        type="file"
-                        id="myFileInput"
-                        className="custom-file-input"
-                        onClick={(e) => (e.target.value = null)}
-                        onChange={(e) =>
-                          handleCoverImagePreview(e)
-                        }
-                      />
-                    </>
-                  )}
-                </div>
-                <div className="box-image">
-                  <div className="box-image__item">
-                    <img
-                      src={accountSelected.photoURL.thumbnail}
-                      alt=""
-                      className="photo-avatar"
-                    />
-                    <label
-                      htmlFor="inputFileAvatar"
-                      className="box-avatar__icon"
-                    >
-                      <i className="fa-solid fa-camera"></i>
-                    </label>
-                    <input
-                      type="file"
-                      id="inputFileAvatar"
-                      className="custom-file-input"
-                      onClick={(e) => (e.target.value = null)}
-                      onChange={(e) => handleAvatarImage(e)}
-                    />
-                  </div>
-                  <div className="display-name">
-                    <div className="value">
-                      {
-                        accountSelected.displayName || <span>Tiểu sử</span>
-                      }
-                    </div>
-                  </div>
-                  <div className="status">
-                    <div className="value">
-                      {accountSelected.status || <span>Tiểu sử</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="content">
-                <div className="title">Thông tin cá nhân</div>
-                <div className="content-detail">
-                  <div className="content-detail__item">
-                    <div className="label">Điện thoại</div>
-                    <div className="value">{formatPhoneVN(accountSelected.phoneNumber)}</div>
-                  </div>
-                  <div className="content-detail__item">
-                    <div className="label">Giới tính</div>
-                    <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
-                  </div>
-                  <div className="content-detail__item">
-                    <div className="label">Ngày sinh</div>
-                    <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="division"></div>
-              <div
-                className="btn-edit-profile"
-                onClick={() => setIsShowUpdateProfile(true)}
-              >
-                <i className="fa-solid fa-pen icon-edit"></i>
-                <span>Cập nhật</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <UpdateProfile
-            setIsShowUpdateProfile={setIsShowUpdateProfile}
-            setIsShowOverlayModal={setIsShowOverlayModal}
-            profile={profile}
-            setProfile={setProfile}
-            userId={userInfo.id}
-            accountSelected={accountSelected}
+  const CloudProfile = () => (
+    <div className="box-account-info">
+      <div className="header">
+        <img src={coverCloud} className="photo-cover" alt=""
+          onClick={() =>
+            openPreview(coverCloud)
+          }
+        />
+        <div className="box-image">
+          <img
+            src={accountSelected.myCloud.photoURLSelected.thumbnail}
+            alt=""
+            className="photo-avatar"
+            onClick={() =>
+              openPreview(accountSelected.myCloud.photoURLSelected.thumbnail)
+            }
           />
-        )}
-      </div>
-      <MessageError />
-    </div>
-  ) : accountSelected.myCloud ? (
-    <div className="modal-overlay">
-      <div className="container-account-info" ref={accountInfoRef}>
-        <div className="account-info">
-          <div className="title">
-            Thông tin tài khoản
-            <i
-              className="fa-solid fa-xmark"
-              onClick={() => setIsShowOverlayModal(false)}
-            ></i>
+          <div className="display-name">
+            {accountSelected.myCloud.displayNameSelected}
           </div>
-          <div className="box-account-info">
-            <div className="header">
-              <img src={coverCloud} alt="" className="photo-cover" />
-              <div className="box-image">
-                <img
-                  src={accountSelected.myCloud.photoURLSelected.thumbnail}
-                  alt=""
-                  className="photo-avatar"
+          <div
+            className="btn-texting"
+            onClick={() =>
+              toogleBoxChat({
+                uidSelected: accountSelected.myCloud.uidSelected,
+                photoURLSelected:
+                  accountSelected.myCloud.photoURLSelected,
+                displayNameSelected:
+                  accountSelected.myCloud.displayNameSelected,
+              })
+            }
+          >
+            Nhắn tin
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const SelfProfile = () => {
+    if (isShowUpdateProfile) {
+      return (
+        <UpdateProfile
+          setIsShowUpdateProfile={setIsShowUpdateProfile}
+          setIsShowOverlayModal={setIsShowOverlayModal}
+          profile={profile}
+          setProfile={setProfile}
+          userId={userInfo.id}
+          accountSelected={accountSelected}
+        />
+      );
+    }
+
+    return (
+      <div className="box-account-info">
+        <div className="header">
+          <img
+            src={imgPreviewCover?.url || accountSelected.photoCover?.original}
+            alt=""
+            className="photo-cover"
+            onClick={() =>
+              openPreview(imgPreviewCover?.url || accountSelected.photoCover?.original)
+            }
+          />
+          <div className="header-right">
+            {imgPreviewCover ? (
+              <>
+                <button
+                  className=" btn-default--custome"
+                  onClick={() => setImgPreviewCover("")}
+                >
+                  Hủy
+                </button>
+                <button
+                  className=" btn-default--custome"
+                  onClick={() => uploadPhotocover()}
+                >
+                  Lưu
+                </button>
+              </>
+            ) : (
+              <>
+                <label
+                  htmlFor="myFileInput"
+                  className="custom-file-label"
+                >
+                  <i className="fa-solid fa-camera"></i>
+                </label>
+                <input
+                  type="file"
+                  id="myFileInput"
+                  className="custom-file-input"
+                  onClick={(e) => (e.target.value = null)}
+                  onChange={(e) =>
+                    handleCoverImagePreview(e)
+                  }
                 />
-                <div className="display-name">
-                  {accountSelected.myCloud.displayNameSelected}
-                </div>
+              </>
+            )}
+          </div>
+          <div className="box-image">
+            <div className="box-image__item">
+              <img
+                src={accountSelected.photoURL.thumbnail}
+                alt=""
+                className="photo-avatar"
+                onClick={() =>
+                  openPreview(accountSelected.photoURL.original)
+                }
+              />
+              <label
+                htmlFor="inputFileAvatar"
+                className="box-avatar__icon"
+              >
+                <i className="fa-solid fa-camera"></i>
+              </label>
+              <input
+                type="file"
+                id="inputFileAvatar"
+                className="custom-file-input"
+                onClick={(e) => (e.target.value = null)}
+                onChange={(e) => handleAvatarImage(e)}
+              />
+            </div>
+            <div className="display-name">
+              <div className="value">
+                {
+                  accountSelected.displayName || <span>Tiểu sử</span>
+                }
+              </div>
+            </div>
+            <div className="status">
+              <div className="value">
+                {accountSelected.status || <span>Tiểu sử</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="content">
+          <div className="title">Thông tin cá nhân</div>
+          <div className="content-detail">
+            <div className="content-detail__item">
+              <div className="label">Điện thoại</div>
+              <div className="value">{formatPhoneVN(accountSelected.phoneNumber)}</div>
+            </div>
+            <div className="content-detail__item">
+              <div className="label">Giới tính</div>
+              <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
+            </div>
+            <div className="content-detail__item">
+              <div className="label">Ngày sinh</div>
+              <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
+            </div>
+          </div>
+        </div>
+        <div className="division"></div>
+        <div
+          className="btn-edit-profile"
+          onClick={() => setIsShowUpdateProfile(true)}
+        >
+          <i className="fa-solid fa-pen icon-edit"></i>
+          <span>Cập nhật</span>
+        </div>
+      </div>
+    );
+  };
+
+  const isSelf = accountSelected.uid === userInfo.uid;
+  const isCloud = accountSelected.myCloud;
+
+  const OtherProfile = () => (
+    <div className="box-account-info">
+      <div className="header">
+        <img
+          src={accountSelected.photoCover?.original}
+          alt=""
+          className="photo-cover"
+          onClick={() =>
+            openPreview(accountSelected.photoCover?.original)
+          }
+        />
+        <div className="box-image">
+          <img
+            src={accountSelected.photoURL.thumbnail}
+            alt=""
+            className="photo-avatar"
+            onClick={() =>
+              openPreview(accountSelected.photoURL.original)
+            }
+          />
+          <div className="display-name">
+            {accountSelected.displayName}
+          </div>
+          <div className="status">{accountSelected.status}</div>
+          {isReceive && (
+            <div style={{ fontWeight: 500, marginTop: "8px" }}>
+              Đã gửi cho bạn một lời mời kết bạn
+            </div>
+          )}
+          {accountSelected.uid !== userInfo?.uid && (
+            <div className="box-action">
+              <div
+                className="btn-texting"
+                onClick={() =>
+                  toogleBoxChat({
+                    uidSelected: accountSelected.uid,
+                    photoURLSelected: accountSelected.photoURL,
+                    displayNameSelected: accountSelected.displayName,
+                  })
+                }
+              >
+                Nhắn tin
+              </div>
+              {isFriend === -1 && !isSent && !isReceive ? (
                 <div
                   className="btn-texting"
-                  onClick={() =>
-                    toogleBoxChat({
-                      uidSelected: accountSelected.myCloud.uidSelected,
-                      photoURLSelected:
-                        accountSelected.myCloud.photoURLSelected,
-                      displayNameSelected:
-                        accountSelected.myCloud.displayNameSelected,
-                    })
-                  }
+                  onClick={() => {
+                    setIsShowOverlayModal(false);
+                    setIsShowOverlayModalAddFriend &&
+                      setIsShowOverlayModalAddFriend(true);
+                  }}
                 >
-                  Nhắn tin
+                  Kết bạn
                 </div>
-              </div>
+              ) : isSent ? (
+                <div
+                  className="btn-texting"
+                  onClick={() => handleInvitationRecall()}
+                >
+                  Huỷ lời mời
+                </div>
+              ) : (
+                isReceive && (
+                  <div className="box-response">
+                    <div
+                      className="btn-texting response"
+                      onClick={() => setIsDropdownResponse(true)}
+                    >
+                      Trả lời
+                    </div>
+                    {isDropdownResponse && (
+                      <div
+                        className="dropdown-response"
+                        ref={dropdownResponseRef}
+                      >
+                        <div
+                          className="btn-texting"
+                          onClick={() => handleInvitationApprove()}
+                        >
+                          Xác nhận lời mời
+                        </div>
+                        <div
+                          className="btn-texting"
+                          onClick={() => handleInvitationReject()}
+                        >
+                          Xoá lời mời
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
             </div>
-            <div className="content-cloud">
-              <span className="name">Mô tả</span>
-              <div className="value">
-                Dễ dàng lưu trử và đồng bộ dữ liệu giữa các thiết bị của bạn.
-              </div>
+          )}
+        </div>
+      </div>
+      <div className="content">
+        <div className="title">Thông tin cá nhân</div>
+        <div className="content-detail">
+          <div className="content-detail__item">
+            <div className="label">Điện thoại</div>
+            <div className="value">
+              {formatPhoneVN(accountSelected.phoneNumber)}
             </div>
+          </div>
+          <div className="content-detail__item">
+            <div className="label">Giới tính</div>
+            <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
+          </div>
+          <div className="content-detail__item">
+            <div className="label">Ngày sinh</div>
+            <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
           </div>
         </div>
       </div>
-      <MessageError />
+      {/* <div className="footer">
+        <div className="action-list">
+          <div className="action-item">
+            <i className="fa-solid fa-users"></i>
+            <span>Nhóm chung (0)</span>
+          </div>
+          <div className="action-item">
+            <i className="fa-regular fa-address-card"></i>
+            <span>Chia sẻ danh thiếp</span>
+          </div>
+          <div className="action-item">
+            <i className="fa-solid fa-ban"></i>
+            <span>Chặn tin nhắn</span>
+          </div>
+          <div className="action-item">
+            <i className="fa-solid fa-triangle-exclamation"></i>
+            <span>Báo xấu</span>
+          </div>
+          <div className="action-item">
+            <i className="fa-regular fa-trash-can"></i>
+            <span>Xóa khỏi danh sách bạn bè</span>
+          </div>
+        </div>
+      </div> */}
     </div>
-  ) : (
+  );
+
+  return (
     <div className="modal-overlay">
       <div className="container-account-info" ref={accountInfoRef}>
         <div className="account-info">
           <div className="title">
             Thông tin tài khoản
-            <i
-              className="fa-solid fa-xmark"
-              onClick={() => setIsShowOverlayModal(false)}
-            ></i>
+            <i className="fa-solid fa-xmark" onClick={() => setIsShowOverlayModal(false)}></i>
           </div>
-          <div className="box-account-info">
-            <div className="header">
-              <img
-                src={accountSelected.photoCover?.original}
-                alt=""
-                className="photo-cover"
-              />
-              <div className="box-image">
-                <img
-                  src={accountSelected.photoURL.thumbnail}
-                  alt=""
-                  className="photo-avatar"
-                />
-                <div className="display-name">
-                  {accountSelected.displayName}
-                </div>
-                <div className="status">{accountSelected.status}</div>
-                {isReceive && (
-                  <div style={{ fontWeight: 500, marginTop: "8px" }}>
-                    Đã gửi cho bạn một lời mời kết bạn
-                  </div>
-                )}
-                {accountSelected.uid !== userInfo?.uid && (
-                  <div className="box-action">
-                    <div
-                      className="btn-texting"
-                      onClick={() =>
-                        toogleBoxChat({
-                          uidSelected: accountSelected.uid,
-                          photoURLSelected: accountSelected.photoURL,
-                          displayNameSelected: accountSelected.displayName,
-                        })
-                      }
-                    >
-                      Nhắn tin
-                    </div>
-                    {isFriend === -1 && !isSent && !isReceive ? (
-                      <div
-                        className="btn-texting"
-                        onClick={() => {
-                          setIsShowOverlayModal(false);
-                          setIsShowOverlayModalAddFriend &&
-                            setIsShowOverlayModalAddFriend(true);
-                        }}
-                      >
-                        Kết bạn
-                      </div>
-                    ) : isSent ? (
-                      <div
-                        className="btn-texting"
-                        onClick={() => handleInvitationRecall()}
-                      >
-                        Huỷ lời mời
-                      </div>
-                    ) : (
-                      isReceive && (
-                        <div className="box-response">
-                          <div
-                            className="btn-texting response"
-                            onClick={() => setIsDropdownResponse(true)}
-                          >
-                            Trả lời
-                          </div>
-                          {isDropdownResponse && (
-                            <div
-                              className="dropdown-response"
-                              ref={dropdownResponseRef}
-                            >
-                              <div
-                                className="btn-texting"
-                                onClick={() => handleInvitationApprove()}
-                              >
-                                Xác nhận lời mời
-                              </div>
-                              <div
-                                className="btn-texting"
-                                onClick={() => handleInvitationReject()}
-                              >
-                                Xoá lời mời
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="content">
-              <div className="title">Thông tin cá nhân</div>
-              <div className="content-detail">
-                <div className="content-detail__item">
-                  <div className="label">Điện thoại</div>
-                  <div className="value">
-                    {formatPhoneVN(accountSelected.phoneNumber)}
-                  </div>
-                </div>
-                <div className="content-detail__item">
-                  <div className="label">Giới tính</div>
-                  <div className="value">  {GENDER_LABEL[accountSelected.sex] ?? ""}</div>
-                </div>
-                <div className="content-detail__item">
-                  <div className="label">Ngày sinh</div>
-                  <div className="value"> {formatISOToVN(accountSelected.dateOfBirth)}</div>
-                </div>
-              </div>
-            </div>
-            <div className="footer">
-              <div className="action-list">
-                <div className="action-item">
-                  <i className="fa-solid fa-users"></i>
-                  <span>Nhóm chung (0)</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-address-card"></i>
-                  <span>Chia sẻ danh thiếp</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-ban"></i>
-                  <span>Chặn tin nhắn</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span>Báo xấu</span>
-                </div>
-                <div className="action-item">
-                  <i className="fa-regular fa-trash-can"></i>
-                  <span>Xóa khỏi danh sách bạn bè</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {isSelf && <SelfProfile />}
+          {isCloud && <CloudProfile />}
+          {!isSelf && !isCloud && <OtherProfile />}
         </div>
+        <ImagePreviewModal src={preview} onClose={closePreview} />
       </div>
       <MessageError />
     </div>

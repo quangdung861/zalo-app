@@ -112,7 +112,7 @@ const ModalAccount = ({
                 )}
               </div>
             </div>
-            <div className="footer">
+            {/* <div className="footer">
               <div className="action-list">
                 <div className="action-item">
                   <i className="fa-solid fa-users"></i>
@@ -123,7 +123,7 @@ const ModalAccount = ({
                   <span>Chia sẻ danh thiếp</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
