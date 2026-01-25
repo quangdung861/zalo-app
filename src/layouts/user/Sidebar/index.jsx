@@ -180,10 +180,13 @@ const Sidebar = () => {
               ref={dropdownRef}
               style={isShowDropdown ? { backgroundColor: "#006edc" } : {}}
             >
-              <i
+              {/* <i
                 className="fa-solid fa-gear"
-                onClick={() => setIsShowDropdown(!isShowDropdown)}
-              ></i>
+                onClick={() => setIsShowModalConfirm("logout")
+                }
+              ></i> */}
+              <i className="fa-solid fa-arrow-right-from-bracket" onClick={() => setIsShowModalConfirm("logout")
+              }></i>
               {isShowDropdown && (
                 <div className="dropdown-setting">
                   <div className="dropdown-setting__item ">
