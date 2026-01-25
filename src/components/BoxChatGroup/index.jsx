@@ -35,6 +35,7 @@ import ModalAccount from "components/ModalAccount";
 import ModalAddFriend from "components/ModalAddFriend";
 import BackgoundModal from "common/BackgoundModal/BackgoundModal";
 import * as S from "./styles";
+import { useMediaQuery } from "react-responsive";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
 import { backgoundsDefault, BACKGROUND_GROUP_DEFAULT } from "../../common/BackgoundModal/constants";
@@ -42,6 +43,7 @@ import { uploadImage } from "services/uploadImage";
 import useClickOutside from "hooks/useClickOutside";
 
 const BoxChatGroup = () => {
+  const isMobile = useMediaQuery({ maxWidth: 576 });
   const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging, startLoading, stopLoading } =
     useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
@@ -2599,10 +2601,13 @@ const BoxChatGroup = () => {
         {isShowOverlayModalDetailImage && (
           <div className="images-container">
             <div className="image-show__title">
-              <div>Cloud của tôi</div>
+              <div>Ảnh</div>
               <i
                 className="fa-solid fa-xmark"
-                onClick={() => setIsShowOverlayModalDetailImage(false)}
+                onClick={() => {
+                  setIsShowOverlayModalDetailImage(false);
+                  setIsShowContainerImageList(!isMobile);
+                }}
               ></i>
             </div>
             <div className="image-show__center">
@@ -2622,7 +2627,7 @@ const BoxChatGroup = () => {
                   style={{ position: "absolute", inset: "0 0 0 0", zIndex: 1 }}
                   onClick={() => {
                     setIsShowOverlayModalDetailImage(false);
-                    setIsShowContainerImageList(true);
+                    setIsShowContainerImageList(!isMobile);
                   }}
                 ></div>
               </div>
@@ -2644,7 +2649,7 @@ const BoxChatGroup = () => {
               <div className="image-show__bottom__sender">
                 <img
                   className="image-show__bottom__sender__avatar"
-                  src={messageSelected?.photoURL}
+                  src={messageSelected?.photoURL?.thumbnail}
                   alt=""
                 />
                 <div className="image-show__bottom__sender__info">
@@ -2657,7 +2662,6 @@ const BoxChatGroup = () => {
                 </div>
               </div>
               <div className="image-show__bottom__ctrl">
-                <i className="fa-solid fa-share"></i>
                 <i className="fa-solid fa-download" onClick={downloadImage}></i>
                 <i
                   className="fa-solid fa-rotate-right fa-flip-horizontal"
@@ -2700,9 +2704,6 @@ const BoxChatGroup = () => {
                 ></i>
               </div>
               <div className="image-show__bottom__slider-wrapper">
-                <div>
-                  <i className="fa-regular fa-thumbs-up"></i>
-                </div>
                 <i
                   className="fa-solid fa-expand"
                   onClick={() =>
