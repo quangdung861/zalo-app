@@ -2312,7 +2312,7 @@ const BoxChatGroup = () => {
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
               <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
-                <i className="fa-solid fa-brush"></i>
+                <i className="fa-solid fa-paintbrush"></i>
               </div>
               {isShowBackgroundModal && <BackgoundModal text="Đổi hình nền mọi người" initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
             </div>

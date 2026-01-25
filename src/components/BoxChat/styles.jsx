@@ -136,13 +136,11 @@ export const Container = styled.div`
         gap: 4px;
         padding-left: 16px;
         .box-icon {
-          width: 32px;
-          height: 32px;
           border-radius: 6px;
           > i {
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
             display: flex;
             justify-content: center;
             align-items: center;

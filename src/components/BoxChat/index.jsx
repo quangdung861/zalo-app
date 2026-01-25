@@ -2179,7 +2179,7 @@ const BoxChat = () => {
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
               {(room.category !== "my cloud" && isFriend !== -1) && <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
-                <i className="fa-solid fa-brush"></i>
+                <i className="fa-solid fa-paintbrush"></i>
               </div>}
             </div>
             {isShowBackgroundModal && <BackgoundModal text="Đổi hình nền cho cả hai bên" initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
