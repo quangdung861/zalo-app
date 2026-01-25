@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { addDocument } from "services";
+import { useMediaQuery } from "react-responsive";
 import { AppContext } from "Context/AppProvider";
 import moment from "moment";
 import messageSend from "assets/audio/messageSend.wav";
@@ -41,7 +42,9 @@ import { backgoundsDefault, BACKGROUND_DEFAULT } from "../../common/BackgoundMod
 import { uploadImage } from "services/uploadImage";
 import useClickOutside from "hooks/useClickOutside";
 
+
 const BoxChat = () => {
+  const isMobile = useMediaQuery({ maxWidth: 576 });
   const { userInfo, room, selectedUserMessaging, setRoom, startLoading, stopLoading } =
     useContext(AppContext);
   const { setIsShowBoxChat } = useContext(UserLayoutContext);
@@ -50,7 +53,7 @@ const BoxChat = () => {
   const [isReplyMessage, setIsReplyMessage] = useState(false);
   const [infoReply, setInfoReply] = useState({});
   const [isShowContainerImageList, setIsShowContainerImageList] =
-    useState(true);
+    useState(!isMobile);
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowMessageError, setIsShowMessageError] = useState(false);
   const [isShowAlertRecallRejectMessage, setIsShowAlertRecallRejectMessage] =
@@ -2481,16 +2484,19 @@ const BoxChat = () => {
         {isShowOverlayModalDetailImage && (
           <div className="images-container">
             <div className="image-show__title">
-              <div>Cloud của tôi</div>
+              <div>Ảnh</div>
               <i
                 className="fa-solid fa-xmark"
-                onClick={() => setIsShowOverlayModalDetailImage(false)}
+                onClick={() => {
+                  setIsShowOverlayModalDetailImage(false);
+                  setIsShowContainerImageList(!isMobile);
+                }}
               ></i>
             </div>
             <div className="image-show__center">
               <div className="main-image">
                 <img
-                  src={messageSelected?.URL?.thumbnail}
+                  src={messageSelected?.URL}
                   alt=""
                   style={{
                     zIndex: 2,
@@ -2504,7 +2510,7 @@ const BoxChat = () => {
                   style={{ position: "absolute", inset: "0 0 0 0", zIndex: 1 }}
                   onClick={() => {
                     setIsShowOverlayModalDetailImage(false);
-                    setIsShowContainerImageList(true);
+                    setIsShowContainerImageList(!isMobile);
                   }}
                 ></div>
               </div>
@@ -2526,7 +2532,7 @@ const BoxChat = () => {
               <div className="image-show__bottom__sender">
                 <img
                   className="image-show__bottom__sender__avatar"
-                  src={messageSelected?.photoURL}
+                  src={messageSelected?.photoURL?.thumbnail}
                   alt=""
                 />
                 <div className="image-show__bottom__sender__info">
@@ -2539,7 +2545,6 @@ const BoxChat = () => {
                 </div>
               </div>
               <div className="image-show__bottom__ctrl">
-                <i className="fa-solid fa-share"></i>
                 <i className="fa-solid fa-download" onClick={downloadImage}></i>
                 <i
                   className="fa-solid fa-rotate-right fa-flip-horizontal"
@@ -2582,9 +2587,6 @@ const BoxChat = () => {
                 ></i>
               </div>
               <div className="image-show__bottom__slider-wrapper">
-                <div>
-                  <i className="fa-regular fa-thumbs-up"></i>
-                </div>
                 <i
                   className="fa-solid fa-expand"
                   onClick={() =>
