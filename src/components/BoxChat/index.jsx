@@ -2262,7 +2262,7 @@ const BoxChat = () => {
                   {selectedUserMessaging.uidSelected !== "my-cloud" && (
                     <>
                       <img
-                        src={selectedUserMessaging.photoURLSelected.thumbnail}
+                        src={selectedUserMessaging.photoURLSelected?.thumbnail}
                         alt=""
                         className="user-info__avatar"
                         onClick={() => setIsShowOverlayModal(true)}
