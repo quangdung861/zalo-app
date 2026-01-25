@@ -35,17 +35,68 @@ const GroupList = () => {
   const [newRooms, setNewRoom] = useState([]);
 
   useEffect(() => {
-    if (rooms[0]) {
-      const fetchDataAsync = async () => {
-        startLoading();
-        const fetchedData = await fetchData();
+    if (!rooms?.length) return;
+
+    const fetchDataAsync = async () => {
+      startLoading();
+      try {
+        const { newRooms, infoPartner } = await fetchData();
+        setNewRoom(newRooms);
+        setInfoPartner(infoPartner);
+      } finally {
         stopLoading();
-        setNewRoom(fetchedData.newRooms);
-        setInfoPartner(fetchedData.infoPartner);
-      };
-      fetchDataAsync();
-    }
+      }
+    };
+
+    fetchDataAsync();
   }, [rooms]);
+
+
+  const fetchData = async () => {
+    const groupRooms = rooms.filter(r => r.category === "group");
+
+    const results = await Promise.all(
+      groupRooms.map(async (room) => {
+        const partnerRef = query(
+          collection(db, "users"),
+          where("uid", "in", room.members)
+        );
+
+        const response = await getDocs(partnerRef);
+
+        const documents = response.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+          };
+        });
+
+        const avatars = documents.map(d => d.photoURL);
+        const name = documents.map(d => d.displayName).join(", ");
+
+        return {
+          infoPartner: {
+            id: room.id,
+            photoURL: avatars,
+            displayName: name,
+            keywordsName: (room.name || name).toLowerCase(),
+          },
+          newRoom: {
+            ...room,
+            nameSearch: room.name || name,
+          },
+        };
+      })
+    );
+
+    return {
+      infoPartner: results.map(r => r.infoPartner),
+      newRooms: results.map(r => r.newRoom),
+    };
+  };
+
 
   const toogleBoxChatGroup = ({ room, avatars, name }) => {
     setIsShowBoxChat(false);
@@ -53,48 +104,6 @@ const GroupList = () => {
     setIsShowBoxChatGroup(true);
 
     setSelectedGroupMessaging({ room, avatars, name });
-  };
-
-  const fetchData = async () => {
-    let infoPartner = [];
-    let newRooms = [];
-    for (const room of rooms) {
-      if (room.category === "group") {
-        const partnerRef = query(
-          collection(db, "users"),
-          where("uid", "in", room.members)
-        );
-        startLoading();
-        const response = await getDocs(partnerRef);
-        stopLoading();
-        const documents = response.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            id: id,
-            displayName: data.displayName,
-            photoURL: data.photoURL,
-          };
-        });
-
-        const avatars = documents.map((item) => item.photoURL);
-
-        const name = documents.map((item) => item.displayName).join(", ");
-
-        infoPartner.push({
-          id: room.id,
-          photoURL: avatars,
-          displayName: name,
-          keywordsName: room.name.toLowerCase() || name.toLowerCase(),
-        });
-
-        newRooms.push({
-          ...room,
-          nameSearch: room.name || name,
-        });
-      }
-    }
-    return { infoPartner, newRooms };
   };
 
   const [totalFriends, setTotalFriends] = useState(0);
