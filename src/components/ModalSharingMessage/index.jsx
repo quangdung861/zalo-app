@@ -115,171 +115,113 @@ const ModalSharingMessage = ({
     getFriends();
   }, [userInfo?.friends, keywords]);
 
-  const handleClickSharingMessage = () => {
-    if (textAreaValue) {
-      audio.play();
-      conversationsSelected.forEach((converstation) => {
-        if (converstation.category) {
-          if (converstation.category === "single") {
-            // Trò chuyện gần đây với nhóm, bạn bè, cloud => hiện tại chưa phát triển
-          }
-          if (converstation.category === "group") {
-            // Trò chuyện với group
+  const sendMessageToRoom = async (roomId) => {
+    const roomRef = doc(db, "rooms", roomId);
 
-            const createMes = async (roomId) => {
-              const roomRef = doc(db, "rooms", roomId);
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(roomRef);
+      if (!snap.exists()) return;
 
-              await runTransaction(db, async (transaction) => {
-                const snap = await transaction.get(roomRef);
-                if (!snap.exists()) return;
+      const roomData = snap.data();
+      const members = roomData.members || [];
+      const unreadCount = roomData.unreadCount || {};
 
-                const roomData = snap.data();
-                const members = roomData.members || [];
-                const unreadCount = roomData.unreadCount || {};
+      const newUnreadCount = {};
+      const newUnreadMembers = [];
 
-                const newUnreadCount = { ...unreadCount };
-                const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
-
-                members.forEach((uid) => {
-                  if (uid === userInfo.uid) {
-                    newUnreadCount[uid] = 0;
-                  } else {
-                    newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
-                  }
-                });
-
-                transaction.set(
-                  roomRef,
-                  {
-                    messageLastest: {
-                      text: textAreaValue,
-                      displayName: userInfo.displayName,
-                      uid: userInfo.uid,
-                      clientCreatedAt: Date.now(),
-                      clientCreatedAt: Date.now(),
-                    },
-                    totalMessages: increment(1),
-                    unreadCount: newUnreadCount,
-                    unreadMembers: newUnreadMembers
-                  },
-                  { merge: true }
-                );
-              });
-
-              addDocument("messages", {
-                roomId,
-                uid: userInfo.uid,
-                displayName: userInfo.displayName,
-                photoURL: userInfo.photoURL,
-                text: textAreaValue,
-                images: [],
-                infoReply: {},
-              });
-            };
-
-            createMes();
-          }
-        }
-
-        if (!converstation.category) {
-          // Trò chuyền với bạn bè
-          // kiểm tra xem đã có hội thoại chưa, nếu chưa có thì tạo room
-          const room = rooms.filter(
-            (room) =>
-              room.category === "single" &&
-              room.members.includes(converstation.uid)
-          )[0];
-
-          if (room?.id) {
-            const createMes = async (roomId) => {
-              const roomRef = doc(db, "rooms", roomId);
-
-              await runTransaction(db, async (transaction) => {
-                const snap = await transaction.get(roomRef);
-                if (!snap.exists()) return;
-
-                const roomData = snap.data();
-                const members = roomData.members || [];
-                const unreadCount = roomData.unreadCount || {};
-
-                const newUnreadCount = { ...unreadCount };
-                const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
-
-                members.forEach((uid) => {
-                  if (uid === userInfo.uid) {
-                    newUnreadCount[uid] = 0;
-                  } else {
-                    newUnreadCount[uid] = (newUnreadCount[uid] || 0) + 1;
-                  }
-                });
-
-                transaction.set(
-                  roomRef,
-                  {
-                    messageLastest: {
-                      text: textAreaValue,
-                      displayName: userInfo.displayName,
-                      uid: userInfo.uid,
-                      clientCreatedAt: Date.now(),
-                      clientCreatedAt: Date.now(),
-                    },
-                    totalMessages: increment(1),
-                    unreadCount: newUnreadCount,
-                    unreadMembers: newUnreadMembers,
-                  },
-                  { merge: true }
-                );
-              });
-
-              addDocument("messages", {
-                roomId,
-                uid: userInfo.uid,
-                displayName: userInfo.displayName,
-                photoURL: userInfo.photoURL,
-                text: textAreaValue,
-                images: [],
-                infoReply: {},
-              });
-            };
-
-            createMes();
-          } else {
-            const createRoomAndMes = async () => {
-              const roomRef = await addDoc(collection(db, "rooms"), {
-                category: "single",
-                members: [userInfo.uid, converstation.uid],
-                unreadCount: {
-                  [userInfo.uid]: 0,
-                  [converstation.uid]: 1,
-                },
-                unreadMembers: [converstation.uid],
-                totalMessages: 1,
-                messageLastest: {
-                  text: textAreaValue,
-                  displayName: userInfo.displayName,
-                  uid: userInfo.uid,
-                  clientCreatedAt: Date.now(),
-                  clientCreatedAt: Date.now(),
-                },
-                clientCreatedAt: Date.now(),
-                clientCreatedAt: Date.now(),
-              });
-
-              addDocument("messages", {
-                roomId: roomRef.id,
-                uid: userInfo.uid,
-                text: textAreaValue,
-                images: [],
-                infoReply: {},
-              });
-            };
-
-
-            createRoomAndMes();
-          }
+      members.forEach(uid => {
+        if (uid === userInfo.uid) {
+          newUnreadCount[uid] = 0;
+        } else {
+          newUnreadCount[uid] = (unreadCount[uid] || 0) + 1;
+          newUnreadMembers.push(uid);
         }
       });
-    }
+
+      transaction.set(
+        roomRef,
+        {
+          messageLastest: {
+            text: !infoMessageSharing?.images?.[0] ? textAreaValue : "Hình ảnh",
+            displayName: userInfo.displayName,
+            uid: userInfo.uid,
+            clientCreatedAt: Date.now(),
+          },
+          totalMessages: increment(1),
+          unreadCount: newUnreadCount,
+          unreadMembers: newUnreadMembers,
+        },
+        { merge: true }
+      );
+    });
+
+    await addDocument("messages", {
+      roomId,
+      uid: userInfo.uid,
+      displayName: userInfo.displayName,
+      photoURL: userInfo.photoURL,
+      text: textAreaValue,
+      images: infoMessageSharing?.images,
+      infoReply: {},
+    });
+  };
+
+
+  const createSingleRoomAndSend = async (partnerUid) => {
+    const roomRef = await addDoc(collection(db, "rooms"), {
+      category: "single",
+      members: [userInfo.uid, partnerUid],
+      unreadCount: {
+        [userInfo.uid]: 0,
+        [partnerUid]: 1,
+      },
+      unreadMembers: [partnerUid],
+      totalMessages: 1,
+      messageLastest: {
+        text: !infoMessageSharing?.images ? textAreaValue : "Hình ảnh",
+        displayName: userInfo.displayName,
+        uid: userInfo.uid,
+        clientCreatedAt: Date.now(),
+      },
+      clientCreatedAt: Date.now(),
+    });
+
+    await addDocument("messages", {
+      roomId: roomRef.id,
+      uid: userInfo.uid,
+      text: textAreaValue,
+      images: infoMessageSharing?.images,
+      infoReply: {},
+    });
+  };
+
+  const handleClickSharingMessage = async () => {
+    if (!textAreaValue && !infoMessageSharing?.images?.[0]) return;
+    if (!conversationsSelected?.[0]) return;
+    audio.play();
+
+    await Promise.all(
+      conversationsSelected.map(async (conversation) => {
+        // GROUP
+        if (conversation.category === "group") {
+          return sendMessageToRoom(conversation.id);
+        }
+
+        // SINGLE
+        const room = rooms.find(
+          r =>
+            r.category === "single" &&
+            r.members.includes(conversation.uid)
+        );
+
+        if (room?.id) {
+          return sendMessageToRoom(room.id);
+        }
+
+        return createSingleRoomAndSend(conversation.uid);
+      })
+    );
+
     setIsShowOverlayModalSharingMessage(false);
   };
 
@@ -324,7 +266,7 @@ const ModalSharingMessage = ({
           categorySelected !== "Tất cả" &&
           categorySelected !== categoryName
         ) {
-          return;
+          return null;
         }
 
         let friendUidList;
@@ -348,7 +290,7 @@ const ModalSharingMessage = ({
             ></i>
             <img
               className="conversation-item__avatar"
-              src={item.photoURL}
+              src={item.photoURL?.thumbnail}
               alt=""
             />
             <div className="conversation-item__name">{item.displayName}</div>
@@ -401,8 +343,6 @@ const ModalSharingMessage = ({
     }
   };
 
-  const friendList = renderFriendList();
-
   const handleSelectedConversation = (conversation) => {
     if (conversationsSelected[0]) {
       let friendsSelectedIndex;
@@ -449,22 +389,12 @@ const ModalSharingMessage = ({
       );
     }
 
-    // if (friendsSelectedIndex !== -1) {
-    //   const newFriendsSelected = [...conversationsSelected];
-    //   newFriendsSelected.splice(friendsSelectedIndex, 1);
-    //   setConversationsSelected(newFriendsSelected);
-    // } else {
-    //   const newFriendsSelected = [...conversationsSelected];
-    //   newFriendsSelected.push(conversation);
-    //   setConversationsSelected(newFriendsSelected);
-    // }
-
     const newFriendsSelected = [...conversationsSelected];
     newFriendsSelected.splice(friendsSelectedIndex, 1);
     setConversationsSelected(newFriendsSelected);
   };
 
-  const renderConversationSelected = useMemo(() => {
+  const renderConversationSelected = () => {
     return conversationsSelected.map((item) => {
       // Loại bỏ trường 'infoParnerData' và truyền đi
       const { infoParnerData, ...room } = item;
@@ -476,16 +406,16 @@ const ModalSharingMessage = ({
         >
           {!item.category ? (
             <img
-              src={item.photoURL}
+              src={item.photoURL.thumbnail}
               alt=""
               className="friend-selected-item__avatar"
             />
           ) : (
             <>
-              {item.avatar?.url ? (
+              {item.avatar ? (
                 <img
                   className="friend-selected-item__avatar"
-                  src={item.avatar?.url}
+                  src={item.avatar?.thumbnail}
                   alt=""
                 />
               ) : (
@@ -521,7 +451,7 @@ const ModalSharingMessage = ({
         </div>
       );
     });
-  }, [conversationsSelected]);
+  };
 
   const handlefilterCategory = (value) => {
     setCategorySelected(value);
@@ -534,68 +464,63 @@ const ModalSharingMessage = ({
   const [newRooms, setNewRoom] = useState([]);
 
   useEffect(() => {
-    if (rooms[0]) {
-      setLoadingGroupList(true);
-      const fetchDataAsync = async () => {
-        const fetchedData = await fetchData();
-        setNewRoom(fetchedData.newRooms);
-        setInfoPartner(fetchedData.infoPartner);
+    if (!rooms?.length) return;
+
+    setLoadingGroupList(true);
+
+    fetchData()
+      .then(({ infoPartner, newRooms }) => {
+        setInfoPartner(infoPartner);
+        setNewRoom(newRooms);
+      })
+      .finally(() => {
         setLoadingGroupList(false);
-      };
-      fetchDataAsync();
-    }
+      });
   }, [rooms]);
 
   const fetchData = async () => {
-    let infoPartner = [];
-    let newRooms = [];
-    for (const room of rooms) {
-      if (room.category === "group") {
+    const groupRooms = rooms.filter(room => room.category === "group");
+
+    const results = await Promise.all(
+      groupRooms.map(async (room) => {
         const partnerRef = query(
           collection(db, "users"),
           where("uid", "in", room.members)
         );
 
         const response = await getDocs(partnerRef);
-        const documents = response.docs.map((doc) => {
-          const id = doc.id;
-          const data = doc.data();
-          return {
-            id: id,
-            displayName: data.displayName,
-            photoURL: data.photoURL,
-          };
-        });
 
-        const avatars = documents.map((item) => item.photoURL);
+        const documents = response.docs.map(doc => ({
+          id: doc.id,
+          displayName: doc.data().displayName,
+          photoURL: doc.data().photoURL,
+        }));
 
-        const name = documents.map((item) => item.displayName).join(", ");
+        const avatars = documents.map(item => item.photoURL);
+        const name = documents.map(item => item.displayName).join(", ");
 
-        // let keywordsName;
+        return {
+          infoPartner: {
+            id: room.id,
+            photoURL: avatars,
+            displayName: name,
+            keywordsName: (room.name || name).toLowerCase(),
+          },
+          newRoom: {
+            ...room,
+            nameSearch: room.name || name,
+          }
+        };
+      })
+    );
 
-        // if (room.name) {
-        //   keywordsName = generateKeywords(room.name.toLowerCase());
-        // } else {
-        //   keywordsName = generateKeywords(name.toLowerCase());
-        // }
-
-        infoPartner.push({
-          id: room.id,
-          photoURL: avatars,
-          displayName: name,
-          keywordsName: room.name.toLowerCase() || name.toLowerCase(),
-        });
-
-        newRooms.push({
-          ...room,
-          nameSearch: room.name || name,
-        });
-      }
-    }
-    return { infoPartner, newRooms };
+    return {
+      infoPartner: results.map(r => r.infoPartner),
+      newRooms: results.map(r => r.newRoom),
+    };
   };
 
-  const renderGroupList = useMemo(() => {
+  const renderGroupList = () => {
     if (infoPartner[0]) {
       return newRooms?.map((room) => {
         if (room.category === "group") {
@@ -611,7 +536,7 @@ const ModalSharingMessage = ({
               categorySelected !== "Tất cả" &&
               categorySelected !== group.category
             ) {
-              return;
+              return null;
             }
           }
 
@@ -620,7 +545,7 @@ const ModalSharingMessage = ({
               keywords.toLowerCase()
             );
             if (!isKeywords) {
-              return;
+              return null;
             }
           }
 
@@ -648,10 +573,10 @@ const ModalSharingMessage = ({
                 }
               ></i>
               <div style={{ margin: "0px 10px 0px 12px" }}>
-                {room.avatar?.url ? (
+                {room.avatar ? (
                   <img
                     className="conversation-item__avatar"
-                    src={room.avatar?.url}
+                    src={room.avatar.thumbnail}
                     alt=""
                     style={{ marginLeft: "0px", marginRight: "0px" }}
                   />
@@ -679,13 +604,7 @@ const ModalSharingMessage = ({
         }
       });
     }
-  }, [
-    infoPartner,
-    keywords,
-    newRooms,
-    conversationsSelected,
-    categorySelected,
-  ]);
+  };
 
   return (
     <S.Wrapper>
@@ -909,7 +828,7 @@ const ModalSharingMessage = ({
                       <>
                         {newRooms?.length >= 1 ? (
                           <div className="conversation-list">
-                            {renderGroupList.every(
+                            {renderGroupList().every(
                               (item) => item === undefined
                             ) ? (
                               <div
@@ -953,7 +872,7 @@ const ModalSharingMessage = ({
                                 </div>
                               </div>
                             ) : (
-                              renderGroupList
+                              renderGroupList()
                             )}
                           </div>
                         ) : (
@@ -981,7 +900,7 @@ const ModalSharingMessage = ({
                       </span>
                     </div>
                     <div className="friend-selected-list">
-                      {renderConversationSelected}
+                      {renderConversationSelected()}
                     </div>
                   </div>
                 </div>
