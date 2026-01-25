@@ -980,7 +980,7 @@ const ModalSharingMessage = ({
                   userSelect: "none",
                 }}
               >
-                Hình ảnh phải có kích thước nhỏ hơn 0.5MB
+                Hình ảnh phải có kích thước nhỏ hơn 10MB
               </div>
             )}
           </div>
