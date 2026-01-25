@@ -414,7 +414,6 @@ export const Container = styled.div`
           .btn-sharing-message--active {
             color: #fff;
             background-color: #0091ff;
-            pointer-events: auto;
             cursor: pointer;
             &:hover {
               opacity: 0.9;

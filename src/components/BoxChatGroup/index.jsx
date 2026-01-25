@@ -82,7 +82,7 @@ const BoxChatGroup = () => {
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  
+
   const pickerEmojiRef = useRef(null);
   const inputRef = useRef();
   const imagesRef = useRef();
@@ -251,17 +251,13 @@ const BoxChatGroup = () => {
   };
 
   const handleSharingMessage = ({ infoMessage }) => {
-    let text = infoMessage.text;
-    infoUsers.forEach((member, index) => {
-      const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
-      const replacement = `@${member.displayName}`;
-      text = text.replace(searchPattern, replacement);
-    });
-
-    setInfoMessageSharing({
-      ...infoMessage,
-      text,
-    });
+    let infoSend = {
+      text: infoMessage.text,
+      images: infoMessage.images,
+    };
+    setInfoMessageSharing(
+      infoSend
+    );
     setIsShowOverlayModalSharingMessage(true);
   };
 
@@ -299,7 +295,6 @@ const BoxChatGroup = () => {
                   text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
-                  clientCreatedAt: Date.now(),
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
@@ -677,14 +672,7 @@ const BoxChatGroup = () => {
   };
 
   const handleReplyMessage = ({ name, id, text, image }) => {
-    let textResult = text;
-    infoUsers.forEach((member, index) => {
-      const searchPattern = new RegExp(`@user:${member.uid}:user`, "g"); // Biểu thức chính quy với biến
-      const replacement = `@${member.displayName}`;
-      textResult = textResult.replace(searchPattern, replacement);
-    });
-
-    setInfoReply({ name, id, text: textResult, image });
+    setInfoReply({ name, id, text, image });
     setIsReplyMessage(true);
     if (inputRef?.current) {
       setTimeout(() => {
@@ -1006,22 +994,22 @@ const BoxChatGroup = () => {
 
       let total = 0;
 
-      item.emojiList.forEach((element) => {
+      item.emojiList?.forEach((element) => {
         element.uids.forEach((item) => {
           total = total + item.quantity;
         });
       });
 
-      const isNewest = item.emojiList.find((emoji) =>
+      const isNewest = item.emojiList?.find((emoji) =>
         emoji.uids.find((item) => item.uid === userInfo.uid && item.isNewest)
       );
 
-      const sortedEmojiList = item.emojiList.sort((a, b) => {
+      const sortedEmojiList = item.emojiList?.sort((a, b) => {
         const sumQuantityA = a.uids.reduce(
           (total, uid) => total + uid.quantity,
           0
         );
-        const sumQuantityB = b.uids.reduce(
+        const sumQuantityB = b.uids?.reduce(
           (total, uid) => total + uid.quantity,
           0
         );
@@ -1031,7 +1019,7 @@ const BoxChatGroup = () => {
 
       //
 
-      const lastIndex = messages.reduce((lastIndex, element, index) => {
+      const lastIndex = messages?.reduce((lastIndex, element, index) => {
         if (element.uid !== userInfo.uid) {
           return index; // Lưu lại chỉ mục của phần tử thỏa mãn điều kiện
         }
@@ -1042,7 +1030,7 @@ const BoxChatGroup = () => {
 
       const userInEmojiList = [];
 
-      sortedEmojiList.forEach((item) =>
+      sortedEmojiList?.forEach((item) =>
         item.uids.forEach((uid) => userInEmojiList.push(uid.uid))
       );
 
@@ -1494,7 +1482,7 @@ const BoxChatGroup = () => {
               <div className="message-item__other">
                 <div className="box-image">
                   <img
-                    src={item.photoURL}
+                    src={item.photoURL?.thumbnail}
                     alt=""
                     className="avatar"
                     onClick={() => {
@@ -1792,8 +1780,6 @@ const BoxChatGroup = () => {
       );
     });
   };
-
-
 
   useClickOutside(pickerEmojiRef, () => {
     setShowEmojiPicker(false);
@@ -2139,7 +2125,7 @@ const BoxChatGroup = () => {
 
 
   const renderMemberList = () => {
-    return infoUsers?.map((member, index) => {
+    return infoUsers?.map((member) => {
 
       return (
         <div
@@ -2147,7 +2133,7 @@ const BoxChatGroup = () => {
           key={member.uid}
           onClick={() => handleSelectTagname(member)}
         >
-          <img src={member.photoURL} alt="" className="member-item__avatar" />
+          <img src={member.photoURL.thumbnail} alt="" className="member-item__avatar" />
           <div className="member-item__name">{member.displayName}</div>
         </div>
       );

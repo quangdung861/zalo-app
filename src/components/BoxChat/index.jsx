@@ -419,6 +419,7 @@ const BoxChat = () => {
                 uid: userInfo.uid,
                 text: inputValue || "",
                 images: imgList || [],
+                infoReply: infoReply,
                 clientCreatedAt: Date.now(),
                 emojiList: [
                   {
@@ -778,7 +779,13 @@ const BoxChat = () => {
   };
 
   const handleSharingMessage = ({ infoMessage }) => {
-    setInfoMessageSharing(infoMessage);
+    let infoSend = {
+      text: infoMessage.text,
+      images: infoMessage.images,
+    };
+    setInfoMessageSharing(
+      infoSend
+    );
     setIsShowOverlayModalSharingMessage(true);
   };
 
@@ -1495,7 +1502,7 @@ const BoxChat = () => {
                             <div className="reply-content__left"></div>
                             {item.infoReply?.image && (
                               <img
-                                src={item.infoReply?.image?.url}
+                                src={item.infoReply?.image?.thumbnail}
                                 alt=""
                                 className="image-reply"
                               />
