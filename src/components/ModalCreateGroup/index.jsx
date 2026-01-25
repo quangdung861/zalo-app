@@ -12,6 +12,7 @@ import {
   where,
   addDoc,
   getDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { convertImageToBase64 } from "utils/file";
@@ -358,35 +359,47 @@ const ModalCreateGroup = ({ setIsShowOverlayModal }) => {
 
       const allUserGroup = [userInfo, ...friendsSelected];
 
-      for (let i = 0; i < allUserGroup.length; i++) {
-        const messageRef = doc(db, "users", allUserGroup[i].id);
-        await setDoc(
-          messageRef,
+      const batch = writeBatch(db); // Automic with firestore
+
+      allUserGroup.forEach(user => {
+        const userRef = doc(db, "users", user.id);
+
+        batch.set(
+          userRef,
           {
-            ...(allUserGroup[i]?.groups
-              ? {
-                groups: [
-                  ...allUserGroup[i]?.groups,
-                  {
-                    id: room.id,
-                    category: "",
-                  },
-                ],
-              }
-              : {
-                groups: [
-                  {
-                    id: room.id,
-                    category: "",
-                  },
-                ],
-              }),
+            groups: [
+              ...(user.groups || []),
+              {
+                id: room.id,
+                category: "",
+              },
+            ],
           },
-          {
-            merge: true,
-          }
+          { merge: true }
         );
-      }
+      });
+
+      await batch.commit();
+
+      // await Promise.all(
+      //   allUserGroup.map(user => {
+      //     const userRef = doc(db, "users", user.id);
+
+      //     return setDoc(
+      //       userRef,
+      //       {
+      //         groups: [
+      //           ...(user.groups || []),
+      //           {
+      //             id: room.id,
+      //             category: "",
+      //           },
+      //         ],
+      //       },
+      //       { merge: true }
+      //     );
+      //   })
+      // );
 
       const userRef = query(
         collection(db, "users"),
