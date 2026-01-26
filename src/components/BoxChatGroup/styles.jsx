@@ -686,7 +686,7 @@ export const Container = styled.div`
           }
         }
         &:first-child {
-          margin-bottom: 20px;
+          margin-bottom: 40px;
         }
         &__other {
           display: flex;
@@ -1493,6 +1493,26 @@ export const Container = styled.div`
           cursor: pointer;
         }
       }
+    }
+  }
+
+  .status-msg {
+    position: absolute;
+    bottom: -32px;
+    right: 16px;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    min-width: 80px;
+    padding: 3px 16px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    font-size: 12px;
+    user-select: none;
+    * {
+     color: rgb(241, 241, 241);
     }
   }
 
