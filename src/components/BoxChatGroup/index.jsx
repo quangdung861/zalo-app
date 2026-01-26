@@ -84,6 +84,8 @@ const BoxChatGroup = () => {
   const [isShowDropdownOption, setIsShowDropdownOption] = useState(false);
   const [isShowBackgroundModal, setIsShowBackgroundModal] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [categoryGroup, setCategoryGroup] = useState({});
 
   const pickerEmojiRef = useRef(null);
   const inputRef = useRef();
@@ -172,7 +174,70 @@ const BoxChatGroup = () => {
     clearUnreadCount();
   }, [room.totalMessages]);
 
-  const [categoryGroup, setCategoryGroup] = useState({});
+  useEffect(() => {
+    if (room?.messageLastest?.clientCreatedAt) {
+      const chatWindow = boxChatRef?.current;
+      if (showBtnUpToTop) return;
+      setTimeout(() => {
+        chatWindow.scrollTo({
+          top: chatWindow.scrollHeight,
+          behavior: "auto",
+        });
+      }, 100);
+    }
+
+  }, [room?.messageLastest?.clientCreatedAt])
+
+  useEffect(() => {
+    if (!room?.id || !userInfo?.uid || !room.messageLastest) return;
+
+    const updateMessageLatestStatus = async () => {
+      const lastMsg = room.messageLastest;
+
+      // ======================
+      // 1️⃣ RECEIVED (chỉ sender làm)
+      // ======================
+      if (lastMsg.uid === userInfo.uid) {
+        const arrOnline = infoUsers?.filter(
+          user =>
+            user.isOnline?.value === true &&
+            user.uid !== userInfo.uid &&
+            !lastMsg.receivedBy?.[user.uid]
+        );
+
+        if (arrOnline?.length) {
+          const receivedUpdates = {};
+
+          arrOnline.forEach(user => {
+            receivedUpdates[`messageLastest.receivedBy.${user.uid}`] =
+              Date.now();
+          });
+
+          await updateDoc(doc(db, "rooms", room.id), receivedUpdates);
+        }
+      }
+
+      // ======================
+      // 2️⃣ SEEN (chỉ receiver làm)
+      // ======================
+      if (
+        lastMsg.uid !== userInfo.uid &&
+        !lastMsg.seenBy?.[userInfo.uid]
+      ) {
+        await updateDoc(doc(db, "rooms", room.id), {
+          [`messageLastest.seenBy.${userInfo.uid}`]: Date.now(),
+        });
+      }
+    };
+
+    updateMessageLatestStatus();
+  }, [
+    room?.id,
+    room.messageLastest?.clientCreatedAt,
+    infoUsers,
+    userInfo?.uid,
+  ]);
+
 
   useEffect(() => {
     const infoGroup = userInfo.groups.find(
@@ -268,8 +333,6 @@ const BoxChatGroup = () => {
       e.preventDefault && e.preventDefault(); // ⛔ chặn xuống dòng
       if (inputValue || imgList[0]) {
         if (room.id) {
-          // 2. Lấy giá trị trực tiếp từ DOM (không đợi State)
-
           audio.play();
           const createMes = async () => {
             const roomRef = doc(db, "rooms", room.id);
@@ -297,6 +360,8 @@ const BoxChatGroup = () => {
                   text: inputValue || (imgList && "Hình ảnh"),
                   displayName: userInfo.displayName,
                   uid: userInfo.uid,
+                  receivedBy: null,
+                  seenBy: null,
                   clientCreatedAt: Date.now(),
                 },
                 totalMessages: room.totalMessages + 1,
@@ -412,7 +477,8 @@ const BoxChatGroup = () => {
                 text: inputValue,
                 displayName: userInfo.displayName,
                 uid: userInfo.uid,
-                clientCreatedAt: Date.now(),
+                receivedBy: null,
+                seenBy: null,
                 clientCreatedAt: Date.now(),
               },
               totalMessages: room.totalMessages + 1,
@@ -560,7 +626,6 @@ const BoxChatGroup = () => {
     setLastDoc(null)
   }, [room.id]);
 
-  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     setMessages([]);
@@ -601,19 +666,6 @@ const BoxChatGroup = () => {
 
     return () => unSubcribe && unSubcribe();
   }, [room.id]);
-
-  useEffect(() => {
-    if (room?.messageLastest?.clientCreatedAt) {
-      const chatWindow = boxChatRef?.current;
-      if (showBtnUpToTop) return;
-      setTimeout(() => {
-        chatWindow.scrollTo({
-          top: chatWindow.scrollHeight,
-          behavior: "auto",
-        });
-      }, 100);
-    }
-  }, [room?.messageLastest?.clientCreatedAt]);
 
   useEffect(() => {
     if (room.members) {
@@ -904,6 +956,29 @@ const BoxChatGroup = () => {
     return curDay !== nextDay;
   }
 
+  const getGroupMessageStatus = (room, userInfo) => {
+    if (room?.messageLastest?.uid !== userInfo.uid) return;
+    const isMe = room.messageLastest.uid === userInfo.uid;
+    if (isMe) {
+      if (Object.keys(room.messageLastest.seenBy || {}).length) {
+        return {
+          type: "seen",
+          text: <span><i className="fa-solid fa-check"></i> <i className="fa-solid fa-check"></i> &nbsp;Đã xem</span>
+        };
+      }
+      if (Object.keys(room.messageLastest.receivedBy || {}).length) {
+        return {
+          type: "received",
+          text: <span><i className="fa-solid fa-check"></i> &nbsp;Đã nhận</span>
+        };
+      }
+      return {
+        type: "sent",
+        text: <span>Đã gửi</span>
+      };
+    }
+  };
+
   const renderMessages = () => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
@@ -993,6 +1068,11 @@ const BoxChatGroup = () => {
         result.push(text.slice(lastIndex));
         return result;
       };
+
+      let statusMsg = null
+      if (index === 0) {
+        statusMsg = getGroupMessageStatus(room, userInfo);
+      }
 
       let total = 0;
 
@@ -1478,6 +1558,9 @@ const BoxChatGroup = () => {
                       )}
                     </div>
                   </div>
+                  {index === 0 && <div className="status-msg">
+                    {statusMsg?.text}
+                  </div>}
                 </div>
               </div>
             ) : (
