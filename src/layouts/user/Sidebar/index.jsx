@@ -137,9 +137,9 @@ const Sidebar = () => {
     setIsShowBoxChatGroup(false);
     setIsShowBoxChat(true);
     setSelectedUserMessaging({
-      uidSelected: roomCloud.uid,
-      photoURLSelected: roomCloud.avatar,
-      displayNameSelected: roomCloud.name,
+      uidSelected: roomCloud?.uid,
+      photoURLSelected: roomCloud?.avatar,
+      displayNameSelected: roomCloud?.name,
     });
   };
 
@@ -180,11 +180,6 @@ const Sidebar = () => {
               ref={dropdownRef}
               style={isShowDropdown ? { backgroundColor: "#006edc" } : {}}
             >
-              {/* <i
-                className="fa-solid fa-gear"
-                onClick={() => setIsShowModalConfirm("logout")
-                }
-              ></i> */}
               <i className="fa-solid fa-arrow-right-from-bracket" onClick={() => setIsShowModalConfirm("logout")
               }></i>
               {isShowDropdown && (

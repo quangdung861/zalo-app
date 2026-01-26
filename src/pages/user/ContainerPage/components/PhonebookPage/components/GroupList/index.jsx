@@ -49,7 +49,7 @@ const GroupList = () => {
     };
 
     fetchDataAsync();
-  }, [rooms]);
+  }, [rooms?.length]);
 
 
   const fetchData = async () => {
