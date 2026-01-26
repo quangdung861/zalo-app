@@ -322,18 +322,6 @@ const ModalAccount = ({
   );
 
   const SelfProfile = () => {
-    if (isShowUpdateProfile) {
-      return (
-        <UpdateProfile
-          setIsShowUpdateProfile={setIsShowUpdateProfile}
-          setIsShowOverlayModal={setIsShowOverlayModal}
-          profile={profile}
-          setProfile={setProfile}
-          userId={userInfo.id}
-          accountSelected={accountSelected}
-        />
-      );
-    }
 
     return (
       <div className="box-account-info">
@@ -595,9 +583,10 @@ const ModalAccount = ({
   );
 
   return (
+
     <div className="modal-overlay">
       <div className="container-account-info" ref={accountInfoRef}>
-        <div className="account-info">
+        {!isShowUpdateProfile && <div className="account-info">
           <div className="title">
             Thông tin tài khoản
             <i className="fa-solid fa-xmark" onClick={() => setIsShowOverlayModal(false)}></i>
@@ -605,7 +594,16 @@ const ModalAccount = ({
           {isSelf && <SelfProfile />}
           {isCloud && <CloudProfile />}
           {!isSelf && !isCloud && <OtherProfile />}
-        </div>
+        </div>}
+        {isShowUpdateProfile &&
+          <UpdateProfile
+            setIsShowUpdateProfile={setIsShowUpdateProfile}
+            setIsShowOverlayModal={setIsShowOverlayModal}
+            profile={profile}
+            setProfile={setProfile}
+            userId={userInfo.id}
+            accountSelected={accountSelected}
+          />}
         <ImagePreviewModal src={preview} onClose={closePreview} />
       </div>
       <MessageError />
