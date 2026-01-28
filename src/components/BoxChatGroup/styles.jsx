@@ -29,7 +29,6 @@ export const Container = styled.div`
         align-items: center;
         max-width: 100%;
         width: 380px;
-        overflow: hidden;
         .btn-come-back {
           display: none;
           min-width: 32px;
@@ -68,6 +67,9 @@ export const Container = styled.div`
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
+            @media only screen and (max-width: 576px) {
+              width: 150px;
+            }
           }
           .new-seperator {
             background: #d6dbe1;
