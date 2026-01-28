@@ -2287,7 +2287,7 @@ const BoxChat = () => {
               <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
-              {(room.category !== "my cloud" && isFriend !== -1) && <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
+              {(room.category !== "my cloud" && isFriend !== -1 && room.id) && <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
                 <i className="fa-solid fa-paintbrush"></i>
               </div>}
             </div>
