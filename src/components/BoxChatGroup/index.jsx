@@ -147,6 +147,12 @@ const BoxChatGroup = () => {
         setIsShowOverlayModalEmotion(false);
         setClicked("all");
       }
+      if (
+        categoryRef.current &&
+        !categoryRef.current.contains(event.target)
+      ) {
+        setCategoryDropdown(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
