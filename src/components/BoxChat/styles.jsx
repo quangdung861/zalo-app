@@ -6,8 +6,8 @@ export const Wrapper = styled.div`
   @media only screen and (max-width: 992px) {
     min-width: calc(100% - var(--sidebar-width));
   }
-   @media only screen and (max-width: 576px) {
-    position:fixed;
+  @media only screen and (max-width: 576px) {
+    position: fixed;
     inset: 0;
   }
 `;
@@ -156,18 +156,19 @@ export const Container = styled.div`
     }
     .container-content {
       min-height: calc(100dvh - var(--header-height) - var(--footer-height));
-      background-image: url(${({ background, isCloud }) => isCloud ? cloudBg : background});
+      background-image: url(${({ background, isCloud }) =>
+        isCloud ? cloudBg : background});
       background-blend-mode: multiply;
       background-color: rgba(
         ${({ isCloud }) => (isCloud ? "0, 0, 0, 0.05" : "0, 0, 0, 0.15")}
       );
       background-size: cover;
       background-repeat: no-repeat;
-       .suggest-add-friend {
+      .suggest-add-friend {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        z-index: 2; 
+        z-index: 2;
         height: 51px;
         padding: 8px 16px;
         background-color: #fff;
@@ -208,14 +209,13 @@ export const Container = styled.div`
       max-width: 100%;
       overflow-x: hidden;
       width: 100%;
-     
+
       .message-view-blur-overlay {
       }
-     max-height: ${({ isSuggest }) =>
-    isSuggest
-      ? `calc(100dvh - var(--header-height) - var(--footer-height) - var(--suggest-height))`
-      : `calc(100dvh - var(--header-height) - var(--footer-height))`
-  };
+      max-height: ${({ isSuggest }) =>
+        isSuggest
+          ? `calc(100dvh - var(--header-height) - var(--footer-height) - var(--suggest-height))`
+          : `calc(100dvh - var(--header-height) - var(--footer-height))`};
       .message-view-blur-overlay {
       }
       /* overflow: hidden; */
@@ -232,8 +232,6 @@ export const Container = styled.div`
       /* display: flex;
       flex-direction: column;
       justify-content: flex-end; */
-
-     
 
       .user-info {
         margin-top: 60px;
@@ -462,7 +460,7 @@ export const Container = styled.div`
               background-color: #e5efff;
               border-radius: 8px;
               padding: 14px;
-              max-width: 300px;
+              max-width: 400px;
               text-align: left;
               min-width: 115px;
               min-height: 83px;
@@ -767,7 +765,7 @@ export const Container = styled.div`
               border-radius: 8px;
               padding: 14px;
               line-height: 1.5rem;
-              max-width: 300px;
+              max-width: 400px;
               min-width: 115px;
               min-height: 83px;
               word-break: break-word;
@@ -1146,8 +1144,9 @@ export const Container = styled.div`
             text-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px;
             outline: none;
             resize: none;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-              "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+            font-family:
+              -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+              "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
               "Helvetica Neue", sans-serif;
             &::-webkit-scrollbar {
               appearance: none;
@@ -1157,9 +1156,10 @@ export const Container = styled.div`
               max-width: 500px;
               overflow: hidden;
               white-space: nowrap;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-                "Droid Sans", "Helvetica Neue", sans-serif;
+              font-family:
+                -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+                "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+                "Helvetica Neue", sans-serif;
             }
           }
         }
@@ -1455,8 +1455,83 @@ export const Container = styled.div`
     font-size: 12px;
     user-select: none;
     * {
-     color: rgb(241, 241, 241);
+      color: rgb(241, 241, 241);
     }
+  }
+
+  .image-group {
+    display: grid;
+    gap: 4px;
+    max-width: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .image-item {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ========== 1 ảnh ========== */
+  .image-group.count-1 {
+    grid-template-columns: 1fr;
+  }
+
+  /* ========== 2 ảnh ========== */
+  .image-group.count-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ========== 3 ảnh ========== */
+  .image-group.count-3 {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .image-group.count-3 .image-item:first-child {
+    grid-row: span 2;
+  }
+
+  /* ========== 4 ảnh ========== */
+  .image-group.count-4 {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  /* ========== 5 ảnh ========== */
+  .image-group.count-5 {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .image-group.count-5 .image-item:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  /* ========== 6+ ảnh (chuẩn bạn cần) ========== */
+  .image-group.count-6 {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  /* overlay +N */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   @keyframes selectIn {
@@ -1503,7 +1578,7 @@ export const Container = styled.div`
         padding: 0 4px;
         .right {
           padding-left: 4px;
-           .box-icon.background {
+          .box-icon.background {
             display: block;
           }
         }

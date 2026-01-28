@@ -1418,15 +1418,14 @@ const BoxChat = () => {
                             </div>
                           </div>
                         )}
-                        {item?.images[0] &&
-                          item.images.map((image, index) => {
-                            return (
-                              <img
-                                className="image-item"
+                        {item.images?.length > 0 && (
+                          <div
+                            className={`image-group count-${Math.min(item.images.length, 6)}`}
+                          >
+                            {item.images.slice(0, 6).map((image, index) => (
+                              <div
                                 key={index}
-                                src={image.thumbnail}
-                                alt=""
-                                style={{ width: "100%" }}
+                                className="image-item"
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
@@ -1437,9 +1436,18 @@ const BoxChat = () => {
                                   });
                                   setIsShowOverlayModalDetailImage(true);
                                 }}
-                              />
-                            );
-                          })}
+                              >
+                                <img src={image.thumbnail} alt="" />
+
+                                {item.images.length > 6 && index === 5 && (
+                                  <div className="overlay">
+                                    +{item.images.length - 6}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                         {item.text}
                       </>
                     ) : (
@@ -1611,14 +1619,14 @@ const BoxChat = () => {
                             </div>
                           </div>
                         )}
-                        {item.images[0] &&
-                          item.images.map((image, index) => {
-                            return (
-                              <img
+                        {item.images?.length > 0 && (
+                          <div
+                            className={`image-group count-${Math.min(item.images.length, 6)}`}
+                          >
+                            {item.images.slice(0, 6).map((image, index) => (
+                              <div
                                 key={index}
-                                src={image.thumbnail}
-                                alt=""
-                                style={{ width: "100%", cursor: "pointer" }}
+                                className="image-item"
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
@@ -1629,9 +1637,18 @@ const BoxChat = () => {
                                   });
                                   setIsShowOverlayModalDetailImage(true);
                                 }}
-                              />
-                            );
-                          })}
+                              >
+                                <img src={image.thumbnail} alt="" />
+
+                                {item.images.length > 6 && index === 5 && (
+                                  <div className="overlay">
+                                    +{item.images.length - 6}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                         {item.text}
                       </>
                     ) : (

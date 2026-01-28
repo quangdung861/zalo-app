@@ -38,14 +38,23 @@ import * as S from "./styles";
 import { useMediaQuery } from "react-responsive";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PAGE_SIZE_MESSAGES } from "constants/public";
-import { backgoundsDefault, BACKGROUND_GROUP_DEFAULT } from "../../common/BackgoundModal/constants";
+import {
+  backgoundsDefault,
+  BACKGROUND_GROUP_DEFAULT,
+} from "../../common/BackgoundModal/constants";
 import { uploadImage } from "services/uploadImage";
 import useClickOutside from "hooks/useClickOutside";
 
 const BoxChatGroup = () => {
   const isMobile = useMediaQuery({ maxWidth: 576 });
-  const { userInfo, room, selectedGroupMessaging, setSelectedGroupMessaging, startLoading, stopLoading } =
-    useContext(AppContext);
+  const {
+    userInfo,
+    room,
+    selectedGroupMessaging,
+    setSelectedGroupMessaging,
+    startLoading,
+    stopLoading,
+  } = useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
   const [mentions, setMentions] = useState([]);
 
@@ -147,10 +156,7 @@ const BoxChatGroup = () => {
         setIsShowOverlayModalEmotion(false);
         setClicked("all");
       }
-      if (
-        categoryRef.current &&
-        !categoryRef.current.contains(event.target)
-      ) {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
         setCategoryDropdown(false);
       }
     };
@@ -163,12 +169,13 @@ const BoxChatGroup = () => {
   useEffect(() => {
     const clearUnreadCount = async () => {
       if (room?.id && userInfo?.uid) {
-        const newUnreadMembers = [...room.unreadMembers].filter(uid => uid !== userInfo.uid);
+        const newUnreadMembers = [...room.unreadMembers].filter(
+          (uid) => uid !== userInfo.uid,
+        );
         try {
           await updateDoc(doc(db, "rooms", room.id), {
             [`unreadCount.${userInfo.uid}`]: 0,
             unreadMembers: newUnreadMembers,
-
           });
         } catch (error) {
           console.error("Lỗi cập nhật unreadCount:", error);
@@ -191,8 +198,7 @@ const BoxChatGroup = () => {
         });
       }, 100);
     }
-
-  }, [room?.messageLastest?.clientCreatedAt])
+  }, [room?.messageLastest?.clientCreatedAt]);
 
   useEffect(() => {
     if (!room?.id || !userInfo?.uid || !room.messageLastest) return;
@@ -205,16 +211,16 @@ const BoxChatGroup = () => {
       // ======================
       if (lastMsg.uid === userInfo.uid) {
         const arrOnline = infoUsers?.filter(
-          user =>
+          (user) =>
             user.isOnline?.value === true &&
             user.uid !== userInfo.uid &&
-            !lastMsg.receivedBy?.[user.uid]
+            !lastMsg.receivedBy?.[user.uid],
         );
 
         if (arrOnline?.length) {
           const receivedUpdates = {};
 
-          arrOnline.forEach(user => {
+          arrOnline.forEach((user) => {
             receivedUpdates[`messageLastest.receivedBy.${user.uid}`] =
               Date.now();
           });
@@ -226,10 +232,7 @@ const BoxChatGroup = () => {
       // ======================
       // 2️⃣ SEEN (chỉ receiver làm)
       // ======================
-      if (
-        lastMsg.uid !== userInfo.uid &&
-        !lastMsg.seenBy?.[userInfo.uid]
-      ) {
+      if (lastMsg.uid !== userInfo.uid && !lastMsg.seenBy?.[userInfo.uid]) {
         await updateDoc(doc(db, "rooms", room.id), {
           [`messageLastest.seenBy.${userInfo.uid}`]: Date.now(),
         });
@@ -244,14 +247,13 @@ const BoxChatGroup = () => {
     userInfo?.uid,
   ]);
 
-
   useEffect(() => {
     const infoGroup = userInfo.groups.find(
-      (item) => item.id === selectedGroupMessaging?.room?.id
+      (item) => item.id === selectedGroupMessaging?.room?.id,
     );
 
     const categoryResult = userInfo.categoriesTemplate.find(
-      (item) => item.name === infoGroup?.category
+      (item) => item.name === infoGroup?.category,
     );
 
     setCategoryGroup(categoryResult);
@@ -259,7 +261,7 @@ const BoxChatGroup = () => {
 
   const handleCategoryUser = async (value) => {
     const groupIndex = userInfo.groups.findIndex(
-      (item) => item.id === selectedGroupMessaging.room.id
+      (item) => item.id === selectedGroupMessaging.room.id,
     );
 
     const newGroups = userInfo.groups;
@@ -279,7 +281,7 @@ const BoxChatGroup = () => {
         },
         {
           merge: true,
-        }
+        },
       );
       stopLoading();
       return;
@@ -299,7 +301,7 @@ const BoxChatGroup = () => {
       },
       {
         merge: true,
-      }
+      },
     );
     setCategoryDropdown(false);
     stopLoading();
@@ -307,7 +309,7 @@ const BoxChatGroup = () => {
 
   const handleFocus = () => {
     const toolbarChatInputElement = document.querySelector(
-      ".toolbar-chat-input"
+      ".toolbar-chat-input",
     );
     Object.assign(toolbarChatInputElement.style, {
       borderBottom: "1px solid #0068FF",
@@ -316,7 +318,7 @@ const BoxChatGroup = () => {
 
   const handleBlur = () => {
     const toolbarChatInputElement = document.querySelector(
-      ".toolbar-chat-input"
+      ".toolbar-chat-input",
     );
     Object.assign(toolbarChatInputElement.style, {
       borderBottom: "1px solid var(--boder-dividing-color)",
@@ -328,9 +330,7 @@ const BoxChatGroup = () => {
       text: infoMessage.text,
       images: infoMessage.images,
     };
-    setInfoMessageSharing(
-      infoSend
-    );
+    setInfoMessageSharing(infoSend);
     setIsShowOverlayModalSharingMessage(true);
   };
 
@@ -347,7 +347,9 @@ const BoxChatGroup = () => {
             const unreadCount = room.unreadCount || {};
 
             const newUnreadCount = { ...unreadCount };
-            const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
+            const newUnreadMembers = [...members].filter(
+              (uid) => uid !== userInfo.uid,
+            );
 
             members.forEach((uid) => {
               if (uid === userInfo.uid) {
@@ -374,7 +376,9 @@ const BoxChatGroup = () => {
                 unreadCount: newUnreadCount,
                 unreadMembers: newUnreadMembers,
                 ...(room.mentioned && {
-                  mentioned: [...new Set([...room.mentioned, ...mentionsOnlyId])],
+                  mentioned: [
+                    ...new Set([...room.mentioned, ...mentionsOnlyId]),
+                  ],
                 }),
                 ...(!room.mentioned && {
                   mentioned: mentionsOnlyId,
@@ -383,7 +387,7 @@ const BoxChatGroup = () => {
               },
               {
                 merge: true,
-              }
+              },
             );
 
             addDocument("messages", {
@@ -428,7 +432,7 @@ const BoxChatGroup = () => {
       setIsReplyMessage(false);
       setInfoReply({});
       setInputValue("");
-      setMentions([])
+      setMentions([]);
 
       if (inputRef?.current) {
         setTimeout(() => {
@@ -453,7 +457,6 @@ const BoxChatGroup = () => {
     };
   };
 
-
   const handleClickSentMessage = () => {
     if (inputValue) {
       if (room.id) {
@@ -465,7 +468,9 @@ const BoxChatGroup = () => {
           const unreadCount = room.unreadCount || {};
 
           const newUnreadCount = { ...unreadCount };
-          const newUnreadMembers = [...members].filter(uid => uid !== userInfo.uid);
+          const newUnreadMembers = [...members].filter(
+            (uid) => uid !== userInfo.uid,
+          );
 
           members.forEach((uid) => {
             if (uid === userInfo.uid) {
@@ -500,7 +505,7 @@ const BoxChatGroup = () => {
             },
             {
               merge: true,
-            }
+            },
           );
 
           await addDocument("messages", {
@@ -544,7 +549,7 @@ const BoxChatGroup = () => {
       setIsReplyMessage(false);
       setInfoReply({});
       setInputValue("");
-      setMentions([])
+      setMentions([]);
 
       if (inputRef?.current) {
         setTimeout(() => {
@@ -567,14 +572,13 @@ const BoxChatGroup = () => {
     setTimeout(function () {
       setIsShowMessageError(false);
     }, 3000);
-  }
+  };
 
   const MAX_FILES = 10;
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
 
   const handleUploadImage = async (event) => {
-
     const files = Array.from(event.target.files);
     if (!files.length) return;
 
@@ -585,7 +589,7 @@ const BoxChatGroup = () => {
     }
 
     // 2️⃣ Check size từng file
-    if (files.some(file => file.size > MAX_FILE_SIZE)) {
+    if (files.some((file) => file.size > MAX_FILE_SIZE)) {
       showError("Mỗi ảnh không được vượt quá 10MB");
       return;
     }
@@ -601,9 +605,7 @@ const BoxChatGroup = () => {
 
     try {
       // 4️⃣ Upload song song + chờ xong
-      const imgList = await Promise.all(
-        files.map(file => uploadImage(file))
-      );
+      const imgList = await Promise.all(files.map((file) => uploadImage(file)));
 
       const e = {
         key: "Enter",
@@ -611,7 +613,6 @@ const BoxChatGroup = () => {
       };
 
       handleKeyDown(imgList, e);
-
     } catch (error) {
       console.error(error);
       showError("Upload ảnh thất bại, vui lòng thử lại");
@@ -627,11 +628,10 @@ const BoxChatGroup = () => {
     if (inputRef) {
       inputRef.current.focus();
     }
-    setMessages([])
+    setMessages([]);
     setHasMore(true);
-    setLastDoc(null)
+    setLastDoc(null);
   }, [room.id]);
-
 
   useEffect(() => {
     setMessages([]);
@@ -642,23 +642,26 @@ const BoxChatGroup = () => {
           collection(db, "messages"),
           where("roomId", "==", room.id),
           orderBy("clientCreatedAt", "desc"),
-          limit(PAGE_SIZE_MESSAGES)
+          limit(PAGE_SIZE_MESSAGES),
         );
-        unSubcribe = onSnapshot(messagesRef, (docsSnap) => {
-          const documents = docsSnap.docs.map((doc) => {
-            const id = doc.id;
-            const data = doc.data();
-            return {
-              ...data,
-              id: id,
-            };
-          });
-          setMessages(documents);
-          setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
-        },
+        unSubcribe = onSnapshot(
+          messagesRef,
+          (docsSnap) => {
+            const documents = docsSnap.docs.map((doc) => {
+              const id = doc.id;
+              const data = doc.data();
+              return {
+                ...data,
+                id: id,
+              };
+            });
+            setMessages(documents);
+            setLastDoc(docsSnap.docs[docsSnap.docs.length - 1] || null);
+          },
           (error) => {
             console.error("🔥 onSnapshot messages error:", error);
-          });
+          },
+        );
       };
       handleSnapShotMessage();
     }
@@ -678,7 +681,7 @@ const BoxChatGroup = () => {
       const fetchData = async () => {
         const docRef = query(
           collection(db, "users"),
-          where("uid", "in", room.members)
+          where("uid", "in", room.members),
         );
         startLoading();
         const reponse = await getDocs(docRef);
@@ -705,7 +708,7 @@ const BoxChatGroup = () => {
     const chatWindow = boxChatRef?.current;
     if (chatWindow) {
       const isNearTop = Math.abs(chatWindow.scrollTop) < 200;
-      setShowBtnUpToTop(!isNearTop)
+      setShowBtnUpToTop(!isNearTop);
     }
   };
 
@@ -782,11 +785,7 @@ const BoxChatGroup = () => {
     if (diffSeconds < 30) {
       const messageRef = doc(db, "messages", id);
 
-      await setDoc(
-        messageRef,
-        { isRecall: true },
-        { merge: true }
-      );
+      await setDoc(messageRef, { isRecall: true }, { merge: true });
 
       stopLoading();
       return;
@@ -816,7 +815,7 @@ const BoxChatGroup = () => {
       },
       {
         merge: true,
-      }
+      },
     );
     stopLoading();
   };
@@ -831,12 +830,12 @@ const BoxChatGroup = () => {
       });
 
       return { ...emojiItem, uids: updatedUids };
-    })
+    });
 
     const myData = emojiList.find((item) => item.id === id);
 
     const myDataIndex = myData.uids.findIndex(
-      (item) => item.uid === userInfo.uid
+      (item) => item.uid === userInfo.uid,
     );
 
     if (myDataIndex !== -1) {
@@ -852,7 +851,6 @@ const BoxChatGroup = () => {
               ?.quantity + 1,
         });
 
-
       const messagesRef = doc(db, "messages", message.id);
       startLoading();
       await setDoc(
@@ -862,7 +860,7 @@ const BoxChatGroup = () => {
         },
         {
           merge: true,
-        }
+        },
       );
       stopLoading();
       setEmojis();
@@ -884,7 +882,7 @@ const BoxChatGroup = () => {
         },
         {
           merge: true,
-        }
+        },
       );
       stopLoading();
       setEmojis();
@@ -915,7 +913,7 @@ const BoxChatGroup = () => {
       },
       {
         merge: true,
-      }
+      },
     );
     stopLoading();
     setEmojis();
@@ -933,14 +931,12 @@ const BoxChatGroup = () => {
     const msgDate = startOfDay(clientCreatedAt);
     const today = startOfDay(new Date());
 
-    const diffDays =
-      (today - msgDate) / (1000 * 60 * 60 * 24);
+    const diffDays = (today - msgDate) / (1000 * 60 * 60 * 24);
 
     if (diffDays === 0) return "Hôm nay";
     if (diffDays === 1) return "Hôm qua";
 
-    const sameYear =
-      msgDate.getFullYear() === today.getFullYear();
+    const sameYear = msgDate.getFullYear() === today.getFullYear();
 
     if (sameYear) {
       return msgDate.toLocaleDateString("vi-VN", {
@@ -969,18 +965,27 @@ const BoxChatGroup = () => {
       if (Object.keys(room.messageLastest.seenBy || {}).length) {
         return {
           type: "seen",
-          text: <span><i className="fa-solid fa-check"></i> <i className="fa-solid fa-check"></i> &nbsp;Đã xem</span>
+          text: (
+            <span>
+              <i className="fa-solid fa-check"></i>{" "}
+              <i className="fa-solid fa-check"></i> &nbsp;Đã xem
+            </span>
+          ),
         };
       }
       if (Object.keys(room.messageLastest.receivedBy || {}).length) {
         return {
           type: "received",
-          text: <span><i className="fa-solid fa-check"></i> &nbsp;Đã nhận</span>
+          text: (
+            <span>
+              <i className="fa-solid fa-check"></i> &nbsp;Đã nhận
+            </span>
+          ),
         };
       }
       return {
         type: "sent",
-        text: <span>Đã gửi</span>
+        text: <span>Đã gửi</span>,
       };
     }
   };
@@ -988,7 +993,7 @@ const BoxChatGroup = () => {
   const renderMessages = () => {
     return messages?.map((item, index) => {
       const infoDeleted = room.deleted?.find(
-        (item) => item.uid === userInfo.uid
+        (item) => item.uid === userInfo.uid,
       );
 
       if (infoDeleted) {
@@ -1000,7 +1005,7 @@ const BoxChatGroup = () => {
       }
 
       const newInfoUser = infoUsers?.find(
-        (infoUser) => infoUser.uid === item.uid
+        (infoUser) => infoUser.uid === item.uid,
       );
 
       if (item.isDeleted?.includes(userInfo.uid)) {
@@ -1031,13 +1036,8 @@ const BoxChatGroup = () => {
 
         CREATEDAT_URL = formattedDate;
 
-        return (
-          <div className="format-date-message">
-            {formattedDate}
-          </div>
-        );
+        return <div className="format-date-message">{formattedDate}</div>;
       };
-
 
       const renderText = () => {
         let text = item.text;
@@ -1047,9 +1047,7 @@ const BoxChatGroup = () => {
         const result = [];
         let lastIndex = 0;
 
-        const sortedMentions = [...mentions].sort(
-          (a, b) => a.start - b.start
-        );
+        const sortedMentions = [...mentions].sort((a, b) => a.start - b.start);
 
         sortedMentions.forEach((m) => {
           if (m.start < lastIndex || m.start < 0 || m.end > text.length) {
@@ -1059,13 +1057,9 @@ const BoxChatGroup = () => {
           result.push(text.slice(lastIndex, m.start));
 
           result.push(
-            <span
-              key={m.key}
-              className="mention"
-              data-id={m.userId}
-            >
+            <span key={m.key} className="mention" data-id={m.userId}>
               {text.slice(m.start, m.end)}
-            </span>
+            </span>,
           );
 
           lastIndex = m.end;
@@ -1075,7 +1069,7 @@ const BoxChatGroup = () => {
         return result;
       };
 
-      let statusMsg = null
+      let statusMsg = null;
       if (index === 0) {
         statusMsg = getGroupMessageStatus(room, userInfo);
       }
@@ -1089,17 +1083,17 @@ const BoxChatGroup = () => {
       });
 
       const isNewest = item.emojiList?.find((emoji) =>
-        emoji.uids.find((item) => item.uid === userInfo.uid && item.isNewest)
+        emoji.uids.find((item) => item.uid === userInfo.uid && item.isNewest),
       );
 
       const sortedEmojiList = item.emojiList?.sort((a, b) => {
         const sumQuantityA = a.uids.reduce(
           (total, uid) => total + uid.quantity,
-          0
+          0,
         );
         const sumQuantityB = b.uids?.reduce(
           (total, uid) => total + uid.quantity,
-          0
+          0,
         );
 
         return sumQuantityB - sumQuantityA; // Sắp xếp theo thứ tự giảm dần
@@ -1119,7 +1113,7 @@ const BoxChatGroup = () => {
       const userInEmojiList = [];
 
       sortedEmojiList?.forEach((item) =>
-        item.uids.forEach((uid) => userInEmojiList.push(uid.uid))
+        item.uids.forEach((uid) => userInEmojiList.push(uid.uid)),
       );
 
       const uniqueUserInEmojiList = [...new Set(userInEmojiList)];
@@ -1191,7 +1185,7 @@ const BoxChatGroup = () => {
                           }
                           alt=""
                         />
-                      )
+                      ),
                   )}
 
                   <span
@@ -1214,10 +1208,7 @@ const BoxChatGroup = () => {
 
       return (
         <React.Fragment key={item.id}>
-          <div
-            className="message-item"
-            onMouseLeave={() => setEmojis()}
-          >
+          <div className="message-item" onMouseLeave={() => setEmojis()}>
             {isShowOverlayModalEmotion?.message?.id === item.id && (
               <div className="modal-emoji-overlay">
                 <div className="modal-container">
@@ -1237,29 +1228,32 @@ const BoxChatGroup = () => {
                     <div className="modal-content__content">
                       <div className="filter-category-list">
                         <div
-                          className={`filter-category-item ${clicked === "all" ? "clicked" : ""
-                            }`}
+                          className={`filter-category-item ${
+                            clicked === "all" ? "clicked" : ""
+                          }`}
                           onClick={() => setClicked("all")}
                         >
                           Tất cả {total}
                           <div
-                            className={`dividing-bottom ${clicked === "all" ? "clicked" : ""
-                              }`}
+                            className={`dividing-bottom ${
+                              clicked === "all" ? "clicked" : ""
+                            }`}
                           ></div>
                         </div>
                         {sortedEmojiList.map(
                           (emoji) =>
                             emoji.uids[0] && (
                               <div
-                                className={`filter-category-item ${clicked === emoji.id ? "clicked" : ""
-                                  }`}
+                                className={`filter-category-item ${
+                                  clicked === emoji.id ? "clicked" : ""
+                                }`}
                                 key={emoji.id}
                                 onClick={() => setClicked(emoji.id)}
                               >
                                 <img
                                   src={
                                     dataIconEmoji.find(
-                                      (item) => item.id === emoji.id
+                                      (item) => item.id === emoji.id,
                                     ).src
                                   }
                                   alt=""
@@ -1267,14 +1261,15 @@ const BoxChatGroup = () => {
                                 {emoji.uids.reduce(
                                   (accumulator, currentValue) =>
                                     accumulator + currentValue.quantity,
-                                  0
+                                  0,
                                 )}
                                 <div
-                                  className={`dividing-bottom ${clicked === emoji.id ? "clicked" : ""
-                                    }`}
+                                  className={`dividing-bottom ${
+                                    clicked === emoji.id ? "clicked" : ""
+                                  }`}
                                 ></div>
                               </div>
-                            )
+                            ),
                         )}
                         <div className="dividing-selected"></div>
                       </div>
@@ -1381,7 +1376,8 @@ const BoxChatGroup = () => {
                       <div
                         className="dropdown-username-reaction"
                         style={{
-                          bottom: messages.length - 1 === index ? "46px" : "auto",
+                          bottom:
+                            messages.length - 1 === index ? "46px" : "auto",
                           top: messages.length - 1 === index ? "auto" : "100%",
                         }}
                       >
@@ -1412,14 +1408,14 @@ const BoxChatGroup = () => {
                             </div>
                           </div>
                         )}
-                        {item.images[0] &&
-                          item.images.map((image, index) => {
-                            return (
-                              <img
+                        {item.images?.length > 0 && (
+                          <div
+                            className={`image-group count-${Math.min(item.images.length, 6)}`}
+                          >
+                            {item.images.slice(0, 6).map((image, index) => (
+                              <div
                                 key={index}
-                                src={image.thumbnail}
-                                alt=""
-                                style={{ width: "100%", cursor: "pointer" }}
+                                className="image-item"
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
@@ -1430,9 +1426,18 @@ const BoxChatGroup = () => {
                                   });
                                   setIsShowOverlayModalDetailImage(true);
                                 }}
-                              />
-                            );
-                          })}
+                              >
+                                <img src={image.thumbnail} alt="" />
+
+                                {item.images.length > 6 && index === 5 && (
+                                  <div className="overlay">
+                                    +{item.images.length - 6}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {renderText()}
                       </>
@@ -1458,7 +1463,7 @@ const BoxChatGroup = () => {
                             <img
                               src={
                                 dataIconEmoji.find(
-                                  (item) => item.id === isNewest.id
+                                  (item) => item.id === isNewest.id,
                                 ).src
                               }
                               alt=""
@@ -1490,12 +1495,12 @@ const BoxChatGroup = () => {
                                     key={emoji.id}
                                     src={
                                       dataIconEmoji.find(
-                                        (item) => item.id === emoji.id
+                                        (item) => item.id === emoji.id,
                                       ).src
                                     }
                                     alt=""
                                   />
-                                )
+                                ),
                             )}
                         </div>
                       </div>
@@ -1558,15 +1563,17 @@ const BoxChatGroup = () => {
                           />
                           <i
                             className="fa-solid fa-xmark btn-close"
-                            onClick={() => handleRemoveEmojis({ message: item })}
+                            onClick={() =>
+                              handleRemoveEmojis({ message: item })
+                            }
                           ></i>
                         </div>
                       )}
                     </div>
                   </div>
-                  {index === 0 && <div className="status-msg">
-                    {statusMsg?.text}
-                  </div>}
+                  {index === 0 && (
+                    <div className="status-msg">{statusMsg?.text}</div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -1615,14 +1622,14 @@ const BoxChatGroup = () => {
                             </div>
                           </div>
                         )}
-                        {item?.images[0] &&
-                          item.images.map((image, index) => {
-                            return (
-                              <img
+                        {item.images?.length > 0 && (
+                          <div
+                            className={`image-group count-${Math.min(item.images.length, 6)}`}
+                          >
+                            {item.images.slice(0, 6).map((image, index) => (
+                              <div
                                 key={index}
-                                src={image.thumbnail}
-                                alt=""
-                                style={{ width: "100%", cursor: "pointer" }}
+                                className="image-item"
                                 onClick={() => {
                                   setMessageSelected({
                                     ...newInfoUser,
@@ -1633,9 +1640,18 @@ const BoxChatGroup = () => {
                                   });
                                   setIsShowOverlayModalDetailImage(true);
                                 }}
-                              />
-                            );
-                          })}
+                              >
+                                <img src={image.thumbnail} alt="" />
+
+                                {item.images.length > 6 && index === 5 && (
+                                  <div className="overlay">
+                                    +{item.images.length - 6}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {renderText()}
                       </>
@@ -1660,7 +1676,7 @@ const BoxChatGroup = () => {
                             <img
                               src={
                                 dataIconEmoji.find(
-                                  (item) => item.id === isNewest.id
+                                  (item) => item.id === isNewest.id,
                                 ).src
                               }
                               alt=""
@@ -1692,12 +1708,12 @@ const BoxChatGroup = () => {
                                     key={emoji.id}
                                     src={
                                       dataIconEmoji.find(
-                                        (item) => item.id === emoji.id
+                                        (item) => item.id === emoji.id,
                                       ).src
                                     }
                                     alt=""
                                   />
-                                )
+                                ),
                             )}
                         </div>
                       </div>
@@ -1768,7 +1784,9 @@ const BoxChatGroup = () => {
                           />
                           <i
                             className="fa-solid fa-xmark btn-close"
-                            onClick={() => handleRemoveEmojis({ message: item })}
+                            onClick={() =>
+                              handleRemoveEmojis({ message: item })
+                            }
                           ></i>
                         </div>
                       )}
@@ -1777,7 +1795,8 @@ const BoxChatGroup = () => {
                       <div
                         className="dropdown-username-reaction"
                         style={{
-                          bottom: messages.length - 1 === index ? "46px" : "auto",
+                          bottom:
+                            messages.length - 1 === index ? "46px" : "auto",
                           top: messages.length - 1 === index ? "auto" : "100%",
                         }}
                       >
@@ -1951,9 +1970,7 @@ const BoxChatGroup = () => {
 
     setInputValue(value);
 
-    setMentions((prev) =>
-      syncMentionsWithText(prevText, value, prev)
-    );
+    setMentions((prev) => syncMentionsWithText(prevText, value, prev));
 
     let shouldOpenDropdown = false;
 
@@ -1993,7 +2010,7 @@ const BoxChatGroup = () => {
         startLoading();
         const partnerRef = query(
           collection(db, "users"),
-          where("uid", "in", room.members)
+          where("uid", "in", room.members),
         );
         const response = await getDocs(partnerRef);
         const documents = response.docs
@@ -2027,7 +2044,7 @@ const BoxChatGroup = () => {
   const renderContainerImages = () => {
     return messages.map((item) => {
       const newInfoUser = infoUsers?.find(
-        (infoUser) => infoUser.uid === item.uid
+        (infoUser) => infoUser.uid === item.uid,
       );
 
       let CREATEDAT_URL;
@@ -2071,14 +2088,14 @@ const BoxChatGroup = () => {
             }
             style={
               item.id === messageSelected.MESSAGE_ID &&
-                index === messageSelected.IMAGE_INDEX
+              index === messageSelected.IMAGE_INDEX
                 ? {
-                  minWidth: "100px",
-                  minHeight: "100px",
-                  filter: "none",
-                  border: "2px solid #fff",
-                  transition: "all .3s ease",
-                }
+                    minWidth: "100px",
+                    minHeight: "100px",
+                    filter: "none",
+                    border: "2px solid #fff",
+                    transition: "all .3s ease",
+                  }
                 : {}
             }
           />
@@ -2177,7 +2194,6 @@ const BoxChatGroup = () => {
       // });
       inputRef.current.focus();
 
-
       return;
     }
 
@@ -2187,9 +2203,7 @@ const BoxChatGroup = () => {
     const end = start + mentionText.length - 1;
 
     const nextText =
-      inputValue.slice(0, start) +
-      mentionText +
-      inputValue.slice(range.end);
+      inputValue.slice(0, start) + mentionText + inputValue.slice(range.end);
 
     setInputValue(nextText);
     prevValueRef.current = nextText;
@@ -2211,20 +2225,21 @@ const BoxChatGroup = () => {
     //     start + mentionText.length;
     // });
     inputRef.current.focus();
-
   };
-
 
   const renderMemberList = () => {
     return infoUsers?.map((member) => {
-
       return (
         <div
           className="member-item"
           key={member.uid}
           onClick={() => handleSelectTagname(member)}
         >
-          <img src={member.photoURL.thumbnail} alt="" className="member-item__avatar" />
+          <img
+            src={member.photoURL.thumbnail}
+            alt=""
+            className="member-item__avatar"
+          />
           <div className="member-item__name">{member.displayName}</div>
         </div>
       );
@@ -2255,7 +2270,7 @@ const BoxChatGroup = () => {
       where("roomId", "==", room.id),
       orderBy("clientCreatedAt", "desc"),
       startAfter(lastDoc),
-      limit(PAGE_SIZE_MESSAGES)
+      limit(PAGE_SIZE_MESSAGES),
     );
 
     const snap = await getDocs(messageRef);
@@ -2278,7 +2293,7 @@ const BoxChatGroup = () => {
     ...(userBackground ? [userBackground] : []),
     ...backgoundsDefault,
   ];
-  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("")
+  const [backgroundOriginalAll, setBackgroundOriginalAll] = useState("");
 
   const [currentIndex, setCurrentIndex] = useState(null);
 
@@ -2288,25 +2303,30 @@ const BoxChatGroup = () => {
 
     if (typeof index === "number") {
       setCurrentIndex(index);
-    } else { // null or undefined
+    } else {
+      // null or undefined
       if (room?.settings?.background?.original) {
-        setCurrentIndex(null)
+        setCurrentIndex(null);
         setBackgroundOriginalAll(room?.settings?.background?.original);
       } else {
         setCurrentIndex(BACKGROUND_GROUP_DEFAULT);
       }
     }
-  }
+  };
 
   useEffect(() => {
     initInfoBackground();
   }, [room, userInfo.uid]);
 
-
   return (
     <S.Wrapper>
-      <S.Container isReplyMessage={isReplyMessage}
-        background={typeof currentIndex === "number" ? backgrounds?.[currentIndex]?.original : backgroundOriginalAll}
+      <S.Container
+        isReplyMessage={isReplyMessage}
+        background={
+          typeof currentIndex === "number"
+            ? backgrounds?.[currentIndex]?.original
+            : backgroundOriginalAll
+        }
       >
         <div className="box-chat">
           <div className="box-chat__header">
@@ -2319,7 +2339,10 @@ const BoxChatGroup = () => {
                 onClick={() => setIsShowOverlayModal(true)}
               >
                 {selectedGroupMessaging?.room?.avatar?.original ? (
-                  <img src={selectedGroupMessaging?.room?.avatar?.original} alt="" />
+                  <img
+                    src={selectedGroupMessaging?.room?.avatar?.original}
+                    alt=""
+                  />
                 ) : (
                   <AvatarGroup
                     props={{
@@ -2330,7 +2353,8 @@ const BoxChatGroup = () => {
                 )}
               </div>
               <div className="user-info">
-                <div className="display-name"
+                <div
+                  className="display-name"
                   onClick={() => setIsShowOverlayModal(true)}
                 >
                   {selectedGroupMessaging?.room?.name
@@ -2402,14 +2426,33 @@ const BoxChatGroup = () => {
               <div className="box-icon background">
                 <i className="fa-solid fa-chart-bar"></i>
               </div> */}
-              <div className="box-icon" onClick={() => setIsShowBackgroundModal(true)} >
+              <div
+                className="box-icon"
+                onClick={() => setIsShowBackgroundModal(true)}
+              >
                 <i className="fa-solid fa-paintbrush"></i>
               </div>
-              {isShowBackgroundModal && <BackgoundModal text="Đổi hình nền mọi người" initInfoBackground={initInfoBackground} backgrounds={backgrounds} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} uid={userInfo.uid} members={room.members} roomId={room.id} setIsShowBackgroundModal={setIsShowBackgroundModal} />}
+              {isShowBackgroundModal && (
+                <BackgoundModal
+                  text="Đổi hình nền mọi người"
+                  initInfoBackground={initInfoBackground}
+                  backgrounds={backgrounds}
+                  currentIndex={currentIndex}
+                  setCurrentIndex={setCurrentIndex}
+                  uid={userInfo.uid}
+                  members={room.members}
+                  roomId={room.id}
+                  setIsShowBackgroundModal={setIsShowBackgroundModal}
+                />
+              )}
             </div>
           </div>
           <div className="container-content">
-            <div id="parentScrollDiv-boxchat" className="box-chat__content" ref={boxChatRef}>
+            <div
+              id="parentScrollDiv-boxchat"
+              className="box-chat__content"
+              ref={boxChatRef}
+            >
               <InfiniteScroll
                 inverse={true}
                 dataLength={messages.length}
@@ -2425,11 +2468,15 @@ const BoxChatGroup = () => {
                   </div>
                 )}
                 <div className="user-info">
-                  <div className="user-info__avatar"
+                  <div
+                    className="user-info__avatar"
                     onClick={() => setIsShowOverlayModal(true)}
                   >
                     {selectedGroupMessaging?.room?.avatar?.thumbnail ? (
-                      <img src={selectedGroupMessaging?.room?.avatar?.thumbnail} alt="" />
+                      <img
+                        src={selectedGroupMessaging?.room?.avatar?.thumbnail}
+                        alt=""
+                      />
                     ) : (
                       <AvatarGroup
                         props={{
@@ -2545,9 +2592,7 @@ const BoxChatGroup = () => {
                     <div className="member-list">
                       <div
                         className="member-item"
-                        onClick={() =>
-                          handleSelectTagname()
-                        }
+                        onClick={() => handleSelectTagname()}
                       >
                         <div>
                           <div className="left left--tag">
@@ -2574,10 +2619,15 @@ const BoxChatGroup = () => {
                   onKeyDown={(e) => handleKeyDown([], e)}
                   onFocus={(e) => handleFocus()}
                   onBlur={() => handleBlur()}
-                  style={{ width: "100%", height: "58px", textShadow: "none", wordBreak: "break-word" }}
+                  style={{
+                    width: "100%",
+                    height: "58px",
+                    textShadow: "none",
+                    wordBreak: "break-word",
+                  }}
                   placeholder={`Nhập @, tin nhắn tới ${formatPlaceholderName(
                     room,
-                    selectedGroupMessaging
+                    selectedGroupMessaging,
                   )}`}
                 >
                   {(text) => {
@@ -2587,12 +2637,16 @@ const BoxChatGroup = () => {
                     let lastIndex = 0;
 
                     const sortedMentions = [...mentions].sort(
-                      (a, b) => a.start - b.start
+                      (a, b) => a.start - b.start,
                     );
 
                     sortedMentions.forEach((m) => {
                       // guard CHỈ để tránh crash, KHÔNG validate text
-                      if (m.start < lastIndex || m.start < 0 || m.end > text.length) {
+                      if (
+                        m.start < lastIndex ||
+                        m.start < 0 ||
+                        m.end > text.length
+                      ) {
                         return;
                       }
 
@@ -2600,12 +2654,12 @@ const BoxChatGroup = () => {
 
                       result.push(
                         <span
-                          key={m.key}              // ✅ identity ổn định
+                          key={m.key} // ✅ identity ổn định
                           className="mention"
                           data-id={m.userId}
                         >
                           {text.slice(m.start, m.end)}
-                        </span>
+                        </span>,
                       );
 
                       lastIndex = m.end;
