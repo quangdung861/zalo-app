@@ -175,13 +175,14 @@ const FormEmail = () => {
 
   const createRegister = async () => {
     try {
-      const data = await createUserWithEmailAndPassword(
+      let data = await createUserWithEmailAndPassword(
         auth,
         formData.email.value,
         formData.password.value
       );
       if (data) {
         const { isNewUser } = getAdditionalUserInfo(data);
+        data.user.displayName = formData.fullName.value;
         if (isNewUser) {
           const userPayload = createUserPayload(data);
           addDocument("users",
