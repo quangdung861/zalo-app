@@ -6,7 +6,7 @@ export const Wrapper = styled.div`
     min-width: calc(100% - var(--sidebar-width));
   }
   @media only screen and (max-width: 576px) {
-    position:fixed;
+    position: fixed;
     inset: 0;
   }
 `;
@@ -152,7 +152,7 @@ export const Container = styled.div`
       background-color: rgba(0, 0, 0, 0.15);
       background-size: cover;
       background-repeat: no-repeat;
-    } 
+    }
     &__content {
       display: flex;
       flex-direction: column-reverse;
@@ -422,7 +422,7 @@ export const Container = styled.div`
               background-color: #e5efff;
               border-radius: 8px;
               padding: 14px;
-              max-width: 300px;
+              max-width: 400px;
               text-align: left;
               min-width: 115px;
               min-height: 83px;
@@ -616,6 +616,7 @@ export const Container = styled.div`
                 margin-bottom: 10px;
               }
             }
+            
           }
           .container-options {
             position: relative;
@@ -720,7 +721,7 @@ export const Container = styled.div`
               border-radius: 8px;
               padding: 14px;
               line-height: 1.5rem;
-              max-width: 300px;
+              max-width: 400px;
               min-width: 115px;
               min-height: 83px;
               word-break: break-word;
@@ -1202,8 +1203,9 @@ export const Container = styled.div`
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-word;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-              "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+            font-family:
+              -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+              "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
               "Helvetica Neue", sans-serif;
             &::-webkit-scrollbar {
               appearance: none;
@@ -1213,9 +1215,10 @@ export const Container = styled.div`
               max-width: 500px;
               overflow: hidden;
               white-space: nowrap;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-                "Droid Sans", "Helvetica Neue", sans-serif;
+              font-family:
+                -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+                "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+                "Helvetica Neue", sans-serif;
             }
           }
         }
@@ -1514,9 +1517,84 @@ export const Container = styled.div`
     font-size: 12px;
     user-select: none;
     * {
-     color: rgb(241, 241, 241);
+      color: rgb(241, 241, 241);
     }
   }
+
+  .image-group {
+              display: grid;
+              gap: 4px;
+              max-width: 400px;
+              border-radius: 12px;
+              overflow: hidden;
+            }
+
+            .image-item {
+              position: relative;
+              cursor: pointer;
+            }
+
+            .image-item img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+
+            /* ========== 1 ảnh ========== */
+            .image-group.count-1 {
+              grid-template-columns: 1fr;
+            }
+
+            /* ========== 2 ảnh ========== */
+            .image-group.count-2 {
+              grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* ========== 3 ảnh ========== */
+            .image-group.count-3 {
+              grid-template-columns: 2fr 1fr;
+              grid-template-rows: repeat(2, 1fr);
+            }
+
+            .image-group.count-3 .image-item:first-child {
+              grid-row: span 2;
+            }
+
+            /* ========== 4 ảnh ========== */
+            .image-group.count-4 {
+              grid-template-columns: repeat(2, 1fr);
+              grid-template-rows: repeat(2, 1fr);
+            }
+
+            /* ========== 5 ảnh ========== */
+            .image-group.count-5 {
+              grid-template-columns: repeat(3, 1fr);
+              grid-template-rows: repeat(2, 1fr);
+            }
+
+            .image-group.count-5 .image-item:first-child {
+              grid-column: span 2;
+              grid-row: span 2;
+            }
+
+            /* ========== 6+ ảnh (chuẩn bạn cần) ========== */
+            .image-group.count-6 {
+              grid-template-columns: repeat(3, 1fr);
+              grid-template-rows: repeat(2, 1fr);
+            }
+
+            /* overlay +N */
+            .overlay {
+              position: absolute;
+              inset: 0;
+              background: rgba(0, 0, 0, 0.55);
+              color: #fff;
+              font-size: 22px;
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
 
   @keyframes zoom {
     0% {
